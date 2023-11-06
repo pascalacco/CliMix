@@ -1,6 +1,6 @@
 # CliMix
 
-Pour générer la doc dans votre répertoire git allez voir les [instructions sur le Github](https://github.com/pascalacco/CliMix/blob/master/doc/source/doc_howto.md)
+Pour générer la doc dans votre répertoire git allez voir les [instructions sur le Github](https://github.com/pascalacco/CliMix/blob/doc/doc/source/doc_howto.md)
 
 
 
