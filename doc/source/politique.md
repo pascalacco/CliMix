@@ -6,13 +6,15 @@ d’électricité des français pour le reste de la partie.
 
 Il y a 6 cartes politiques différentes allant de la carte A à la carte F avec 3 choix possibles pour chacune.
 ## Carte politique A 
-**1** la conso baisse de 10000 unités
+**1-** la conso baisse de 10000 unités
 
-**2** la conso baisse de 6000 unités
+**2-** la conso baisse de 6000 unités
 
-**3** rien ne change
+**3-** rien ne change
 
 # Carte politique B
-**1** la conso 
+**1-** la conso augmente de 4900 unités
+
+**2-** $varEmissions$ baisse de 2.1 et la variable $EmissionCO2$ augmente de $varEmissions$
 
 
