@@ -4,7 +4,6 @@
 
 On utilise *Sphynx* pour générer les pages html dans `doc/build/html` à partir du code python dans `flaskapp/` et de sources écrites manuellement en markdown dans `doc/source`
 
-Pour cela il faut :
 
   1. Lancer la [commande make](#1---commande-make)
   2. Puis [visualiser la doc](#2---visualiser-la-doc)

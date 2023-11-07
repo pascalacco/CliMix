@@ -15,19 +15,59 @@ from constantes import *
 np.seterr('raise') # A ENLEVER SUR LE CODE FINAL
 
 
-# Classe regroupant toutes les technologies de stockage et de production pilotables
-#
-# @params
-# name (str) : nom de la techno
-# stored (array) : niveau des stocks a chaque heure
-# prod (array) : ce qui est produit chaque heure
-# etain (float) : coefficient de rendement a la charge
-# etaout (float) : coefficient de rendement a la decharge
-# Q (float) : capacite installee (flux sortant)
-# S (float) : capacite de charge (flux entrant)
-# vol (float) : capacite maximale de stockage
+"""Classe regroupant toutes les technologies de stockage et de production pilotables
+
+    @params
+    name (str) : 
+    stored (array) : niveau des stocks a chaque heure
+    prod (array) : ce qui est produit chaque heure
+    etain (float) : coefficient de rendement a la charge
+    etaout (float) : coefficient de rendement a la decharge
+    Q (float) : capacite installee (flux sortant)
+    S (float) : capacite de charge (flux entrant)
+    vol (float) : capacite maximale de stockage
+"""
 class Techno:
+    """ Technologies de stockages et de production pilotables
+
+    Classe regroupant toutes les technologies de stockage et de production pilotables
+    """    
     def __init__(self, name, stored, prod, etain, etaout, Q, S, Vol):
+        """_summary_
+
+        _extended_summary_
+
+        :param name: _description_
+        :type name: _type_
+        :param stored: _description_
+        :type stored: _type_
+        :param prod: _description_
+        :type prod: _type_
+        :param etain: _description_
+        :type etain: _type_
+        :param etaout: _description_
+        :type etaout: _type_
+        :param Q: _description_
+        :type Q: _type_
+        :param S: _description_
+        :type S: _type_
+        :param Vol: _description_
+        :type Vol: _type_
+        """        
+        
+        
+        
+        """
+        Args:
+            name (str): nom de la techno
+            stored (array) : niveau des stocks a chaque heure
+            prod (array) : ce qui est produit chaque heure
+            etain (float) : coefficient de rendement a la charge
+            etaout (float) : coefficient de rendement a la decharge
+            Q (float) : capacite installee (flux sortant)
+            S (float) : capacite de charge (flux entrant)
+            vol (float) : capacite maximale de stockage
+        """        
         self.name = name     # nom de la techno
         self.stored = stored # ce qui est stocke
         self.prod = prod     # ce qui est produit

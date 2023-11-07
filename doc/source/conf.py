@@ -26,6 +26,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'myst_parser',
+    'sphinx_automodapi.automodapi',
     'sphinxcontrib.mermaid'
 ]
 intersphinx_mapping = {
@@ -41,7 +42,7 @@ language = 'fr'
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
+html_theme = 'nature'
 html_static_path = ['_static']
 
 # -- Options for intersphinx extension ---------------------------------------
