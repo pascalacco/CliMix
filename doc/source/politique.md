@@ -1,4 +1,4 @@
-### Liste des effets des cartes politiques :
+# Liste des effets des cartes politiques :
 
 Tous les effets des cartes de choix politiques semblent être simplement indiqués dans le fichier  **strat_stockage.py**
  et ils modifient la consommation 

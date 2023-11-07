@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath('../../flaskapp/'))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Mix NRJ'
+project = 'CliMix'
 copyright = '2023, Aymeric et Marion'
 author = 'Aymeric et Marion'
 release = 'beta'
@@ -25,8 +25,13 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-    'myst_parser'
+    'myst_parser',
+    'sphinxcontrib.mermaid'
 ]
+intersphinx_mapping = {
+    "sphinx": ("https://www.sphinx-doc.org/en/master", None),
+}
+myst_fence_as_directive = ["mermaid"]
 
 templates_path = ['_templates']
 exclude_patterns = []
