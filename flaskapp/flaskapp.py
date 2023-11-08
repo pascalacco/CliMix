@@ -78,19 +78,21 @@ def set_group():
         resp.set_cookie(key="equipe", value=team, samesite="Lax")
 
         if action == "new":
+            data_dir = dataPath+"game_data/{}/{}/".format(group, team)
+            os.makedirs(data_dir, exist_ok=True)
             with open(dataPath+"game_data/save_init.json", "r") as src:
                 newSave = json.load(src)
-            with open(dataPath+"game_data/{}/{}/save.json".format(group, team), "w") as dst:
+            with open(data_dir+"save.json", "w") as dst:
                 json.dump(newSave, dst)
 
             with open(dataPath+"game_data/mix_init.json", "r") as src:
                 newMix = json.load(src)
-            with open(dataPath+"game_data/{}/{}/mix.json".format(group, team), "w") as dst:
+            with open(data_dir+"mix.json", "w") as dst:
                 json.dump(newMix, dst)
 
             with open(dataPath+"game_data/resultats_init.json", "r") as src:
                 newResultats = json.load(src)
-            with open(dataPath+"game_data/{}/{}/resultats.json".format(group, team), "w") as dst:
+            with open(data_dir+"resultats.json", "w") as dst:
                 json.dump(newResultats, dst)
 
     except:
