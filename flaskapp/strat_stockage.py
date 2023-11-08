@@ -494,7 +494,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, group, team):
     if mix["alea"] == "MEMFDC1" or mix["alea"] == "MEMFDC2" or mix["alea"] == "MEMFDC3":
         prodOnshore -= (np.array(fdc_on["cvl"]) * mix["cvl"]["eolienneON"] * powOnshore) * 0.1
         
-
+#note de Hugo, je ne sais pas à quoi sert cette ligne, l'effet de la carte aléa correspondant est déjà écrit à un autre endroit.
     # Alea +15% prod PV
     prodPV += save["innovPV"] * prodPV
 
@@ -533,6 +533,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, group, team):
     initGaz = 1000000
     gazBiomasse = nbPions["biomasse"] * 2 * 0.1 * 0.71 * 6200  # nbPions * nbCentraleParPion * puissance * fdc * nbHeures
 
+#note Hugo : il semble que cet effet soit mal implémenté : à tester
     #carte alea MEMFDC (lance 2 / 3)
     if mix["alea"] == "MEMFDC3":
         gazBiomasse -= mix["naq"]["biomasse"] * 2 * 0.1 * 0.71 * 6200
@@ -1019,7 +1020,9 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, group, team):
         cout += 1/3*nvPionsReg["pac"]["panneauPV"]*3.6
 
     if mix["alea"] == "MEGDT3":
-        cout += nvPionsReg["pll"]["eolienneOFF"]*1.2
+        #cout += nvPionsReg["pll"]["eolienneOFF"]*1.2
+        #d'après le rapport de stage, un pion d'éolienneOFF devrait coûter 6 Mds et non 1.2 Mds
+        cout += nvPionsReg["pll"]["eolienneOFF"]*6
 
     
     Sol = (nbPions["eolienneON"]*300 + nbPions["eolienneOFF"]*400 + nbPions["panneauPV"]*26 + 
