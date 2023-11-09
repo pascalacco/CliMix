@@ -12,8 +12,10 @@ Welcome to CliMix's documentation!
 
    doc_howto
    deploiement
-   politique   
+   politique
+   alea   
    modules
+   
    
    
 Indices and tables
