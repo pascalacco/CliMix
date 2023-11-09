@@ -25,14 +25,31 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    'sphinx.ext.mathjax',
     'myst_parser',
+    'sphinx.ext.napoleon',
+    'sphinx_automodapi.automodapi',
     'sphinxcontrib.mermaid'
 ]
 intersphinx_mapping = {
     "sphinx": ("https://www.sphinx-doc.org/en/master", None),
 }
 myst_fence_as_directive = ["mermaid"]
-
+myst_enable_extensions = [
+    "amsmath",
+    "attrs_inline",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]
 templates_path = ['_templates']
 exclude_patterns = []
 
@@ -41,7 +58,7 @@ language = 'fr'
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
+html_theme = 'nature'
 html_static_path = ['_static']
 
 # -- Options for intersphinx extension ---------------------------------------

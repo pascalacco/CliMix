@@ -15,36 +15,49 @@ from constantes import *
 np.seterr('raise') # A ENLEVER SUR LE CODE FINAL
 
 
-# Classe regroupant toutes les technologies de stockage et de production pilotables
-#
-# @params
-# name (str) : nom de la techno
-# stored (array) : niveau des stocks a chaque heure
-# prod (array) : ce qui est produit chaque heure
-# etain (float) : coefficient de rendement a la charge
-# etaout (float) : coefficient de rendement a la decharge
-# Q (float) : capacite installee (flux sortant)
-# S (float) : capacite de charge (flux entrant)
-# vol (float) : capacite maximale de stockage
+
 class Techno:
+    """Classe regroupant toutes les technologies de stockage et de production pilotables
+
+    """    
     def __init__(self, name, stored, prod, etain, etaout, Q, S, Vol):
-        self.name = name     # nom de la techno
-        self.stored = stored # ce qui est stocke
-        self.prod = prod     # ce qui est produit
-        self.etain = etain     # coefficient de rendement à la charge
-        self.etaout = etaout   # coefficient de rendement à la decharge
-        self.Q=Q             # capacite installee (flux sortant)
-        self.S=S             # capacite de charge d'une techno de stockage (flux entrant)
-        self.vol=Vol         # Capacite maximale de stockage de la techno (Volume max)
+        """ Créateur de la classe
+        Args:
+            name (str): nom de la techno
+            stored (array) : niveau des stocks a chaque heure
+            prod (array) : ce qui est produit chaque heure
+            etain (float) : coefficient de rendement a la charge
+            etaout (float) : coefficient de rendement a la decharge
+            Q (float) : capacite installee (flux sortant)
+            S (float) : capacite de charge (flux entrant)
+            vol (float) : capacite maximale de stockage
+        
+        Returns:
+            l'objet de la classe créé (Techno)
+        """        
+        self.name = name     #. nom de la techno
+        self.stored = stored #. ce qui est stocke
+        self.prod = prod     #. ce qui est produit
+        self.etain = etain     #. coefficient de rendement à la charge
+        self.etaout = etaout   #. coefficient de rendement à la decharge
+        self.Q=Q             #. capacite installee (flux sortant)
+        self.S=S             #. capacite de charge d'une techno de stockage (flux entrant)
+        self.vol=Vol         #. Capacite maximale de stockage de la techno (Volume max)
 
 
-# Recharge les moyens de stockage quand on a trop d'energie
-#
-# @params
-# tec : technologie de stockage a recharger (batterie, phs, ...)
-# k (int) : heure courante
-# astocker (float) : qte d'energie a stocker
+
+
 def load(tec, k, astocker):
+    """Recharge les moyens de stockage quand on a trop d'energie
+        
+    Args:
+        tec : technologie de stockage a recharger (batterie, phs, ...)
+        k (int) : heure courante
+        astocker (float) : qte d'energie a stocker
+    
+    Returns:
+        out()
+    """    
     if astocker == 0:
         out = 0
 
@@ -55,16 +68,18 @@ def load(tec, k, astocker):
     
     return out
 
+   
 
-# Decharge les moyens de stockage quand on a besoin d'energie
-#
-# @params
-# tec : technologie de stockage a utiliser pour la production (batterie, phs, ...)
-# k (int) : heure courante
-# aproduire (float) : qte d'energie a fournir
-# endmonthlake (array) : qte d'energie restante dans les lacs jusqu'a la fin du mois
-# prod (boolean) : indique si l'energie dechargee est a prendre en compte pour la production globale (faux pour les echanges internes)
 def unload(tec, k, aproduire, endmonthlake, prod=True):
+    """ Decharge les moyens de stockage quand on a besoin d'energie
+
+    Args:
+        tec : technologie de stockage a utiliser pour la production (batterie, phs, ...)
+        k (int) : heure courante
+        aproduire (float) : qte d'energie a fournir
+        endmonthlake (array) : qte d'energie restante dans les lacs jusqu'a la fin du mois
+        prod (boolean) : indique si l'energie dechargee est a prendre en compte pour la production globale (faux pour les echanges internes)
+    """
     if aproduire <= 0:
         out = 0
 
@@ -85,19 +100,20 @@ def unload(tec, k, aproduire, endmonthlake, prod=True):
     return out
 
 
-# Renvoie la puissance dispo actuellement pour le nucleaire, par rapport a la puissance max
-#
-# @params
-# k (int) : heure courante
 def cycle(k):
+    """ Renvoie la puissance dispo actuellement pour le nucleaire, par rapport a la puissance max
 
-    # Sur ATH : pas de penurie avec 56 centrales min.
-    # Sur ATL : 28 centrales min. (50%)
-    # Diviser en 4 ou 8 groupes (plutôt 8 pour les besoins humains)
-    # 1/8 = 0.125, 7/8 = 0.875
-    # 2180, 2920, 3650, 4400, 5130, 5900, 6732, 7580
-    # Tiers de 8760 : 2920(4*730), 5840, 8460
-    # DANS le dernier tiers : 50% croissance lineaire min, 25% baisse de 20% prod min/max, 25% arret
+    Args:
+        k (int) : heure courante
+
+    Sur ATH : pas de penurie avec 56 centrales min.
+    Sur ATL : 28 centrales min. (50%)
+    Diviser en 4 ou 8 groupes (plutôt 8 pour les besoins humains)
+    1/8 = 0.125, 7/8 = 0.875
+    2180, 2920, 3650, 4400, 5130, 5900, 6732, 7580
+    Tiers de 8760 : 2920(4*730), 5840, 8460
+    DANS le dernier tiers : 50% croissance lineaire min, 25% baisse de 20% prod min/max, 25% arret
+    """
 
     # La production nucleaire est divisee en 8 groupes, chacun a son cycle d'arret. 
     # Dans cette fonction, on regarde dans quel partie du cycle on est pour chaque groupe, 
@@ -148,13 +164,14 @@ def cycle(k):
     return (sMin, sMax)
 
 
-# Lance la production des centrales nucleaires
-#
-# @params
-# tec : objet à utiliser pour la production  (ici, Techno Nucleaire)
-# k (int) : heure courante
-# aproduire (float) : qte d'energie a fournir
 def nucProd(tec, k, aproduire):
+    """ Lance la production des centrales nucleaires
+
+    Args:
+        tec : objet à utiliser pour la production  (ici, Techno Nucleaire)
+        k (int) : heure courante
+        aproduire (float) : qte d'energie a fournir
+    """
     if aproduire <= 0:
         out = 0
 
@@ -175,13 +192,14 @@ def nucProd(tec, k, aproduire):
     return out
 
 
-# Lance la production des centrales thermiques
-#
-# @params
-# tec : objet à utiliser pour la production  (ici, Techno Thermique)
-# k (int) : heure courante
-# aproduire (float) : qte d'energie a fournir
 def thermProd(tec, k, aproduire):
+    """ Lance la production des centrales thermiques
+
+    Args:
+        tec : objet à utiliser pour la production  (ici, Techno Thermique)
+        k (int) : heure courante
+        aproduire (float) : qte d'energie a fournir
+    """
     if aproduire <= 0:
         out = 0
 
@@ -193,14 +211,16 @@ def thermProd(tec, k, aproduire):
     return out
 
 
-# 1ere methode de calcul des seuils de stock
-#
-# @params
-# y1 (array) : heures avec surplus
-# y2 (array) : heures avec penuries
-# y3 (array) : heures sans surplus ni penurie 
-# stockmax (float) : capacite max des batteries + phs
 def certitudeglobal(y1, y2, y3, stockmax):
+    """ 1ere methode de calcul des seuils de stock
+
+    Args:
+        y1 (array) : heures avec surplus
+        y2 (array) : heures avec penuries
+        y3 (array) : heures sans surplus ni penurie 
+        stockmax (float) : capacite max des batteries + phs 
+    """
+
     certitude_interval = np.zeros(3)
     
     ##distribution ecretage : min, max, moyenne et ecart-type
@@ -226,15 +246,16 @@ def certitudeglobal(y1, y2, y3, stockmax):
     return certitude_interval
 
     
-# 2e methode de calcul des seuils de stock
-#
-# @params
-# a (array) : heures avec surplus
-# b (array) : heures avec penuries
-# c (array) : heures sans surplus ni penurie 
-# crit (float) : critere de separation des penuries (ex: si 0.2, on garde 20% des penuries d'un cote, 80% de l'autre)
-# mode (str) : vaut 'u' ou 'd' selon qu'on veuille se placer au dessus ou en dessous du seuil
 def seuil(a, b, c, crit, mode):
+    """ 2e methode de calcul des seuils de stock
+
+    Args:
+        a (array) : heures avec surplus
+        b (array) : heures avec penuries
+        c (array) : heures sans surplus ni penurie 
+        crit (float) : critere de separation des penuries (ex: si 0.2, on garde 20% des penuries d'un cote, 80% de l'autre)
+        mode (str) : vaut 'u' ou 'd' selon qu'on veuille se placer au dessus ou en dessous du seuil 
+    """
         
     y1 = np.copy(a)
     y2 = np.copy(b)
@@ -276,14 +297,15 @@ def seuil(a, b, c, crit, mode):
     return bestStock
 
 
-# Premiere strat de stockage naive
-#
-# @params
-# prodres (array) : production residuelle sur l'annee
-# H (int) : nombre d'heures dans l'annee
-# Battery - Nuclear : objets de la classe Techno
-# endmonthlake (array) : contient la qte d'energie restante dans les lacs jusqu'a la fin de chaque mois
 def StratStockage(prodres, H, Phs, Battery, Gas, Lake, Nuclear, endmonthlake):
+    """ Premiere strat de stockage naive
+
+    Args:
+        prodres (array) : production residuelle sur l'annee
+        H (int) : nombre d'heures dans l'annee
+        Battery - Nuclear : objets de la classe Techno
+        endmonthlake (array) : contient la qte d'energie restante dans les lacs jusqu'a la fin de chaque mois
+    """
     Surplus=np.zeros(H)
     ##Ajout paramètre Penurie
     Manque = np.zeros(H)
@@ -319,15 +341,16 @@ def StratStockage(prodres, H, Phs, Battery, Gas, Lake, Nuclear, endmonthlake):
     return Surplus, Manque
 
 
-# Strat de stockage optimisee
-#
-# @params
-# prodres (array) : production residuelle sur l'annee
-# H (int) : nombre d'heures dans l'annee
-# Battery - Nuclear : objets de la classe Techno
-# I0, I1, I2 (array) : seuils de stockage dirigeant la strat de stockage, et deduits de la strat naive
-# endmonthlake (array) : contient la qte d'energie restante dans les lacs jusqu'a la fin de chaque mois
 def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2, endmonthlake):
+    """Strat de stockage optimisee
+        
+    Args:
+        prodres (array) : production residuelle sur l'annee
+        H (int) : nombre d'heures dans l'annee
+        Battery - Nuclear : objets de la classe Techno
+        I0, I1, I2 (array) : seuils de stockage dirigeant la strat de stockage, et deduits de la strat naive
+        endmonthlake (array) : contient la qte d'energie restante dans les lacs jusqu'a la fin de chaque mois
+    """
     Surplus=np.zeros(H)
     ##Ajout paramètre Penurie
     Manque = np.zeros(H)
@@ -398,19 +421,21 @@ def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2, en
     return Surplus, Manque
 
 
-# Optimisation de strategie de stockage et de destockage du Mix energetique
-#
-# @params
-# scenario (array) : scenario de consommation heure par heure
-# mix (dict) : donnees du plateau
-# save (dict) : donnees du tour precedent
-# nbPions (dict) : nombre de pions total pour chaque techno
-# nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
-# nvPionsReg (dict) : nombre de pions total pour chaque techno
-# group (str) : groupe de TD de l'equipe qui joue
-# team (int) : numero de l'equipe qui joue dans ce groupe
 def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, group, team):
-
+    """ Optimisation de strategie de stockage et de destockage du Mix energetique
+    
+    Args:
+        scenario (array) : scenario de consommation heure par heure
+        mix (dict) : donnees du plateau
+        save (dict) : donnees du tour precedent
+        nbPions (dict) : nombre de pions total pour chaque techno
+        nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
+        nvPionsReg (dict) : nombre de pions total pour chaque techno
+        group (str) : groupe de TD de l'equipe qui joue
+        team (int) : numero de l'equipe qui joue dans ce groupe
+    Returns:
+        result (dict) : dictionnaire contenant les résultats d'une seule année (result sans s à la fin)
+    """
     H = 8760
 
     save["carte"] = mix["carte"]
@@ -1172,26 +1197,26 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, group, team):
 
 
 
-# Fonction principale
-#
-# @params
-# mix (dict) : donnees du plateau
-# save (dict) : donnees du tour precedent
-# nbPions (dict) : nombre de pions total pour chaque techno
-# nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
-# nvPionsReg (dict) : nombre de pions total pour chaque techno
-# group (str) : groupe de TD de l'equipe qui joue
-# team (int) : numero de l'equipe qui joue dans ce groupe      
 def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
+    """Fonction principale
+        
+        Args:
+            mix (dict) : donnees du plateau
+            save (dict) : donnees du tour precedent
+            nbPions (dict) : nombre de pions total pour chaque techno
+            nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
+            nvPionsReg (dict) : nombre de pions total pour chaque techno
+            group (str) : groupe de TD de l'equipe qui joue
+            team (int) : numero de l'equipe qui joue dans ce groupe      
 
-    # Infos sur les unites de data :
-    # eolienneON --> 1 unite = 10 parcs = 700 eoliennes
-    # eolienneOFF --> 1 unite = 5 parcs = 400 eoliennes
-    # panneauPV --> 1 unite = 10 parcs = 983 500 modules
-    # centraleTherm --> 1 unite = 1 centrale
-    # centraleNuc --> 1 unite = 1 reacteur
-    # biomasse --> 1 unite = une fraction de flux E/S en methanation
-
+        Infos sur les unites de data :
+            * eolienneON --> 1 unite = 10 parcs = 700 eoliennes
+            * eolienneOFF --> 1 unite = 5 parcs = 400 eoliennes
+            * panneauPV --> 1 unite = 10 parcs = 983 500 modules
+            * centraleTherm --> 1 unite = 1 centrale
+            * centraleNuc --> 1 unite = 1 reacteur
+            * biomasse --> 1 unite = une fraction de flux E/S en methanation
+    """
 
     # Definition des scenarios (Negawatt, ADEME, RTE pour 2050)
     # Les autres scenarios sont faits mains à partir des donnees de Quirion

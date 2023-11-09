@@ -15,11 +15,10 @@ Welcome to CliMix's documentation!
    politique
    alea   
    modules
-   
-   
-   
-Indices and tables
-==================
+
+
+Indices and tables  
+===================
 
 * :ref:`genindex`
 * :ref:`modindex`
