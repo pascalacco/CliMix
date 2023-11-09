@@ -35,14 +35,15 @@ class Techno:
         Returns:
             l'objet de la classe créé (Techno)
         """        
-        self.name = name     # nom de la techno
-        self.stored = stored # ce qui est stocke
-        self.prod = prod     # ce qui est produit
-        self.etain = etain     # coefficient de rendement à la charge
-        self.etaout = etaout   # coefficient de rendement à la decharge
-        self.Q=Q             # capacite installee (flux sortant)
-        self.S=S             # capacite de charge d'une techno de stockage (flux entrant)
-        self.vol=Vol         # Capacite maximale de stockage de la techno (Volume max)
+        self.name = name     #. nom de la techno
+        self.stored = stored #. ce qui est stocke
+        self.prod = prod     #. ce qui est produit
+        self.etain = etain     #. coefficient de rendement à la charge
+        self.etaout = etaout   #. coefficient de rendement à la decharge
+        self.Q=Q             #. capacite installee (flux sortant)
+        self.S=S             #. capacite de charge d'une techno de stockage (flux entrant)
+        self.vol=Vol         #. Capacite maximale de stockage de la techno (Volume max)
+
 
 
 
@@ -53,6 +54,9 @@ def load(tec, k, astocker):
         tec : technologie de stockage a recharger (batterie, phs, ...)
         k (int) : heure courante
         astocker (float) : qte d'energie a stocker
+    
+    Returns:
+        out()
     """    
     if astocker == 0:
         out = 0
@@ -64,6 +68,7 @@ def load(tec, k, astocker):
     
     return out
 
+   
 
 def unload(tec, k, aproduire, endmonthlake, prod=True):
     """ Decharge les moyens de stockage quand on a besoin d'energie
@@ -428,6 +433,8 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, group, team):
         nvPionsReg (dict) : nombre de pions total pour chaque techno
         group (str) : groupe de TD de l'equipe qui joue
         team (int) : numero de l'equipe qui joue dans ce groupe
+    Returns:
+        result (dict) : dictionnaire contenant les résultats d'une seule année (result sans s à la fin)
     """
     H = 8760
 

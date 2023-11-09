@@ -93,5 +93,7 @@ Les commentaires du code `.py` du répertoire `flaskapp/` sont autogénérés
  end 
 ```
 
+## Support des équations 
 
+Normalement `$\sqrt{-\pi}$` donne ça $\sqrt{-\pi}$
 
