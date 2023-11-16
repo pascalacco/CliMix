@@ -1,11 +1,13 @@
-import numpy as np
-from collections import Counter
 import sys
-import json
-import pandas as pd
 import os
 import datetime
-from constantes import *
+
+import numpy as np
+from collections import Counter
+import json
+import pandas as pd
+
+from flaskapp.constantes import *
 
 
                                 #########################
@@ -421,7 +423,7 @@ def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2, en
     return Surplus, Manque
 
 
-def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, group, team):
+def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg):
     """ Optimisation de strategie de stockage et de destockage du Mix energetique
     
     Args:
@@ -431,8 +433,6 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, group, team):
         nbPions (dict) : nombre de pions total pour chaque techno
         nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
         nvPionsReg (dict) : nombre de pions total pour chaque techno
-        group (str) : groupe de TD de l'equipe qui joue
-        team (int) : numero de l'equipe qui joue dans ce groupe
     Returns:
         result (dict) : dictionnaire contenant les résultats d'une seule année (result sans s à la fin)
     """
@@ -1147,11 +1147,6 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, group, team):
                 replaceList.append([nbReplace, p, reg])
 
 
-    #modification du fichier save
-    with open(dataPath+"game_data/{}/{}/save_tmp.json".format(group, team), "w") as output:
-        json.dump(save, output)
-
-
     result = {"carte":mix["carte"], 
                 "annee":mix["annee"], 
                 "alea":mix["alea"], 
@@ -1193,7 +1188,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, group, team):
     }
 
 
-    return result
+    return result, save
 
 
 
@@ -1209,6 +1204,9 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
             group (str) : groupe de TD de l'equipe qui joue
             team (int) : numero de l'equipe qui joue dans ce groupe      
 
+        Returns:
+            result (dict) : tous les résultat de l'année
+            
         Infos sur les unites de data :
             * eolienneON --> 1 unite = 10 parcs = 700 eoliennes
             * eolienneOFF --> 1 unite = 5 parcs = 400 eoliennes
@@ -1231,13 +1229,11 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
     # # NEGAWATT.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
 
-    result = simulation(ADEME.d2025, mix, save, nbPions, nvPions, nvPionsReg, group, team)
+    result, save = simulation(ADEME.d2025, mix, save, nbPions, nvPions, nvPionsReg)
+    
+    #modification du fichier save
+    with open(dataPath+"game_data/{}/{}/save_tmp.json".format(group, team), "w") as output:
+        json.dump(save, output)
 
-
-    with open(dataPath+'game_data/{}/{}/resultats.json'.format(group, team), 'r') as src:
-        resultatGlobal = json.load(src)
-
-    resultatGlobal[str(mix["annee"])] = result
-
-    with open(dataPath+'game_data/{}/{}/resultats.json'.format(group, team), 'w') as dst:
-        json.dump(resultatGlobal, dst)
+    return result
+ 
