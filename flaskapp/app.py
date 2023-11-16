@@ -94,6 +94,11 @@ def set_group():
                 newResultats = json.load(src)
             with open(data_dir+"resultats.json", "w") as dst:
                 json.dump(newResultats, dst)
+            
+            with open(dataPath+"game_data/inputs_init.json", "r") as src:
+                newResultats = json.load(src)
+            with open(data_dir+"inputs.json", "w") as dst:
+                json.dump(newResultats, dst)
 
     except:
         resp = jsonify(["log_in_error"])
@@ -209,7 +214,7 @@ def commitResults():
     with open(dataPath+"game_data/{}/{}/save.json".format(group, team), "w") as dst:
         json.dump(newSave, dst)
     
-    return redirect("/photo")
+    return redirect("/manual")
 
 
 #Create the detector API POST endpoint:
@@ -371,9 +376,27 @@ def prodCompute():
             if nvPions["EPR2"] > 0:
                 errDetails = nvPions["EPR2"]
                 raise exc.errNuc
-                
+        input = {"mix": data, "save": save, "nbPions": nbPions, "nvPions":nvPions, "nvPionsReg": nvPionsReg}    
+        with open(dataPath+'game_data/{}/{}/inputs.json'.format(group, team), 'r') as src:
+            inputsGlobal = json.load(src)
+        
+        inputsGlobal[str(data["annee"])] = input
 
-        strat_stockage.strat_stockage_main(data, save, nbPions, nvPions, nvPionsReg, group, team)
+        with open(dataPath+'game_data/{}/{}/inputs.json'.format(group, team), 'w') as dst:
+            json.dump(inputsGlobal, dst)
+
+        input["group"]=group
+        input["team"]=team
+        result = strat_stockage.strat_stockage_main( **input )
+        
+        with open(dataPath+'game_data/{}/{}/resultats.json'.format(group, team), 'r') as src:
+            resultatGlobal = json.load(src)
+
+        resultatGlobal[str(input["mix"]["annee"])] = result
+
+        with open(dataPath+'game_data/{}/{}/resultats.json'.format(group, team), 'w') as dst:
+            json.dump(resultatGlobal, dst)
+        
         resp = ["success"]
 
 
