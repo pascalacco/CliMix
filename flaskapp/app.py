@@ -1,12 +1,13 @@
 from flask import Flask, request, jsonify, render_template, redirect, make_response
 from flask_cors import CORS, cross_origin
-import detection
-import strat_stockage
 import base64
 import json
 import datetime
 import traceback
 import exc
+
+import detection
+import strat_stockage
 from constantes import *
 
 
@@ -255,6 +256,91 @@ def imgProcess():
     return resp
 
 
+def inputs_from_save_and_data(save, data):
+
+    # TRAITEMENT SUPPLEMENTAIRE POUR LE NUCLEAIRE AU 1ER TOUR
+    if data["annee"] == 2030:
+        save["hdf"]["centraleNuc"][0:6] = [1995,1995,1995,1995,1995,1995]
+        save["occ"]["centraleNuc"][0:2] = [2020,2020]
+        save["naq"]["centraleNuc"][0:6] = [1995,1995,1995,1995,2000,2000]
+        save["pac"]["centraleNuc"][0:8] = [2000,2000,2000,2000,2000,2000,2000,2000]
+        save["cvl"]["centraleNuc"][0:7] = [2005,2005,2005,2005,2005,2005,2005]
+        save["bfc"]["centraleNuc"][0:2] = [2005,2005]
+        save["est"]["centraleNuc"][0:5] = [2005,2010,2010,2010,2010]
+        save["ara"]["centraleNuc"][0:3] = [2010,2010,2010]
+        save["nor"]["centraleNuc"][0:8] = [2010,2010,2010,2020,2020,2020,2020,2020]
+
+
+    # CALCUL NOMBRE DE NOUVEAU PIONS + TOTAL A CE TOUR
+    nvPionsReg = {
+        "hdf": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "idf": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "est": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "nor": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "occ": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "pac": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "bre": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "cvl": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "pll": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "naq": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "ara": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "bfc": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
+        "cor": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}
+    }
+
+    nvPions = {
+        "eolienneON": 0,
+        "eolienneOFF": 0,
+        "panneauPV": 0,
+        "methanation": 0,
+        "EPR2": 0,
+        "biomasse": 0
+    }
+
+    nbPions = {
+        "eolienneON": 0,
+        "eolienneOFF": 0,
+        "panneauPV": 0,
+        "methanation": 0,
+        "centraleNuc": 0,
+        "EPR2" : 0,
+        "biomasse": 0
+    }
+
+    for reg in save["capacite"]:
+        nbPions["centraleNuc"] += data[reg]["centraleNuc"]
+    if data["annee"] == 2030 and nbPions["centraleNuc"] != 47:
+        raise exc.errMixInit
+    else:
+        nbPions["centraleNuc"] = 0
+
+
+    for reg in save["capacite"]:
+        for p in data[reg]:
+            nbPions[p] += data[reg][p]
+
+            if p == "eolienneON" or p == "eolienneOFF":
+                eolSuppr = len(save[reg][p]) - data[reg][p]
+                for i in range(eolSuppr):
+                    save[reg][p].remove(data["annee"]-15)
+                    
+            if p != "centraleNuc":
+                nvPionsReg[reg][p] = data[reg][p] - len(save[reg][p])
+                nvPions[p] += data[reg][p] - len(save[reg][p])
+                
+                for i in range(nvPionsReg[reg][p]):
+                    save[reg][p].append(data["annee"])
+            else:
+                nucSuppr = len(save[reg][p]) - data[reg][p]
+                for i in range(nucSuppr):
+                    save[reg][p].remove(data["annee"]-40)
+
+    
+ 
+    
+    return {"mix": data, "save": save, "nbPions": nbPions, "nvPions":nvPions, "nvPionsReg": nvPionsReg}
+    
+
 #Create the production API POST endpoint:
 @app.route("/production", methods=["POST"])
 @cross_origin(supports_credentials=True)
@@ -293,90 +379,13 @@ def prodCompute():
                     raise exc.errSol
 
 
+        input = inputs_from_save_and_data(save, data)      
 
-        # TRAITEMENT SUPPLEMENTAIRE POUR LE NUCLEAIRE AU 1ER TOUR
-        if data["annee"] == 2030:
-            save["hdf"]["centraleNuc"][0:6] = [1995,1995,1995,1995,1995,1995]
-            save["occ"]["centraleNuc"][0:2] = [2020,2020]
-            save["naq"]["centraleNuc"][0:6] = [1995,1995,1995,1995,2000,2000]
-            save["pac"]["centraleNuc"][0:8] = [2000,2000,2000,2000,2000,2000,2000,2000]
-            save["cvl"]["centraleNuc"][0:7] = [2005,2005,2005,2005,2005,2005,2005]
-            save["bfc"]["centraleNuc"][0:2] = [2005,2005]
-            save["est"]["centraleNuc"][0:5] = [2005,2010,2010,2010,2010]
-            save["ara"]["centraleNuc"][0:3] = [2010,2010,2010]
-            save["nor"]["centraleNuc"][0:8] = [2010,2010,2010,2020,2020,2020,2020,2020]
-
-
-        # CALCUL NOMBRE DE NOUVEAU PIONS + TOTAL A CE TOUR
-        nvPionsReg = {
-            "hdf": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "idf": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "est": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "nor": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "occ": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "pac": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "bre": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "cvl": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "pll": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "naq": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "ara": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "bfc": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}, 
-            "cor": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0}
-        }
-
-        nvPions = {
-            "eolienneON": 0,
-            "eolienneOFF": 0,
-            "panneauPV": 0,
-            "methanation": 0,
-            "EPR2": 0,
-            "biomasse": 0
-        }
-
-        nbPions = {
-            "eolienneON": 0,
-            "eolienneOFF": 0,
-            "panneauPV": 0,
-            "methanation": 0,
-            "centraleNuc": 0,
-            "EPR2" : 0,
-            "biomasse": 0
-        }
-
-        for reg in save["capacite"]:
-            nbPions["centraleNuc"] += data[reg]["centraleNuc"]
-        if data["annee"] == 2030 and nbPions["centraleNuc"] != 47:
-            raise exc.errMixInit
-        else:
-            nbPions["centraleNuc"] = 0
-
-
-        for reg in save["capacite"]:
-            for p in data[reg]:
-                nbPions[p] += data[reg][p]
-
-                if p == "eolienneON" or p == "eolienneOFF":
-                    eolSuppr = len(save[reg][p]) - data[reg][p]
-                    for i in range(eolSuppr):
-                        save[reg][p].remove(data["annee"]-15)
-                        
-                if p != "centraleNuc":
-                    nvPionsReg[reg][p] = data[reg][p] - len(save[reg][p])
-                    nvPions[p] += data[reg][p] - len(save[reg][p])
-                    
-                    for i in range(nvPionsReg[reg][p]):
-                        save[reg][p].append(data["annee"])
-                else:
-                    nucSuppr = len(save[reg][p]) - data[reg][p]
-                    for i in range(nucSuppr):
-                        save[reg][p].remove(data["annee"]-40)
-
-        
         if data["alea"] == "MECS3":
-            if nvPions["EPR2"] > 0:
-                errDetails = nvPions["EPR2"]
+            if input["nvPions"]["EPR2"] > 0:
+                errDetails = input["nvPions"]["EPR2"]
                 raise exc.errNuc
-        input = {"mix": data, "save": save, "nbPions": nbPions, "nvPions":nvPions, "nvPionsReg": nvPionsReg}    
+        
         with open(dataPath+'game_data/{}/{}/inputs.json'.format(group, team), 'r') as src:
             inputsGlobal = json.load(src)
         
@@ -398,6 +407,7 @@ def prodCompute():
             json.dump(resultatGlobal, dst)
         
         resp = ["success"]
+
 
 
         with open(dataPath+"game_data/{}/{}/mix.json".format(group, team), "w") as dst:
