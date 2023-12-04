@@ -55,4 +55,8 @@ On fait une connexion distante `ssh` sur le serveur et on tire la branche master
     Le mot de passe est "egats" en verland.
 
     
-
+## 5 - Modif de appache sur apps-geitp
+ 0. se connecter `ssh user@srv-geitp -p2222`
+ 1. modifier `/etc/apache2/sites-available/000-default.conf`
+ 2. relancer appache  `sudo systemctl restart apache2`
+ 3. vérifier que c'est repartis `sudo systemctl status apache2`

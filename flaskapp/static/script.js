@@ -435,7 +435,7 @@ $(function() {
         });
 
         $(".backHome").click(() => {
-            location.href = "/photo";
+            location.href = "/";
         });
 
 
@@ -628,7 +628,7 @@ $(function() {
             
             else {
                 $("#carte").val(mixData.carte);
-                $("#annee").val(mixData.annee.toString());
+                $("#annee").val((mixData.annee + 5).toString());
                 $("#stock").val(mixData.stock.toString());
                 $("#alea").val(mixData.alea);
                 $("#politique").val(mixData.politique);
@@ -660,7 +660,7 @@ $(function() {
         });
 
         $('.backHome').click(() => {
-            location.href = "/manual";
+            location.href = "/";
         });
 
         $('#computeResults').click(() => {
