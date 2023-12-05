@@ -628,7 +628,7 @@ $(function() {
             
             else {
                 $("#carte").val(mixData.carte);
-                $("#annee").val((mixData.annee + 5).toString());
+                $("#annee").val((Number(mixData.annee) + 5).toString());
                 $("#stock").val(mixData.stock.toString());
                 $("#alea").val(mixData.alea);
                 $("#politique").val(mixData.politique);
