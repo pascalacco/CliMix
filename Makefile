@@ -5,8 +5,10 @@ venv :
 
 
 deploiement : 
-	cp -rf flaskapp /var/www/html/flaskapp
-	chmod a+w -R /var/www/html/flaskapp/game_data
+	cp -rf . /var/www/html/master
+	chmod a+w -R /var/www/html/master/flaskapp/game_data
+	touch /var/www/html/master/flaskapp/logs.txt
+	chmod a+w -R /var/www/html/master/flaskapp/logs.txt	
 
 exec_locale : 
 	. venv/bin/activate && python flaskapp/app.py
