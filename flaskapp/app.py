@@ -1,14 +1,16 @@
-from flask import Flask, request, jsonify, render_template, redirect, make_response
+from flask import Flask, request, jsonify, render_template, redirect, make_response,Blueprint
 from flask_cors import CORS, cross_origin
 import base64
 import json
 import datetime
 import traceback
 import exc
-
+import api
 import detection
 import strat_stockage
 from constantes import *
+
+from api.resources import api_blueprint
 
 
 # with open(dataPath+'logs.txt', 'a') as logs:
@@ -18,12 +20,13 @@ from constantes import *
 app = Flask(__name__)
 
 
+app.register_blueprint(api_blueprint)
+
 #Bypass CORS at the front end:
 cors = CORS(app)
 CORS(app, support_credentials=True)
 
 json_opts = {"indent": 4, "sort_keys": True}
-
 
 def inputs_from_save_and_data(save, data):
     # TRAITEMENT SUPPLEMENTAIRE POUR LE NUCLEAIRE AU 1ER TOUR

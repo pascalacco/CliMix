@@ -63,7 +63,7 @@ $(function() {
     let exitConfirm = false; // METTRE A TRUE LORS DU DEPLOIEMENT
 
     onbeforeunload = function() {
-        if (exitConfirm) return "Etes-vous sûr(e) de vouloir quitter cette page ? Vos modifications seront perdues."
+        if (exitConfirOupsm) return "Etes-vous sûr(e) de vouloir quitter cette page ? Vos modifications seront perdues."
     }
 
 
@@ -233,7 +233,7 @@ $(function() {
             let divStr = "";
 
             for (const reg of maps[map]) {
-                divStr += `<h3 class="row mt-5 ps-2 bg-info rounded bg-opacity-50 justify-content-center" id="${reg[0]}">${reg[1]}</h3>`;
+               divStr += `<div class="region"id="${reg[0]}>  <h3 class="row mt-5 ps-2 bg-info rounded bg-opacity-50 justify-content-center" > toto ${reg[1]}</h3>`;
                 for (const pion of pions) {
                     divStr +=
                     `<div class="row justify-content-around">
@@ -249,8 +249,9 @@ $(function() {
                                 <button class="btn btn-basic col-2" type="button" id="${reg[0]}_${pion[0]}_plus">➕</button>
                             </div>
                         </div>
-
-                    </div>`;
+                    
+                    </div>
+                </div>`;
                 }
             }
 
@@ -493,7 +494,7 @@ $(function() {
             let divStr = "";
 
             for (const reg of maps[map]) {
-                divStr += `<h3 class="row mt-5 ps-2 bg-info rounded bg-opacity-50 justify-content-center" id="${reg[0]}">${reg[1]}</h3>`;
+                divStr += `<div class="region" id="${reg[0]}"> <h3 class="row mt-5 ps-2 bg-info rounded bg-opacity-50 justify-content-center">${reg[1]}</h3>`;
                 for (const pion of pions) {
                     divStr +=
                     `<div class="row justify-content-around">
@@ -504,14 +505,19 @@ $(function() {
                             <div class="row justify-content-end">
                                 <div class="form-outline col-6">
                                     <input value="0" min="0" max="100" type="number" id="${reg[0]}_${pion[0]}" class="form-control"/>
+                                   
                                 </div>
-                                <button class="btn btn-basic col-2" type="button" id="${reg[0]}_${pion[0]}_minus">➖</button>
-                                <button class="btn btn-basic col-2" type="button" id="${reg[0]}_${pion[0]}_plus">➕</button>
+                                <div class="col-2">
+                                 <button class="btn btn-basic col-2" type="button" id="${reg[0]}_${pion[0]}_minus">➖</button>
+                                    <button class="btn btn-basic col-2" type="button" id="${reg[0]}_${pion[0]}_plus">➕</button>
+                                 </div>
+                                
                             </div>
                         </div>
 
                     </div>`;
                 }
+                divStr += "</div>";
             }
 
             $("#mid").html(divStr);
