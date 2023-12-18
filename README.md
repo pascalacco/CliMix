@@ -43,5 +43,16 @@ Pour générer la doc dans votre répertoire git allez voir les [instructions su
      rendermanual -- render --> manual
   end
 ```
+## Installation
 
+### Prérequis
+python3.6 ou supérieur
+
+### Installation des dépendances
+```bash
+pip install -r requirements.txt
+```
+### personnalisation des chemins
+Dans le ficher flaskapp/constantes.py, modifier les chemins
+ 
 

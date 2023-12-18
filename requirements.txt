@@ -8,3 +8,4 @@ myst-parser
 sphinxcontrib-mermaid
 sphinx-automodapi
 pytest
+flask-restx
