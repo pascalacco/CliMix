@@ -1,0 +1,10 @@
+
+before_script:
+  - ls
+deploy_stage:
+    stage: deploy
+    environment: Staging
+    script:
+      - pwd
+      - sudo cp -r . /var/www/climix-test-Testdeplo/
+
