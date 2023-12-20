@@ -6,5 +6,6 @@ deploy_stage:
     environment: Staging
     script:
       - pwd
+      - rm -rf .git/
       - cp -r . /var/www/climix-test/
 
