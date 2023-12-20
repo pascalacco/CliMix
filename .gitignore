@@ -267,3 +267,4 @@ flaskapp/__pycache__/
 logs.txt
 flaskapp/logs.txt
 flaskapp/constantes.py
+venv/
