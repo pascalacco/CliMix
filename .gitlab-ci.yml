@@ -10,4 +10,13 @@ deploy_stage:
       - rm flaskapp/static/logo.png
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
       - cp -r . /var/www/climix-test/
+deploy_production:
+  stage: deploy
+  environment: Production
+  only:
+    - tags
+  script:
+      - pwd
+      - rm -rf .git/
+      - cp -r . /var/www/climix/
 
