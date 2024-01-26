@@ -1,11 +1,10 @@
-from flask import Flask, request, jsonify, render_template, redirect, make_response,Blueprint
+from flask import Flask, request, jsonify, render_template, redirect, make_response
 from flask_cors import CORS, cross_origin
 import base64
 import json
 import datetime
 import traceback
 import exc
-import api
 import detection
 import strat_stockage
 from constantes import *
@@ -105,6 +104,7 @@ def inputs_from_save_and_data(save, data):
                     save[reg][p].remove(data["annee"] - 40)
 
     return {"mix": data, "save": save, "nbPions": nbPions, "nvPions": nvPions, "nvPionsReg": nvPionsReg}
+
 
 def ajoute_annee(fichier, annee, val):
     with open(fichier, 'r') as src:
