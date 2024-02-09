@@ -15,8 +15,8 @@ admin_blueprint = Blueprint('admin', __name__)
 
 cas_client = CASClient(
     version=3,
-    service_url='http://insa-09340.insa-toulouse.fr:5000/admin/login?next=%2Fadmin%2Fdashboard',
-    server_url='https://cas.insa-toulouse.fr/cas/'
+    service_url=CAS_SERVICE_URL,
+    server_url=CAS_SERVER_URL
 )
 
 
