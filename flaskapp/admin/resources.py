@@ -70,7 +70,7 @@ def dashboard(method=['GET']):
             grouplist[key] = sorted(grouplist[key], key=lambda d: d['team'])
 
         print(grouplist)
-        return render_template('dashboard.html', username=session['username'], attributes=session['attributes']['memberOf'],grouplist=grouplist)
+        return render_template('dashboard.html', username=session['username'], attributes=session['attributes']['memberOfCN'],grouplist=grouplist)
     return 'Login required. <a href="/login">Login</a>', 403
 
 
