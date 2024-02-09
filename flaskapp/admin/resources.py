@@ -33,7 +33,7 @@ def normap(value, start1, stop1, start2, stop2):
 @admin_blueprint.route('/admin/dashboard')
 def dashboard(method=['GET']):
     grouplist = {}
-    if 'username' in session and 'cn=admin_climix_man,ou=Current,ou=Groups,dc=insa-toulouse,dc=fr' in session['attributes']['memberOf']:
+    if 'username' in session and 'admin_climix_man' in session['attributes']['memberOfCN']:
         # list game_data games only directoires and teams on subdirectories
         for filename in os.listdir(dataPath+'game_data/'):
 
