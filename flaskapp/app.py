@@ -6,11 +6,13 @@ import datetime
 import traceback
 import exc
 import api
+import logging
 import detection
 import strat_stockage
 from constantes import *
 
 from api.resources import api_blueprint
+from admin.resources import admin_blueprint
 
 
 # with open(dataPath+'logs.txt', 'a') as logs:
@@ -18,9 +20,15 @@ from api.resources import api_blueprint
 
 #Set up Flask:
 app = Flask(__name__)
+handler = logging.FileHandler(dataPath+'logs.txt')
+handler.setLevel(logging.DEBUG)
+app.logger.addHandler(handler)
+
+app.secret_key = 'fdsfds3215zez'
 
 
 app.register_blueprint(api_blueprint)
+app.register_blueprint(admin_blueprint)
 
 #Bypass CORS at the front end:
 cors = CORS(app)
@@ -435,4 +443,9 @@ def imgProcess():
 # TESTS EN LOCAL:
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    #run the apps on the current host and port 5000
+
+    #app.run(host='insa-09340.insa-toulouse.fr',debug=True,ssl_context='adhoc')
+    app.run(host='insa-09340.insa-toulouse.fr',debug=True)
+    logging.basicConfig(filename=dataPath+'logs.txt', level=logging.DEBUG)
+    app.logger.info('server started')

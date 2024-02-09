@@ -9,3 +9,4 @@ sphinxcontrib-mermaid
 sphinx-automodapi
 pytest
 flask-restx
+python-cas
