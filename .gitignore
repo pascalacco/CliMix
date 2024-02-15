@@ -268,3 +268,5 @@ logs.txt
 flaskapp/logs.txt
 flaskapp/constantes.py
 venv/
+
+.vscode

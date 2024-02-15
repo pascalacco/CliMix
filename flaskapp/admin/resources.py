@@ -20,6 +20,44 @@ cas_client = CASClient(
 )
 
 
+def get_group_list(dataPath):
+    grouplist = {}
+    # list game_data games only directoires and teams on subdirectories
+    for filename in os.listdir(dataPath+'game_data/'):
+
+        #print(filename+' is a directory? '+str(os.path.isdir(os.path.join(dataPath+'game_data/',filename))))
+        if os.path.isdir(os.path.join(dataPath+'game_data/',filename)):
+            # add key to the dictionary
+            grouplist[filename] = []
+            for fileteam in os.listdir(dataPath + 'game_data/'+filename):
+                if os.path.isdir(os.path.join(dataPath+'game_data/'+filename,fileteam)) == True:
+
+                    #read the json file
+                    with open(dataPath + 'game_data/'+filename+'/'+fileteam+'/resultats.json') as json_file:
+                        data = json.load(json_file)
+                        currentYear=0
+                        #get the first key of the json file
+                        for key in data.keys():
+                            #check if it's empty
+                            if data[key] == {}:
+                                #remove the empty key
+                                currentYear = key
+                                print(currentYear)
+                                #exite the for loop
+                                break
+                        percent= normap(int(currentYear), 2030, 2050, 0, 100)
+                        grouplist[filename].append({'team':fileteam,'data':currentYear,'percent':percent})
+                        #grouplist[filename]{'team':fileteam,'data':'data'})
+
+    #grouplist = sorted(grouplist, key=lambda d: d['group']+d['team'])
+    #sort the dictionary by key
+    grouplist = dict(sorted(grouplist.items()))
+    #sort the list of teams by team name
+    for key in grouplist:
+        grouplist[key] = sorted(grouplist[key], key=lambda d: d['team'])
+
+    return grouplist
+
 def normap(value, start1, stop1, start2, stop2):
     OldRange = (stop1 - start1)
     if OldRange == 0:
@@ -32,46 +70,18 @@ def normap(value, start1, stop1, start2, stop2):
 
 @admin_blueprint.route('/admin/dashboard')
 def dashboard(method=['GET']):
-    grouplist = {}
+    
     if 'username' in session and 'admin_climix_man' in session['attributes']['memberOfCN']:
-        # list game_data games only directoires and teams on subdirectories
-        for filename in os.listdir(dataPath+'game_data/'):
-
-
-            #print(filename+' is a directory? '+str(os.path.isdir(os.path.join(dataPath+'game_data/',filename))))
-            if os.path.isdir(os.path.join(dataPath+'game_data/',filename)):
-                # add key to the dictionary
-                grouplist[filename] = []
-                for fileteam in os.listdir(dataPath + 'game_data/'+filename):
-                    if os.path.isdir(os.path.join(dataPath+'game_data/'+filename,fileteam)) == True:
-
-                        #read the json file
-                        with open(dataPath + 'game_data/'+filename+'/'+fileteam+'/resultats.json') as json_file:
-                            data = json.load(json_file)
-                            currentYear=0
-                            #get the first key of the json file
-                            for key in data.keys():
-                                #check if it's empty
-                                if data[key] == {}:
-                                    #remove the empty key
-                                    currentYear = key
-                                    print(currentYear)
-                                    #exite the for loop
-                                    break
-                            percent= normap(int(currentYear), 2030, 2050, 0, 100)
-                            grouplist[filename].append({'team':fileteam,'data':currentYear,'percent':percent})
-                            #grouplist[filename]{'team':fileteam,'data':'data'})
-
-        #grouplist = sorted(grouplist, key=lambda d: d['group']+d['team'])
-        #sort the dictionary by key
-        grouplist = dict(sorted(grouplist.items()))
-        #sort the list of teams by team name
-        for key in grouplist:
-            grouplist[key] = sorted(grouplist[key], key=lambda d: d['team'])
-
-        print(grouplist)
+        grouplist = get_group_list(dataPath=dataPath)
         return render_template('dashboard.html', username=session['username'], attributes=session['attributes']['memberOfCN'],grouplist=grouplist)
-    return 'Login required. <a href="/login">Login</a>', 403
+    return 'Login required. <a href="/admin/login">Login</a>', 403
+
+@admin_blueprint.route('/admin/cheatboard')
+def cheatboard(method=['GET']):    
+    grouplist = get_group_list(dataPath)
+    print(grouplist)
+    return render_template('dashboard.html', username="tricheur", attributes='memberOfCN',grouplist=get_group_list(dataPath))
+
 
 
 @admin_blueprint.route('/admin/login')
@@ -121,3 +131,8 @@ def logout_callback():
     # redirect from CAS logout request after CAS logout successfully
     session.pop('username', None)
     return 'Logged out from CAS. <a href="/admin/login">Login</a>'
+
+
+@admin_blueprint.route('/admin/view/<equipe>/<partie>')
+def view(equipe, partie):
+    return(render_template('view.html', equipe=equipe, partie=partie))

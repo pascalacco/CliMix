@@ -86,7 +86,7 @@
                                         {% for key, teams in grouplist.items() %}
                                             <h5>Groupe : {{ key }} </h5>
                                             {% for team in teams %}
-                                                <ul>Equipe {{ team['team'] }} <span class="pull-right strong"><a href="admin/view/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> </a> </span>
+                                                <ul>Equipe {{ team['team'] }} <span class="pull-right strong"><a href="view/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> </a> </span>
                                                  <div class="progress">
                                                    
 											<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="{{ team['data'] }}" aria-valuemin="2030" aria-valuemax="2050" style="width:{{ team['percent'] }}%">{{ team['data'] }}</div>

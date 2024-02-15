@@ -445,7 +445,12 @@ def imgProcess():
 if __name__ == "__main__":
     #run the apps on the current host and port 5000
 
-    #app.run(host='insa-09340.insa-toulouse.fr',debug=True,ssl_context='adhoc')
-    app.run(host='insa-09340.insa-toulouse.fr',debug=True)
+
+    if est_local:
+        app.run(host='localhost',debug=True)
+    else:
+        #app.run(host='insa-09340.insa-toulouse.fr',debug=True,ssl_context='adhoc')
+        app.run(host='insa-09340.insa-toulouse.fr',debug=True)
+
     logging.basicConfig(filename=dataPath+'logs.txt', level=logging.DEBUG)
     app.logger.info('server started')
