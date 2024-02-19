@@ -15,7 +15,7 @@ Welcome to CliMix's documentation!
    politique
    alea   
    modules
-
+   pages_frugal
 
 Indices and tables  
 ===================

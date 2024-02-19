@@ -2,7 +2,7 @@
 
 Pour générer la doc dans votre répertoire git allez voir les [instructions sur le Github](https://github.com/pascalacco/CliMix/blob/doc/doc/source/doc_howto.md)
 
-
+## Pages de la version frugale
 
 ## Machine à état des pages
 
@@ -43,6 +43,9 @@ Pour générer la doc dans votre répertoire git allez voir les [instructions su
      rendermanual -- render --> manual
   end
 ```
+
+
+
 ## Installation
 
 ### Prérequis
