@@ -1,0 +1,67 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+
+
+    		<nav class="navbar navbar-dark bg-primary navbar-default navbar-static-top  ">
+				<div class="container-fluid">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand" href="#">
+							New index
+						</a>
+					</div>
+					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+						<ul class="nav navbar-nav navbar-right">
+
+							<li class="dropdown ">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+									<b>{{username}}</b>
+									<span class="caret"></span></a>
+									<ul class="dropdown-menu" role="menu">
+										<li class=""><a href="/logout">Déconnection </a></li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</nav>
+                <h2 class="text-center">Nouvelle interface du jeu mix énergétique</h2>
+				<div class="container">
+					<div class="align-items-center">
+						<h4 class="text-center">Liste des parties en cours : </h4>
+								{% for key, teams in grouplist.items() %}
+									<h5>Groupe : {{ key }} </h5>
+									{% for team in teams %}
+										<ul>Partie {{ team['team'] }} : 
+											<span class="pull-right strong">
+												<a href="jeu_manual/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm">
+													<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 
+												</a> 
+											</span>     
+											<span class="pull-right strong">
+												<a href="jeu_manual/{{ key }}/{{ team['team'] }}" class="btn btn-primary btn-sm">
+													<span class="glyphicon glyphicon-hand-pointer" style="color: blue;" aria-hidden="true"> Scribes </span>
+												</a>
+											</span>
+										<div class="progress">
+										
+									<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="{{ team['data'] }}" aria-valuemin="2030" aria-valuemax="2050" style="width:{{ team['percent'] }}%">{{ team['data'] }}</div>
+									</div>
+										</ul>
+									{%- endfor %}
+								{%- endfor %}
+								</ul>
+					</div>
+				</div>
+
+                <hr class="my-5">
+                <a href="/admin/login" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Espace Enseignants</a>
+                <a href="/admin/cheatboard" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Espace Tricheurs</a>
+        </body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>            
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .title {
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #additionalText {
+            font-size: 18px;
+            text-align: justify;
+            margin-bottom: 20px;
+        }
+
+        .column-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .column {
+            width: 48%; /* Adjust the width as needed */
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #picture {
+            display: block;
+            margin: 0 auto; /* Center the image */
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="title" id="pageTitle">Année 2030</div>
+
+    <div id="additionalText">
+        Jour tant attendu des résultats du dernier rapport sur la transition écologique, dans un climat politique tendu. Réactions des différentes voix du pays.
+    </div>
+
+    <!-- Display the picture fetched from /get_picture -->
+    <img id="picture" src="/get_picture" alt="Picture from /get_picture">
+
+    <div class="column-container">
+        <!-- Repeat the following block for each of the 6 text spots -->
+        <div class="column" id="fileContent1">
+            <!-- Content from /get_file_1er_perso will be displayed here -->
+        </div>
+
+        <div class="column" id="fileContent2">
+            <!-- Content from /get_file_2nd_perso will be displayed here -->
+        </div>
+
+        <div class="column" id="fileContent3">
+            <!-- Content from /get_file_3eme_perso will be displayed here -->
+        </div>
+    </div>
+
+    <button id="results">Voir les résultats</button>
+</div>
+
+<script>
+    document.getElementById('results').addEventListener('click', function() {
+        // Redirect to the "/results" route
+        window.location.href = '/results';
+    });
+
+    // Fetch and replace the title dynamically
+    fetch('/get_title')
+        .then(response => response.text())
+        .then(title => {
+            // Update the document title and the displayed title
+            document.title = title;
+            document.getElementById('pageTitle').innerText = title;
+        })
+        .catch(error => console.error('Error fetching title:', error));
+
+    // Fetch and display the content of the first text file
+    fetch('/get_file_1er_perso')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('fileContent1').innerHTML = '<h3>1er personnage</h3>' + data;
+        })
+        .catch(error => console.error('Error fetching first file:', error));
+
+    // Fetch and display the content of the second text file
+    fetch('/get_file_2nd_perso')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('fileContent2').innerHTML = '<h3>2nd personnage</h3>' + data;
+        })
+        .catch(error => console.error('Error fetching second file:', error));
+
+    // Fetch and display the content of the third text file
+    fetch('/get_file_3eme_perso')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('fileContent3').innerHTML = '<h3>3eme personnage</h3>' + data;
+        })
+        .catch(error => console.error('Error fetching third file:', error));
+</script>
+
+</body>
+</html>
