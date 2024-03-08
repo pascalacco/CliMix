@@ -39,18 +39,18 @@
                         {% if scenario is none %}
                                 <select id="scenarioInput" class="form-select form-select-md" name="scenarioInput">
                                     <option value="default">Scénario Ademe...</option>
-                                    <option value="1">Ademe1</option>
-                                    <option value="2">Ademe2</option>
-                                    <option value="3">Ademe3</option>
-                                    <option value="4">Ademe4</option>
+                                    <option value="Ademe1">Ademe1</option>
+                                    <option value="Ademe2">Ademe2</option>
+                                    <option value="Ademe3">Ademe3</option>
+                                    <option value="Ademe4">Ademe4</option>
                                 </select>
                             {% else %}
                                 <select id="scenarioInput" class="form-select form-select-md" name="scenarioInput" disabled>
                                     <option value="default">Scénario Ademe...</option>
-                                    <option value="1">Ademe1</option>
-                                    <option value="2">Ademe2</option>
-                                    <option value="3">Ademe3</option>
-                                    <option value="4">Ademe4</option>
+                                    <option value="Ademe1">Ademe1</option>
+                                    <option value="Ademe2">Ademe2</option>
+                                    <option value="Ademe3">Ademe3</option>
+                                    <option value="Ademe4">Ademe4</option>
                                 </select>
                             {% endif %}
                     </div>
@@ -66,20 +66,30 @@
                     <div class="form-outline col-md-3">
                         <select id="genreInput" name="genreInput" class="form-select form-select-md">
                             <option value="default">Genre...</option>
-                            <option value="1">Masculin</option>
-                            <option value="2">Féminin</option>
+                            <option value="Masculin">Masculin</option>
+                            <option value="Féminin">Féminin</option>
                         </select>
                     </div>
     
-                    <div class="form-outline col-md-3">
+                   <!-- <div class="form-outline col-md-3"> Pensez à rajouter le jinja pour role
                         <form method="post">
                             <select id="roleInput" name="roleInput" class="form-select form-select-md">
                                 <option value="default">Donnez-lui un rôle...</option>
-                                {% for key, value in roles.items() %}
-                                    <option value="{{ key }}">{{ value }}</option>
-                                {% endfor %}
+                               
                             </select>
                         </form>
+                    </div>-->
+
+                    <div class="form-outline col-md-3">
+                        <select id="roleInput" name="roleInput" class="form-select form-select-md">
+                            <option value="default">Role...</option>
+                            <option value="PDG">PDG</option>
+                            <option value="Ministre">Ministre</option>
+                            <option value="Chef d'entreprise">Chef d'entreprise</option>
+                            <option value="Employé">Employé</option>
+                            <option value="Ecologiste">Ecologiste</option>
+                            <option value="Politicien">Politicien</option>
+                        </select>
                     </div>
                     
     
@@ -100,19 +110,21 @@
     
         </div>
 
-        <div class="form-outline col-md-6">
-            <p>Liste des joueurs:</p>
-            {% if joueurs %}
-                <ul class="list-group text-center">
-                    {% for joueur in joueurs %}
-                        <li class="list-group-item">{{ joueur.nom }}, {{ joueur.prenom }}, {{ joueur.genre }}, {{ joueur.role }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-center">Aucun joueur saisi pour le moment.</p>
-            {% endif %}
-        </div>        
-    
+        <div class="row justify-content-center align-items-center">
+            <div class="form-outline col-md-6">
+                <p>Liste des joueurs:</p>
+                {% if player %}
+                    <ul class="list-group text-center">
+                        {% for joueur in player %}
+                            <li class="list-group-item">{{ joueur.nom }}, {{ joueur.prenom }}, {{ joueur.genre }}, {{ joueur.role }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-center">Aucun joueur saisi pour le moment.</p>
+                {% endif %}
+            </div>
+        </div>
+
         <hr class="my-5">
         <a href="/admin/login" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Espace Enseignants</a>
         <a href="/admin/cheatboard" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Espace Tricheurs</a>

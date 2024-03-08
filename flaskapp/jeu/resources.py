@@ -72,8 +72,8 @@ def creer_dossier(chemin_dossier):
     if not os.path.exists(chemin_dossier):
         os.makedirs(chemin_dossier)
 
-def get_rol():
-    data_role = DataManager(equipe='', partie='').get_roles()
+def get_rol(equipe, partie):
+    data_role = DataManager(equipe=equipe, partie=partie).get_roles()
     return data_role
 
 
@@ -92,7 +92,7 @@ def jeu_manual(equipe, partie):
 def jeu_init(equipe, partie):
    # print("Entrer dans le dossier")
     grouplist = get_group_list()
-    data_roles = get_rol()
+   # data_roles = get_rol(equipe, partie)
     chemin_dossier = f'game_data/{equipe}/{partie}'
     chemin_fichier = f'{chemin_dossier}/infos.json'
     scenario = None
@@ -142,6 +142,18 @@ def jeu_init(equipe, partie):
         #return jsonify({'message': 'Données enregistrées avec succès!'})
         
         for i in range(1, n + 1):
+            joueur_key = "joueur" + str(i)
+            if joueur_key in infos:
+                joueur = infos[joueur_key]
+                player.append({
+                    'nom': joueur['nom'],
+                    'prenom': joueur['prenom'],
+                    'genre': joueur['genre'],
+                    'role': joueur['role']
+                })
+        '''
+        
+        for i in range(1, n + 1):
             joueur = infos["joueur" + str(i)]
             player.append({
                 'nom': joueur['nom'],
@@ -149,6 +161,7 @@ def jeu_init(equipe, partie):
                 'genre': joueur['genre'],
                 'role': joueur['role']
             })
+        '''
 
-    return render_template('jeu_init.html', equipe=equipe, partie=partie, scenario = scenario, password = password, grouplist=get_group_list(), data_roles=get_rol(), player=player)
+    return render_template('jeu_init.html', equipe=equipe, partie=partie, scenario = scenario, password = password, grouplist=get_group_list(), player=player)#, data_roles=get_rol(), player=player)
     #return render_template('jeu_init.html', equipe=equipe, partie=partie, scenario=scenario, password=password, grouplist=grouplist, roles=data_roles)

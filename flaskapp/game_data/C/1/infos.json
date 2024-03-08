@@ -1,0 +1,18 @@
+{
+    "scrib": {
+        "password": "cibuj",
+        "scenario_ademe": "Ademe1"
+    },
+    "joueur1": {
+        "nom": "ZOUBGA",
+        "prenom": "Wend-Yam",
+        "genre": "Masculin",
+        "role": "Employ\u00e9"
+    },
+    "joueur3": {
+        "nom": "ZOUBGA",
+        "prenom": "Wend-Yam",
+        "genre": "Masculin",
+        "role": "Employ\u00e9"
+    }
+}
