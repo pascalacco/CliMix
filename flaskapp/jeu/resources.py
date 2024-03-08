@@ -2,10 +2,10 @@ import os
 import sys,json
 sys.path.append('../')
 from constantes import dataPath, host, CAS_SERVICE_URL, CAS_SERVER_URL
-from flask import Blueprint, Flask,render_template, session,request, redirect, url_for
+from flask import Blueprint, Flask,render_template, session,request, redirect, url_for, jsonify
 from flask import current_app
 
-from archiveur import Parties
+from archiveur import Parties, DataManager #Ajout de l'importation de la classe DataManager
 
 jeu_blueprint = Blueprint('jeu', __name__)
 
@@ -68,6 +68,14 @@ def get_group_list():
 
     return grouplist
 
+def creer_dossier(chemin_dossier):
+    if not os.path.exists(chemin_dossier):
+        os.makedirs(chemin_dossier)
+
+def get_rol():
+    data_role = DataManager(equipe='', partie='').get_roles()
+    return data_role
+
 
 @jeu_blueprint.route('/jeu/jeu_index')
 def jeu_index():
@@ -79,3 +87,68 @@ def jeu_index():
 @jeu_blueprint.route('/jeu/jeu_manual/<equipe>/<partie>')
 def jeu_manual(equipe, partie):
     return(render_template('jeu_manual.html', equipe=equipe, partie=partie))
+
+@jeu_blueprint.route('/jeu/jeu_init/<equipe>/<partie>', methods=['GET', 'POST'])
+def jeu_init(equipe, partie):
+   # print("Entrer dans le dossier")
+    grouplist = get_group_list()
+    data_roles = get_rol()
+    chemin_dossier = f'game_data/{equipe}/{partie}'
+    chemin_fichier = f'{chemin_dossier}/infos.json'
+    scenario = None
+    password = None
+    player = []
+    
+    if request.method == 'POST':
+        data = {
+            'nom': request.form['nomInput'],
+            'prenom': request.form['prenomInput'],
+            'genre': request.form['genreInput'],
+            'role': request.form['roleInput']
+        }
+        
+        if not os.path.exists(chemin_dossier):
+            os.makedirs(chemin_dossier, exist_ok=True)
+            #print("Dossier")
+        
+        if not os.path.exists(chemin_fichier):
+            with open(chemin_fichier, 'w') as file:
+                scrib = {
+                    'password': request.form['passwordInput'],
+                    'scenario_ademe': request.form['scenarioInput']
+                }
+                l = {}
+                l["scrib"] = scrib
+                l["joueur1"] = data
+                json.dump(l, file, indent=4)
+                #print("Path not exists")
+                
+        if os.path.exists(chemin_fichier):
+            with open(chemin_fichier, 'r') as file:
+                infos = json.load(file)
+                n = len(infos) + 1
+                infos["joueur"+str(n)] = data
+                #print("Path exists")
+            with open(chemin_fichier, 'w') as file:
+                json.dump(infos, file, indent=4)
+                #print("Path exists and write")
+                scrib = {
+                    'password': infos['scrib']['password'],
+                    'scenario_ademe': infos['scrib']['scenario_ademe']
+                }
+                
+        scenario = scrib['scenario_ademe']
+        password = scrib['password']
+        #return jsonify({'message': 'Données enregistrées avec succès!'})
+        
+        for i in range(1, n + 1):
+            joueur = infos["joueur" + str(i)]
+            player.append({
+                'nom': joueur['nom'],
+                'prenom': joueur['prenom'],
+                'genre': joueur['genre'],
+                'role': joueur['role']
+            })
+
+    return render_template('jeu_init.html', equipe=equipe, partie=partie, scenario = scenario, password = password, grouplist=get_group_list(), data_roles=get_rol(), player=player)
+    #return render_template('jeu_init.html', equipe=equipe, partie=partie, scenario=scenario, password=password, grouplist=grouplist, roles=data_roles)

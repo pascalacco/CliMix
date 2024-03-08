@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="author" content="Aymeric Shinawi">
+        <meta name="description" content="Jeu Mix Energétique pour l'INSA Toulouse">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Jeu mix énergétique</title>
+
+        <link rel="shortcut icon" type="image/x-icon" href="static/img/favicon.ico">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+       <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="static/jeu_init.js" defer></script> -->
+        
+    </head>
+
+    <body>
+
+        <h1 id="titre" class="container-fluid mt-2 mb-5 text-center">Initialisation de la partie {{ partie }} de {{ equipe }}</h1>
+        <img src="static/logo.png" width="100" height="auto" alt="Climix logo">
+        <div id="sous-titre" class="pt-5 container justify-content-center">
+            <h3 class="mt-3 mb-5 text-center">Renseignez les informations suivantes</h3>
+    
+            <form action="/jeu/jeu_init/{{ equipe }}/{{ partie }}" method="post">
+                <div class="pt-3 row justify-content-center align-items-center gy-4">
+    
+                    <div class="form-outline col-md-3">
+                        {% if password is none %}
+                        <input type="password" name="passwordInput" id="passwordInput" placeholder="password">
+                        {% else %}
+                        <input type="password" name="passwordInput" id="passwordInput" placeholder="" disabled>
+                        {% endif %}
+                    </div>
+    
+                    <div class="form-outline col-md-3">
+                        {% if scenario is none %}
+                                <select id="scenarioInput" class="form-select form-select-md" name="scenarioInput">
+                                    <option value="default">Scénario Ademe...</option>
+                                    <option value="1">Ademe1</option>
+                                    <option value="2">Ademe2</option>
+                                    <option value="3">Ademe3</option>
+                                    <option value="4">Ademe4</option>
+                                </select>
+                            {% else %}
+                                <select id="scenarioInput" class="form-select form-select-md" name="scenarioInput" disabled>
+                                    <option value="default">Scénario Ademe...</option>
+                                    <option value="1">Ademe1</option>
+                                    <option value="2">Ademe2</option>
+                                    <option value="3">Ademe3</option>
+                                    <option value="4">Ademe4</option>
+                                </select>
+                            {% endif %}
+                    </div>
+    
+                    <div class="form-outline col-md-3">
+                        <input type="text" id="nomInput" placeholder="nom" name="nomInput">
+                    </div>
+    
+                    <div class="form-outline col-md-3">
+                        <input type="text" id="prenomInput" placeholder="prénom" name="prenomInput">
+                    </div>
+    
+                    <div class="form-outline col-md-3">
+                        <select id="genreInput" name="genreInput" class="form-select form-select-md">
+                            <option value="default">Genre...</option>
+                            <option value="1">Masculin</option>
+                            <option value="2">Féminin</option>
+                        </select>
+                    </div>
+    
+                    <div class="form-outline col-md-3">
+                        <form method="post">
+                            <select id="roleInput" name="roleInput" class="form-select form-select-md">
+                                <option value="default">Donnez-lui un rôle...</option>
+                                {% for key, value in roles.items() %}
+                                    <option value="{{ key }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                    
+    
+                    <div class="form-outline col-md-3">
+                        <button class="btn btn-primary" type="submit">Valider</button>
+                    </div>
+    
+                    <div class="form-outline col-md-3">
+                        <a href="manual.html" class="btn btn-primary">Lancer la partie</a>
+                    </div>
+    
+                    <div class="form-outline col-md-6">
+                        <p id="confirmationMessage" style="display: none;"></p>
+                    </div>
+    
+                </div>
+            </form>
+    
+        </div>
+
+        <div class="form-outline col-md-6">
+            <p>Liste des joueurs:</p>
+            {% if joueurs %}
+                <ul class="list-group text-center">
+                    {% for joueur in joueurs %}
+                        <li class="list-group-item">{{ joueur.nom }}, {{ joueur.prenom }}, {{ joueur.genre }}, {{ joueur.role }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-center">Aucun joueur saisi pour le moment.</p>
+            {% endif %}
+        </div>        
+    
+        <hr class="my-5">
+        <a href="/admin/login" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Espace Enseignants</a>
+        <a href="/admin/cheatboard" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Espace Tricheurs</a>
+        <a href="/jeu/jeu_index" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Retour</a>
+    </body>
+    
+
+</html>
+        

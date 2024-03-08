@@ -1,0 +1,60 @@
+{
+    "scrib": {
+        "password": "3tuV%YcYr5*v#2d",
+        "scenario_ademe": "default"
+    },
+    "joueur1": {
+        "nom": "Mama",
+        "prenom": "Papa",
+        "genre": "1",
+        "role": "2"
+    },
+    "joueur2": {
+        "password": "3tuV%YcYr5*v#2d",
+        "scenario_ademe": "default",
+        "nom": "Mama",
+        "prenom": "Papa",
+        "genre": "1",
+        "role": "2"
+    },
+    "joueur3": {
+        "password": "3tuV%YcYr5*v#2d",
+        "scenario_ademe": "default",
+        "nom": "Mama",
+        "prenom": "Papa",
+        "genre": "1",
+        "role": "2"
+    },
+    "joueur4": {
+        "password": "3tuV%YcYr5*v#2d",
+        "scenario_ademe": "1",
+        "nom": "Lolo",
+        "prenom": "Lala",
+        "genre": "1",
+        "role": "3"
+    },
+    "joueur6": {
+        "nom": "Lolo",
+        "prenom": "Papa",
+        "genre": "1",
+        "role": "2"
+    },
+    "joueur7": {
+        "nom": "Lolo",
+        "prenom": "Papa",
+        "genre": "1",
+        "role": "2"
+    },
+    "joueur8": {
+        "nom": "Nini",
+        "prenom": "Nana",
+        "genre": "2",
+        "role": "3"
+    },
+    "joueur9": {
+        "nom": "Marc",
+        "prenom": "Marc",
+        "genre": "1",
+        "role": "1"
+    }
+}

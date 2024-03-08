@@ -36,25 +36,26 @@
 					<div class="align-items-center">
 						<h4 class="text-center">Liste des parties en cours : </h4>
 								{% for key, teams in grouplist.items() %}
-									<h5>Groupe : {{ key }} </h5>
-									{% for team in teams %}
-										<ul>Partie {{ team['team'] }} : 
-											<span class="pull-right strong">
-												<a href="jeu_manual/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm">
-													<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 
-												</a> 
-											</span>     
-											<span class="pull-right strong">
-												<a href="jeu_manual/{{ key }}/{{ team['team'] }}" class="btn btn-primary btn-sm">
-													<span class="glyphicon glyphicon-hand-pointer" style="color: blue;" aria-hidden="true"> Scribes </span>
-												</a>
-											</span>
-										<div class="progress">
-										
-									<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="{{ team['data'] }}" aria-valuemin="2030" aria-valuemax="2050" style="width:{{ team['percent'] }}%">{{ team['data'] }}</div>
-									</div>
-										</ul>
-									{%- endfor %}
+									{% set group_key = key ~ loop.index %}
+									<h5>Groupe : {{ group_key }} </h5>
+										{% for team in teams %}
+											<ul>Partie {{ team['team'] }} : 
+												<span class="pull-right strong">
+													<a href="jeu_manual/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm">
+														<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 
+													</a> 
+												</span>     
+												<span class="pull-right strong">
+													<a href="jeu_init/{{ key }}/{{ team['team']}}" class="btn btn-primary btn-sm"> <!--version précédente : href="jeu_manual/{{ key }}/{{ team['team'] }}" class="btn btn-primary btn-sm" -->
+														<span class="glyphicon glyphicon-hand-pointer" style="color: blue;" aria-hidden="true"> Scribes </span>
+													</a>
+												</span>
+											<div class="progress">
+											
+										<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="{{ team['data'] }}" aria-valuemin="2030" aria-valuemax="2050" style="width:{{ team['percent'] }}%">{{ team['data'] }}</div>
+										</div>
+											</ul>
+										{%- endfor %}
 								{%- endfor %}
 								</ul>
 					</div>

@@ -10,7 +10,6 @@ import logging
 import detection
 import strat_stockage
 from constantes import *
-
 from archiveur import Parties
 
 from api.resources import api_blueprint
@@ -316,9 +315,19 @@ def commitResults():
     else:
         return redirect("/manual")
 
+'''
+@app.route('/jeu_results')
+@cross_origin(support_credentials=True)
+def results_html():
+    return redirect("jeu_results.html")
+'''
 
-
-
+'''
+@app.route('/jeu_results/')
+@cross_origin(support_credentials=True)
+def results_bis_html():
+    return redirect("/jeu_results")
+'''
 
 @app.route('/results')
 @cross_origin(support_credentials=True)
@@ -338,7 +347,6 @@ def results_html():
 @cross_origin(support_credentials=True)
 def results_bis_html():
     return redirect("/results")
-
 
 
 @app.route('/get_results')
