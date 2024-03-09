@@ -71,8 +71,11 @@ class DataManager:
         self.roles_path = dataPath + "game_data/{}/{}/roles.json".format(equipe, partie)
         self.round_path = dataPath + "game_data/{}/{}/current_round.pkl".format(equipe, partie)
         self.title_path = dataPath + "game_data/{}/{}/annee.txt".format(equipe, partie)
+<<<<<<< HEAD
         self.infos_path = dataPath + "game_data/{}/{}/infos.json".format(equipe, partie)
         
+=======
+>>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 
     def set_round(self):
         current_round = -1
@@ -187,5 +190,9 @@ class DataManager:
     def get_data_for_themes(self, role, theme):
         with open(self.scores_path, "r") as f:
             scores = json.load(f)
+<<<<<<< HEAD
         return scores[role][theme][1]
     
+=======
+        return scores[role][theme][1]
+>>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf

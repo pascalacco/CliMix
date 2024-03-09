@@ -439,10 +439,13 @@ $(function() {
             location.href = "/";
         });
 
+<<<<<<< HEAD
         $("#res_opt").click(() => {
             location.href = "/jeu_results";
         });
 
+=======
+>>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 
 
         // DEBUT EXECUTION PAGE

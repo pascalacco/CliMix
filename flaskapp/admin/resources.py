@@ -9,7 +9,11 @@ from flask import current_app
 
 from archiveur import Parties
 
+<<<<<<< HEAD
 # Creation du Blueprint l'administration
+=======
+# Création du Blueprint l'administration
+>>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 admin_blueprint = Blueprint('admin', __name__)
 
 

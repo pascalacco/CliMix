@@ -10,11 +10,18 @@ import logging
 import detection
 import strat_stockage
 from constantes import *
+<<<<<<< HEAD
 from archiveur import Parties
 
 from api.resources import api_blueprint
 from admin.resources import admin_blueprint
 from jeu.resources import jeu_blueprint
+=======
+
+from api.resources import api_blueprint
+from admin.resources import admin_blueprint
+
+>>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 
 # with open(dataPath+'logs.txt', 'a') as logs:
 #     logs.write("[{}] error: {} \n".format(datetime.datetime.now(), traceback.format_exc()))
@@ -30,7 +37,10 @@ app.secret_key = 'fdsfds3215zez'
 
 app.register_blueprint(api_blueprint)
 app.register_blueprint(admin_blueprint)
+<<<<<<< HEAD
 app.register_blueprint(jeu_blueprint)
+=======
+>>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 
 #Bypass CORS at the front end:
 cors = CORS(app)
@@ -143,6 +153,7 @@ def verif_fichier(fich, rep="", format=".json"):
         ok = False
     return ok
 
+<<<<<<< HEAD
 
 
 @app.route('/')
@@ -150,6 +161,12 @@ def verif_fichier(fich, rep="", format=".json"):
 def home_html():
     #return render_template("index.html")
     return(render_template('index.html'))
+=======
+@app.route('/')
+@cross_origin(support_credentials=True)
+def home_html():
+    return render_template("index.html")
+>>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 
 @app.route('/set_group', methods=["POST"])
 @cross_origin(support_credentials=True)
@@ -315,6 +332,7 @@ def commitResults():
     else:
         return redirect("/manual")
 
+<<<<<<< HEAD
 '''
 @app.route('/jeu_results')
 @cross_origin(support_credentials=True)
@@ -328,6 +346,11 @@ def results_html():
 def results_bis_html():
     return redirect("/jeu_results")
 '''
+=======
+
+
+
+>>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 
 @app.route('/results')
 @cross_origin(support_credentials=True)
@@ -349,6 +372,10 @@ def results_bis_html():
     return redirect("/results")
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 @app.route('/get_results')
 @cross_origin(support_credentials=True)
 def get_results():
@@ -460,7 +487,11 @@ if __name__ == "__main__":
     #run the apps on the current host and port 5000
 
 
+<<<<<<< HEAD
     if path_local:
+=======
+    if est_local:
+>>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
         app.run(host='localhost',debug=True)
     else:
         #app.run(host='insa-09340.insa-toulouse.fr',debug=True,ssl_context='adhoc')
