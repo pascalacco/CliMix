@@ -16,7 +16,7 @@
 import os
 
 path_serveur = "/var/www/html/flaskapp/"
-path_local = "/mnt/c/Users/ishaa/OneDrive/Bureau/climix/ClimIntervenants/flaskapp/"
+path_local = "/mnt/c/Users/ishaa/OneDrive/Bureau/v1Climix/climix/flaskapp/"
 if os.path.exists(path_serveur) :
     dataPath = path_serveur
 else:

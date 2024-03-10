@@ -172,3 +172,10 @@ def authentification(equipe, partie):
         return (redirect('/jeu/jeu_init/<equipe>/<partie>'))
     else:
         return render_template("authentification.html", partie=partie, equipe=equipe)
+
+@jeu_blueprint.route('/jeu/jeu_index/verification')
+def verification_mdp():
+    equipe = session['equipe']
+    partie = session['partie']
+    
+    return None
