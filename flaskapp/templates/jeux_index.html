@@ -36,26 +36,25 @@
 					<div class="align-items-center">
 						<h4 class="text-center">Liste des parties en cours : </h4>
 								{% for key, teams in grouplist.items() %}
-									{% set group_key = key ~ loop.index %}
-									<h5>Groupe : {{ group_key }} </h5>
-										{% for team in teams %}
-											<ul>Partie {{ team['team'] }} : 
-												<span class="pull-right strong">
-													<a href="jeu_manual/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm">
-														<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 
-													</a> 
-												</span>     
-												<span class="pull-right strong">
-													<a href="jeu_init/{{ key }}/{{ team['team']}}" class="btn btn-primary btn-sm"> <!--version précédente : href="jeu_manual/{{ key }}/{{ team['team'] }}" class="btn btn-primary btn-sm" -->
-														<span class="glyphicon glyphicon-hand-pointer" style="color: blue;" aria-hidden="true"> Scribes </span>
-													</a>
-												</span>
-											<div class="progress">
-											
-										<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="{{ team['data'] }}" aria-valuemin="2030" aria-valuemax="2050" style="width:{{ team['percent'] }}%">{{ team['data'] }}</div>
-										</div>
-											</ul>
-										{%- endfor %}
+									<h5>Groupe : {{ key }} </h5>
+									{% for team in teams %}
+										<ul>Partie {{ team['team'] }} : 
+											<span class="pull-right strong">
+												<a href="/jeu/jeu_index/manual/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm" {% if team['data'] == '2030' or team['data'] == '2025' %}disabled{% endif %}>
+													<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 
+												</a> 
+											</span>     
+											<span class="pull-right strong">
+												<a href="/jeu/jeu_init/{{ key }}/{{ team['team'] }}" class="btn btn-primary btn-sm">
+													<span class="glyphicon glyphicon-hand-pointer" style="color: blue;" aria-hidden="true"> Scribe </span>
+												</a>
+											</span>
+										<div class="progress">
+										
+									<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="{{ team['data'] }}" aria-valuemin="2030" aria-valuemax="2050" style="width:{{ team['percent'] }}%">{{ team['data'] }}</div>
+									</div>
+										</ul>
+									{%- endfor %}
 								{%- endfor %}
 								</ul>
 					</div>
@@ -64,5 +63,8 @@
                 <hr class="my-5">
                 <a href="/admin/login" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Espace Enseignants</a>
                 <a href="/admin/cheatboard" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Espace Tricheurs</a>
+				<a href="/jeu/statut" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Changement de statut</a>
+				<a>Vous êtes actuellement : {{role}}</a>
+
         </body>
 </html>

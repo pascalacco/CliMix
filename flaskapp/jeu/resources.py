@@ -5,47 +5,12 @@ from constantes import dataPath, host, CAS_SERVICE_URL, CAS_SERVER_URL
 from flask import Blueprint, Flask,render_template, session,request, redirect, url_for, jsonify
 from flask import current_app
 
-from archiveur import Parties, DataManager #Ajout de l'importation de la classe DataManager
+from archiveur import Parties, DataManager
 
 jeu_blueprint = Blueprint('jeu', __name__)
 
-# def normap(value, start1, stop1, start2, stop2):
-#     OldRange = (stop1 - start1)
-#     if OldRange == 0:
-#         NewValue = start2
-#     else:
-#         NewRange = (stop2 - start2)
-#         NewValue = (((value - start1) * NewRange) / OldRange) + start2
+json_opts = {"indent": 4, "sort_keys": True}
 
-#     return NewValue
-
-
-# def get_group_list():
-#     grouplist = Parties(dataPath=dataPath).get_liste_equipes()
-
-#     for equipe in grouplist:
-#         for partie in grouplist[equipe] :
-#             percent = normap(int(partie['data']), 2030, 2050, 0, 100)
-#             partie['percent'] = percent
-
-#     return grouplist
-
-# @jeu_blueprint.route('/jeu/dashboard')
-# def dashboard(method=['GET']):
-    
-#     if 'username' in session and 'admin_climix_man' in session['attributes']['memberOfCN']:
-#         grouplist = get_group_list()
-#         return render_template('dashboard.html', username=session['username'], attributes=session['attributes']['memberOfCN'],grouplist=grouplist)
-#     return 'Login required. <a href="/admin/login">Login</a>', 403
-
-# @jeu_blueprint.route('/jeu/cheatboard')
-# def cheatboard(method=['GET']):    
-#     grouplist = get_group_list()
-#     print(grouplist)
-#     return render_template('dashboard.html',
-#                            username="tricheur",
-#                            attributes='memberOfCN',
-#                            grouplist=get_group_list())
 
 def normap(value, start1, stop1, start2, stop2):
     OldRange = (stop1 - start1)
@@ -68,25 +33,67 @@ def get_group_list():
 
     return grouplist
 
+def verif_fichier(fich, rep="", format=".json"):
+    ok = True
+    try:
+        src = open(rep + "/" + fich + format, "r")
+        dic = json.load(src)
+    except :
+        ok = False
+    return ok
+
 def creer_dossier(chemin_dossier):
     if not os.path.exists(chemin_dossier):
         os.makedirs(chemin_dossier)
 
 def get_rol(equipe, partie):
-    data_role = DataManager(equipe=equipe, partie=partie).get_roles()
+    data_role = DataManager(equipe=equipe, partie=partie,dataPath=dataPath).get_roles()
     return data_role
 
-
+    
 @jeu_blueprint.route('/jeu/jeu_index')
 def jeu_index():
     grouplist = get_group_list()
-    return(render_template('jeux_index.html', username='Ishaac', grouplist=grouplist))
+    return(render_template('jeux_index.html', username='username', grouplist=grouplist, role=session['role'], equipe=session['equipe'], partie=session['partie']))
 
 
 
 @jeu_blueprint.route('/jeu/jeu_manual/<equipe>/<partie>')
 def jeu_manual(equipe, partie):
     return(render_template('jeu_manual.html', equipe=equipe, partie=partie))
+
+
+@jeu_blueprint.route('/jeu/jeu_index/manual/<equipe>/<partie>')
+def manual(equipe, partie):
+    
+    ok = True
+    data_dir = dataPath + "game_data/{}/{}".format(equipe, partie)
+    for file in ["save", "mix", "resultats", "inputs", "logs"]:
+        ok = ok and verif_fichier(fich=file, rep=data_dir)
+    
+    if ok:
+        session['equipe'] = equipe
+        session['partie'] = partie
+        return(render_template("manual.html", annee_default_value= ''))
+    else:
+        return(redirect('/'))
+
+
+@jeu_blueprint.route('/jeu/statut')
+def statut():
+    if session['role'] == 'voyeur':
+        session['role'] = 'scribe'
+    else:
+        session['role'] = 'voyeur'
+    return(redirect('/'))
+
+@jeu_blueprint.route('/jeu/jeu_index/manual/oldmix')
+def oldmix():
+    return None
+
+# @jeu_blueprint.route('/jeu/jeu_manual/<equipe>/<partie>')
+# def jeu_manual(equipe, partie):
+#     return(render_template('jeu_manual.html', equipe=equipe, partie=partie))
 
 @jeu_blueprint.route('/jeu/jeu_init/<equipe>/<partie>', methods=['GET', 'POST'])
 def jeu_init(equipe, partie):

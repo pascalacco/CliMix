@@ -64,7 +64,7 @@
                 "biomasse": 0,
                 "centraleNuc": 6,
                 "eolienneOFF": 0,
-                "eolienneON": 2,
+                "eolienneON": 0,
                 "methanation": 0,
                 "panneauPV": 0
             },
@@ -130,7 +130,7 @@
             "biomasse": 0,
             "centraleNuc": 47,
             "eolienneOFF": 0,
-            "eolienneON": 2,
+            "eolienneON": 0,
             "methanation": 0,
             "panneauPV": 0
         },
@@ -138,7 +138,7 @@
             "EPR2": 0,
             "biomasse": 0,
             "eolienneOFF": 0,
-            "eolienneON": 2,
+            "eolienneON": 0,
             "methanation": 0,
             "panneauPV": 0
         },
@@ -195,7 +195,7 @@
                 "EPR2": 0,
                 "biomasse": 0,
                 "eolienneOFF": 0,
-                "eolienneON": 2,
+                "eolienneON": 0,
                 "methanation": 0,
                 "panneauPV": 0
             },
@@ -419,10 +419,7 @@
                     1995
                 ],
                 "eolienneOFF": [],
-                "eolienneON": [
-                    2030,
-                    2030
-                ],
+                "eolienneON": [],
                 "methanation": [],
                 "panneauPV": []
             },

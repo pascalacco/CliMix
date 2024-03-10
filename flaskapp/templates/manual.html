@@ -8,12 +8,12 @@
 
         <title>Entrée manuelle - Jeu mix énergétique</title>
 
-        <link rel="icon" type="image/x-icon" href="static/img/favicon.ico">
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="static/script.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
 <style>
   #region-info {
     position: absolute;
@@ -70,6 +70,22 @@
             $('#'+regionName).show();
       });
     });
+    function updateYearOptions() {
+        const selectedYear = document.getElementById("annee").value;
+        const yearOptions = document.getElementById("annee").options;
+
+
+        for (let i = 0; i < yearOptions.length; i++) {
+            yearOptions[i].disabled = false;
+        }
+
+        for (let i = 0; i < yearOptions.length; i++) {
+            if (parseInt(yearOptions[i].value) > parseInt(selectedYear)) {
+                yearOptions[i].disabled = true;
+            }
+        }
+    }
+    document.getElementById("annee").addEventListener("change", updateYearOptions);
   });
 </script>
     </head>
@@ -105,7 +121,29 @@
     <div class="container text-center mb-5">
         <button class="btn btn-outline-secondary backHome" type="button">Retour à l'accueil</button>
     </div>
-
+    <h2 class="container-fluid pb-5 text-center">Observez vos anciens choix</h2>
+    <!-- See old mix-->
+    <div class="row justify-content-evenly bg-success bg-opacity-50 rounded pb-2 mb-4">
+        <!-- Année -->
+        <div class="col-3 mt-2 h2 text-center">Anciens résultats</div>
+        <div class="form-outline col-5 mt-2 d-flex justify-content-between align-items-center">
+            <form>
+                <select name="annee" id="annee" class="form-select form-select-lg" onchange="updateYearOptions()">
+                    <option value="default">Choisir une année...</option>
+                    <option value="2030">2030</option>
+                    <option value="2035">2035</option>
+                    <option value="2040">2040</option>
+                    <option value="2045">2045</option>
+                    <option value="2050">2050</option>
+                </select>
+            </form>
+            <span class="strong">
+                <a href="/jeu/jeu_index/manual/oldmix" class="btn btn-success btn-lg mx-2">
+                    <span class="glyphicon glyphicon-hand-pointer" style="color: white;" aria-hidden="true"> Accès </span>
+                </a>
+            </span>
+        </div>
+    </div>
     <!-- Plateau information entry -->
     <h2 class="container-fluid pb-5 text-center">Entrez les informations de votre plateau</h2>
 
@@ -115,9 +153,9 @@
         <div class="col-3 mt-2 h2 text-center">Carte</div>
         <div class="form-outline col-5 mt-2">
             <form>
-                <select name="carte" id="carte" class="form-select form-select-lg">
+                <select name="carte" id="carte" class="form-select form-select-lg" {% if session['role'] != 'scribe' %} disabled {% endif %}>
                     <option value="default">Choisir une carte...</option>
-                    <option value="France">France</option>
+                    <option value="France" {% if session['role'] != 'scribe' %} readonly {% endif %}>France</option>
                 </select>
             </form>
         </div>
@@ -128,13 +166,13 @@
         <div class="col-3 mt-2 h2 text-center">Année</div>
         <div class="form-outline col-5 mt-2">
             <form>
-                <select name="annee" id="annee" class="form-select form-select-lg">
+                <select name="annee" id="annee" class="form-select form-select-lg" {% if session['role'] != 'scribe' %} disabled {% endif %}>
                     <option value="default">Choisir une année...</option>
-                    <option value="2030">2030</option>
-                    <option value="2035">2035</option>
-                    <option value="2040">2040</option>
-                    <option value="2045">2045</option>
-                    <option value="2050">2050</option>
+                    <option value="2030" {% if session['role'] != 'scribe' %} readonly {% endif %} {% if annee_default_value == '2030' and annee_default_value != '' %}selected{% endif %}>2030</option>
+                    <option value="2035" {% if session['role'] != 'scribe' %} readonly {% endif %} {% if annee_default_value == '2035' and annee_default_value != '' %}selected{% endif %}>2035</option>
+                    <option value="2040" {% if session['role'] != 'scribe' %} readonly {% endif %} {% if annee_default_value == '2040' and annee_default_value != ''%}selected{% endif %}>2040</option>
+                    <option value="2045" {% if session['role'] != 'scribe' %} readonly {% endif %} {% if annee_default_value == '2045' and annee_default_value != ''%}selected{% endif %}>2045</option>
+                    <option value="2050" {% if session['role'] != 'scribe' %} readonly {% endif %} {% if annee_default_value == '2050' and annee_default_value != ''%}selected{% endif %}>2050</option>
                 </select>
             </form>
         </div>
@@ -144,7 +182,7 @@
         <!-- Stock -->
         <div class="col-3 mt-2 h2 text-center">Stock de batteries</div>
         <div class="form-outline col-5 mt-2">
-            <input value="1" min="1" max="10" type="number" id="stock" class="form-control"/>
+            <input value="1" min="1" max="10" type="number" id="stock" class="form-control" {% if session['role'] != 'scribe' %} readonly {% endif %} value="{{battery_default_value}}"/>
         </div>
     </div>
 
@@ -153,7 +191,7 @@
         <div class="col-3 mt-3 h2 text-center">Aléa</div>
         <div class="col-5">
             <div class="form-floating mt-2">
-                <input type="text" class="form-control" id="alea" placeholder="Code aléa" name="alea">
+                <input type="text" class="form-control" id="alea" placeholder="Code aléa" name="alea" {% if session['role'] != 'scribe' %} readonly {% endif %} value= "{{alea_default_value}}"">
                 <label for="alea">Code aléa</label>
             </div>
         </div>
@@ -164,7 +202,7 @@
         <div class="col-3 mt-3 h2 text-center">Politique</div>
         <div class="col-5">
             <div class="form-floating mt-2">
-                <input type="text" class="form-control" id="politique" placeholder="Code politique" name="politique">
+                <input type="text" class="form-control" id="politique" placeholder="Code politique" name="politique" {% if session['role'] != 'scribe' %} readonly {% endif %} value="{{politique_default_value}}">
                 <label for="politique">Code politique</label>
             </div>
         </div>
@@ -256,7 +294,7 @@
             <div class="text-center pt-5 my-5">  
                 <div class="row justify-content-evenly">
                     <button class="btn btn-danger col-4 backHome" type="button">Je préfère prendre une photo</button>
-                    <button class="btn btn-success col-4" type="button" id="computeResults">Valider</button>
+                    <button class="btn btn-success col-4" type="button" id="computeResults" {% if session['role'] != 'scribe' %} disabled {% endif %}>Valider</button>
                 </div>
             </div>
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
     <head>
         <meta charset="utf-8">
         <meta name="author" content="Aymeric Shinawi">
@@ -18,7 +19,6 @@
     </head>
 
     <body>
-
         <!--Pop-Up d'erreur-->
         <div class="modal fade" id="errModal">
             <div class="modal-dialog modal-dialog-centered">
@@ -51,11 +51,7 @@
                 <div class="form-outline col-md-3">
                     <form>
                         <select name="grpInput" id="grpInput" class="form-select form-select-md">
-<<<<<<< HEAD
-                            <option value="default">Choisir une équipe...</option>
-=======
                             <option value="default">Choisir un groupe...</option>
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
                             <option value="A">A</option>
                             <option value="B">B</option>
                             <option value="C">C</option>
@@ -73,11 +69,7 @@
                 <div class="form-outline col-md-3">
                     <form>
                         <select name="teamInput" id="teamInput" class="form-select form-select-md">
-<<<<<<< HEAD
-                            <option value="default">Choisir une partie...</option>
-=======
                             <option value="default">Choisir une équipe...</option>
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -89,10 +81,11 @@
 
         </div>
 
+        
 
         <div class="container text-center mt-4" id="submit" style="display: none;">  
             <div class="row justify-content-center gx-5">
-                <button class="btn btn-danger btn-md mt-4 col-3 mx-3 logInBtn" id="new" type="button">Nouvelle partie</button>
+                <button class="btn btn-danger btn-md mt-4 col-3 mx-3 logInBtn" id="new" type="button" {% if session['role'] != 'scribe' %} disabled {% endif %}>Nouvelle partie</button>
                 <button class="btn btn-primary btn-md mt-4 col-3 mx-3 logInBtn" id="continue" type="button">Continuer</button>
             </div>
         </div>
@@ -100,10 +93,10 @@
         <hr class="my-5">
         <a href="/admin/login" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Espace Enseignants</a>
         <a href="/admin/cheatboard" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Espace Tricheurs</a>
-<<<<<<< HEAD
-        <a href="/jeu/jeu_index" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Nouvelle fake page</a>
-=======
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
+        <a href="/jeu/jeu_index" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Nouvelle page d'accueil</a>
+        <a href="/jeu/statut" class="mt-4 col-3 mx-3 logInBtn" id="admin" type="button">Changement de statut</a>
+        <a>Vous êtes actuellement : {{role}}</a>
+
     </body>
 
 </html>

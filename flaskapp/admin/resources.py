@@ -9,11 +9,7 @@ from flask import current_app
 
 from archiveur import Parties
 
-<<<<<<< HEAD
 # Creation du Blueprint l'administration
-=======
-# Création du Blueprint l'administration
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 admin_blueprint = Blueprint('admin', __name__)
 
 
@@ -97,6 +93,7 @@ def login():
     else:  # Login successfully, redirect according `next` query parameter.
         session['username'] = user
         session['attributes'] = attributes
+        session['role'] = 'prof'
         return redirect(next)
 
 
@@ -113,6 +110,7 @@ def logout():
 def logout_callback():
     # redirect from CAS logout request after CAS logout successfully
     session.pop('username', None)
+    session['role'] = 'voyeur'
     return 'Logged out from CAS. <a href="/admin/login">Login</a>'
 
 

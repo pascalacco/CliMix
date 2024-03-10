@@ -70,7 +70,7 @@ $(function() {
 
 
     if (document.title == "Jeu mix énergétique") {
-
+        console.log("entre dans jeu mix")
         function displayError(reason) {
             let msg;
             const modal = new bootstrap.Modal($("#errModal"));
@@ -127,6 +127,7 @@ $(function() {
 
 
     if (document.title == "Détection photo - Jeu mix énergétique") {
+        console.log("entre dans dectection photo")
 
         const imgData = document.createElement('img');
 
@@ -215,6 +216,7 @@ $(function() {
 
 
     if (document.title == "Vérification - Jeu mix énergétique") {
+        console.log("entre dans verif")
 
         let detectionData = null;
         let mixData = null;
@@ -439,17 +441,10 @@ $(function() {
             location.href = "/";
         });
 
-<<<<<<< HEAD
-        $("#res_opt").click(() => {
-            location.href = "/jeu_results";
-        });
-
-=======
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 
 
         // DEBUT EXECUTION PAGE
-
+        console.log("je suis 445")
         $.ajax({
             url: "/get_detection",
             type: "GET",
@@ -484,7 +479,8 @@ $(function() {
 
 
     if (document.title == "Entrée manuelle - Jeu mix énergétique") {
-
+        console.log("entre dans entree manuelle")
+        
         let mixData = null;
 
         function btnCallbacks(plus, minus, nb) {
@@ -707,7 +703,7 @@ $(function() {
 
 
         // DEBUT EXECUTION PAGE
-
+        console.log("je suis 703")
         $.ajax({
             url: "/get_mix",
             type: "GET",

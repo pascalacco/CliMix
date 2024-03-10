@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, make_response,Blueprint
+from flask import Flask, request, jsonify, render_template, redirect, make_response, Blueprint, session
 from flask_cors import CORS, cross_origin
 import base64
 import json
@@ -10,18 +10,11 @@ import logging
 import detection
 import strat_stockage
 from constantes import *
-<<<<<<< HEAD
-from archiveur import Parties
+from archiveur import Parties, DataManager
 
 from api.resources import api_blueprint
 from admin.resources import admin_blueprint
 from jeu.resources import jeu_blueprint
-=======
-
-from api.resources import api_blueprint
-from admin.resources import admin_blueprint
-
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 
 # with open(dataPath+'logs.txt', 'a') as logs:
 #     logs.write("[{}] error: {} \n".format(datetime.datetime.now(), traceback.format_exc()))
@@ -37,10 +30,7 @@ app.secret_key = 'fdsfds3215zez'
 
 app.register_blueprint(api_blueprint)
 app.register_blueprint(admin_blueprint)
-<<<<<<< HEAD
 app.register_blueprint(jeu_blueprint)
-=======
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 
 #Bypass CORS at the front end:
 cors = CORS(app)
@@ -153,20 +143,19 @@ def verif_fichier(fich, rep="", format=".json"):
         ok = False
     return ok
 
-<<<<<<< HEAD
 
 
 @app.route('/')
 @cross_origin(support_credentials=True)
 def home_html():
     #return render_template("index.html")
-    return(render_template('index.html'))
-=======
-@app.route('/')
-@cross_origin(support_credentials=True)
-def home_html():
-    return render_template("index.html")
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
+    session['equipe'] = ''
+    session['partie'] = ''
+    if 'role' in session:
+        return(render_template('index.html', role=session['role']))
+    else:
+        session['role'] = 'voyeur'
+        return(render_template('index.html', role=session['role']))
 
 @app.route('/set_group', methods=["POST"])
 @cross_origin(support_credentials=True)
@@ -226,10 +215,13 @@ def manual_bis_html():
 @app.route('/get_mix')
 @cross_origin(support_credentials=True)
 def get_mix():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
+    # equipe = request.cookies.get("groupe")
+    # partie = request.cookies.get("equipe")
 
-    with open(dataPath+"game_data/{}/{}/mix.json".format(group, team), "r") as f:
+    equipe = session['equipe']
+    partie = session['partie']
+    
+    with open(dataPath+"game_data/{}/{}/mix.json".format(equipe, partie), "r") as f:
         mix = json.load(f)
 
     return jsonify(mix)
@@ -238,8 +230,10 @@ def get_mix():
 @app.route("/production", methods=["POST"])
 @cross_origin(supports_credentials=True)
 def prodCompute():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
+    # group = request.cookies.get("groupe")
+    # team = request.cookies.get("equipe")
+    group = session['equipe']
+    team = session['partie']
     rep = dataPath + "game_data/{}/{}/".format(group, team)
     team = int(team)
 
@@ -318,8 +312,11 @@ def prodCompute():
 @app.route("/commit")
 @cross_origin(supports_credentials=True)
 def commitResults():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
+    # group = request.cookies.get("groupe")
+    # team = request.cookies.get("equipe")
+    group = session['equipe']
+    team = session['partie']
+    
     rep = dataPath + "game_data/{}/{}/".format(group, team)
 
     with open(rep + "save_tmp.json", "r") as src:
@@ -332,32 +329,16 @@ def commitResults():
     else:
         return redirect("/manual")
 
-<<<<<<< HEAD
-'''
-@app.route('/jeu_results')
-@cross_origin(support_credentials=True)
-def results_html():
-    return redirect("jeu_results.html")
-'''
 
-'''
-@app.route('/jeu_results/')
-@cross_origin(support_credentials=True)
-def results_bis_html():
-    return redirect("/jeu_results")
-'''
-=======
-
-
-
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 
 @app.route('/results')
 @cross_origin(support_credentials=True)
 def results_html():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-
+    # group = request.cookies.get("groupe")
+    # team = request.cookies.get("equipe")
+    group = session['equipe']
+    team = session['partie']
+    
     if (group is None) or (team is None):
         resp = make_response(redirect("/"))
     else:
@@ -372,16 +353,15 @@ def results_bis_html():
     return redirect("/results")
 
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
 @app.route('/get_results')
 @cross_origin(support_credentials=True)
 def get_results():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-
+    # group = request.cookies.get("groupe")
+    # team = request.cookies.get("equipe")
+    group = session['equipe']
+    team = session['partie']
+    
     with open(dataPath+"game_data/{}/{}/resultats.json".format(group, team), "r") as f:
         resultats = json.load(f)
 
@@ -393,9 +373,11 @@ def get_results():
 @app.route('/photo')
 @cross_origin(support_credentials=True)
 def photo_html():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-
+    # group = request.cookies.get("groupe")
+    # team = request.cookies.get("equipe")
+    group = session['equipe']
+    team = session['partie']
+    
     if (group is None) or (team is None):
         resp = make_response(redirect("/"))
     else:
@@ -413,9 +395,11 @@ def photo_bis_html():
 @app.route('/detection')
 @cross_origin(support_credentials=True)
 def detection_html():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-
+    # group = request.cookies.get("groupe")
+    # team = request.cookies.get("equipe")
+    group = session['equipe']
+    team = session['partie']
+    
     if (group is None) or (team is None):
         resp = make_response(redirect("/"))
     else:
@@ -432,9 +416,11 @@ def detection_bis_html():
 @app.route('/get_detection')
 @cross_origin(support_credentials=True)
 def get_detection():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-
+    # group = request.cookies.get("groupe")
+    # team = request.cookies.get("equipe")
+    group = session['equipe']
+    team = session['partie']
+    
     with open(dataPath+"game_data/{}/{}/detection.json".format(group, team), "r") as f:
         detection = json.load(f)
 
@@ -444,9 +430,11 @@ def get_detection():
 @app.route("/detector", methods=["POST"])
 @cross_origin(supports_credentials=True)
 def imgProcess():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-
+    # group = request.cookies.get("groupe")
+    # team = request.cookies.get("equipe")
+    group = session['equipe']
+    team = session['partie']
+    
     team = int(team)
 
     data = request.get_json()
@@ -487,11 +475,7 @@ if __name__ == "__main__":
     #run the apps on the current host and port 5000
 
 
-<<<<<<< HEAD
     if path_local:
-=======
-    if est_local:
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
         app.run(host='localhost',debug=True)
     else:
         #app.run(host='insa-09340.insa-toulouse.fr',debug=True,ssl_context='adhoc')

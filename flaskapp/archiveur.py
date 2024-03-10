@@ -59,7 +59,7 @@ class DataManager:
     @revision : rempalcer group par équipe et team par équipe
 
     """
-    def __init__(self, equipe, partie):
+    def __init__(self, equipe, partie, dataPath):
         self.group = equipe
         self.team = partie
         self.results_path = dataPath + "game_data/{}/{}/resultats.json".format(equipe, partie)
@@ -71,12 +71,14 @@ class DataManager:
         self.roles_path = dataPath + "game_data/{}/{}/roles.json".format(equipe, partie)
         self.round_path = dataPath + "game_data/{}/{}/current_round.pkl".format(equipe, partie)
         self.title_path = dataPath + "game_data/{}/{}/annee.txt".format(equipe, partie)
-<<<<<<< HEAD
         self.infos_path = dataPath + "game_data/{}/{}/infos.json".format(equipe, partie)
         
-=======
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
-
+    
+    def get_info(self):
+        with open(self.infos_path, 'r') as json_file:
+            infos = json.load(json_file)
+        return infos
+        
     def set_round(self):
         current_round = -1
         with open(self.round_path, 'wb') as file:
@@ -190,9 +192,4 @@ class DataManager:
     def get_data_for_themes(self, role, theme):
         with open(self.scores_path, "r") as f:
             scores = json.load(f)
-<<<<<<< HEAD
         return scores[role][theme][1]
-    
-=======
-        return scores[role][theme][1]
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf
