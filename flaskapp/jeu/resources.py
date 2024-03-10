@@ -97,9 +97,11 @@ def oldmix():
 
 @jeu_blueprint.route('/jeu/jeu_init/<equipe>/<partie>', methods=['GET', 'POST'])
 def jeu_init(equipe, partie):
-   # print("Entrer dans le dossier")
+    equipe = session['equipe']
+    partie = session['partie']
+    
     grouplist = get_group_list()
-   # data_roles = get_rol(equipe, partie)
+
     chemin_dossier = f'game_data/{equipe}/{partie}'
     chemin_fichier = f'{chemin_dossier}/infos.json'
     scenario = None
@@ -116,7 +118,6 @@ def jeu_init(equipe, partie):
         
         if not os.path.exists(chemin_dossier):
             os.makedirs(chemin_dossier, exist_ok=True)
-            #print("Dossier")
         
         if not os.path.exists(chemin_fichier):
             with open(chemin_fichier, 'w') as file:
@@ -146,7 +147,6 @@ def jeu_init(equipe, partie):
                 
         scenario = scrib['scenario_ademe']
         password = scrib['password']
-        #return jsonify({'message': 'Données enregistrées avec succès!'})
         
         for i in range(1, n + 1):
             joueur_key = "joueur" + str(i)
@@ -158,17 +158,17 @@ def jeu_init(equipe, partie):
                     'genre': joueur['genre'],
                     'role': joueur['role']
                 })
-        '''
-        
-        for i in range(1, n + 1):
-            joueur = infos["joueur" + str(i)]
-            player.append({
-                'nom': joueur['nom'],
-                'prenom': joueur['prenom'],
-                'genre': joueur['genre'],
-                'role': joueur['role']
-            })
-        '''
+
 
     return render_template('jeu_init.html', equipe=equipe, partie=partie, scenario = scenario, password = password, grouplist=get_group_list(), player=player)#, data_roles=get_rol(), player=player)
     #return render_template('jeu_init.html', equipe=equipe, partie=partie, scenario=scenario, password=password, grouplist=grouplist, roles=data_roles)
+
+@jeu_blueprint.route('/jeu/authentification/<equipe>/<partie>')
+def authentification(equipe, partie):
+    session['equipe'] = equipe
+    session['partie'] = partie
+    dm = DataManager(equipe=equipe, partie=partie, dataPath=dataPath)
+    if not os.path.exists(dm.infos_path):
+        return (redirect('/jeu/jeu_init/<equipe>/<partie>'))
+    else:
+        return render_template("authentification.html", partie=partie, equipe=equipe)

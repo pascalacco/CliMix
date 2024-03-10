@@ -195,8 +195,8 @@ def set_group():
 @app.route('/manual')
 @cross_origin(support_credentials=True)
 def manual_html():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
+    group = session['equipe']
+    team = session['partie']
 
     if (group is None) or (team is None):
         resp = make_response(redirect("/"))
