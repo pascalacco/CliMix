@@ -147,7 +147,7 @@ def jeu_init(equipe, partie):
                 
         scenario = scrib['scenario_ademe']
         password = scrib['password']
-        
+        '''
         for i in range(1, n + 1):
             joueur_key = "joueur" + str(i)
             if joueur_key in infos:
@@ -158,7 +158,19 @@ def jeu_init(equipe, partie):
                     'genre': joueur['genre'],
                     'role': joueur['role']
                 })
-
+        '''
+    elif os.path.exists(chemin_fichier):
+        with open(chemin_fichier, 'r') as file:
+            data = json.load(file)
+            player = []
+            for key, joueur in data.items():
+                if key.startswith('joueur'):
+                    player.append({
+                        'nom': joueur['nom'],
+                        'prenom': joueur['prenom'],
+                        'genre': joueur['genre'],
+                        'role': joueur['role']
+                    })
 
     return render_template('jeu_init.html', equipe=equipe, partie=partie, scenario = scenario, password = password, grouplist=get_group_list(), player=player)#, data_roles=get_rol(), player=player)
     #return render_template('jeu_init.html', equipe=equipe, partie=partie, scenario=scenario, password=password, grouplist=grouplist, roles=data_roles)
@@ -178,4 +190,11 @@ def verification_mdp():
     equipe = session['equipe']
     partie = session['partie']
     
+    password_entered = request.form.get('password')
+    dm = DataManager(equipe=equipe, partie=partie, dataPath=dataPath)
+    
+    if os.path.exists(dm.infos_path):
+        with open(dm.infos_path, 'r') as json_file:
+            infos = json.load(json_file)
+            
     return None
