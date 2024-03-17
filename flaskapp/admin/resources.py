@@ -1,13 +1,13 @@
 import os
-import sys,json
-sys.path.append('../')
-from constantes import dataPath, host, CAS_SERVICE_URL, CAS_SERVER_URL
+import sys, json
+
+from flaskapp.constantes import dataPath, host, CAS_SERVICE_URL, CAS_SERVER_URL
 from flask import Blueprint, Flask,render_template, session,request, redirect, url_for
 from cas import CASClient
 import logging
 from flask import current_app
 
-from archiveur import Parties
+from flaskapp.archiveur import Parties
 
 # Creation du Blueprint l'administration
 admin_blueprint = Blueprint('admin', __name__)

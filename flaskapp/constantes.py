@@ -3,6 +3,7 @@ est_local = True
 
 path_serveur = "/var/www/html/flaskapp/"
 path_local = "/mnt/c/Users/eleaz/PROJET_Jeu_Sérieux/final/climix/flaskapp/"
+path_local = "/home/pacco/climix_test/flaskapp/"
 
 if est_local :
     dataPath = path_local

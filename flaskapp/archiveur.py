@@ -4,13 +4,28 @@ import json
 import pickle
 
 
+def normap(value, start1, stop1, start2, stop2):
+    """
+    Normalise la valeur value donnée dans les bornes 1 pour l'adapter aux bornes 2
+    """
+    OldRange = (stop1 - start1)
+    if OldRange == 0:
+        NewValue = start2
+    else:
+        NewRange = (stop2 - start2)
+        NewValue = (((value - start1) * NewRange) / OldRange) + start2
+
+    return NewValue
+
+
 class Parties:
     """
         Gère la vision globale de toutes les parties
 
     """
-    def __init__(self, dataPath):
-        self.chemin = dataPath
+    def __init__(self, chemin=dataPath):
+        self.chemin = chemin
+        self.data_managers={}
 
     def get_liste_equipes(self):
         grouplist = {}
@@ -50,6 +65,33 @@ class Parties:
 
         return grouplist
 
+    def get_group_list(self):
+        grouplist = self.get_liste_equipes()
+
+        for equipe in grouplist:
+            for partie in grouplist[equipe]:
+                percent = normap(int(partie['data']), 2030, 2050, 0, 100)
+                partie['percent'] = percent
+
+        return grouplist
+
+    def get_data_manager(self, equipe, partie):
+        if equipe in self.data_managers:
+            if partie in self.data_managers[equipe]:
+                return self.data_managers[equipe][partie], "ok"
+
+        dm = DataManager(equipe, partie)
+
+        if dm.est_ok():
+            if equipe in self.data_managers:
+                self.data_managers[equipe][partie] = dm
+            else:
+                self.data_managers[equipe] = {partie:  dm}
+
+            return self.data_managers[equipe][partie], "init"
+        else:
+            return None, "Mauvais fichiers dans " + dm.chemin
+
 
 class DataManager:
     """
@@ -59,21 +101,45 @@ class DataManager:
     @revision : rempalcer group par équipe et team par équipe
 
     """
-    def __init__(self, equipe, partie, dataPath):
-        self.group = equipe
-        self.team = partie
-        self.results_path = dataPath + "game_data/{}/{}/resultats.json".format(equipe, partie)
-        self.scores_path = dataPath + "game_data/{}/{}/scores.json".format(equipe, partie)
-        self.mix_path = dataPath + "game_data/{}/{}/mix.json".format(equipe, partie)
-        self.initial_mix_path = dataPath + "game_data/mix_init.json"
-        self.aggregated_mix_path = dataPath + "game_data/{}/{}/mix_aggregated.json".format(equipe, partie)
-        self.occasions_path = dataPath + "game_data/{}/{}/occasions.json".format(equipe, partie)
-        self.roles_path = dataPath + "game_data/{}/{}/roles.json".format(equipe, partie)
-        self.round_path = dataPath + "game_data/{}/{}/current_round.pkl".format(equipe, partie)
-        self.title_path = dataPath + "game_data/{}/{}/annee.txt".format(equipe, partie)
-        self.infos_path = dataPath + "game_data/{}/{}/infos.json".format(equipe, partie)
-        
-    
+
+    fichiers = ["save", "mix", "resultats", "inputs", "logs"]
+    json_opts = {"indent": 4, "sort_keys": True}
+
+    def __init__(self, equipe, partie, chemin=dataPath):
+        self.equipe = equipe
+        self.partie = partie
+        self.chemin = "game_data/{}/{}/".format(equipe, partie)
+
+        self.results_path = self.chemin + "game_data/{}/{}/resultats.json".format(equipe, partie)
+        self.scores_path = self.chemin + "game_data/{}/{}/scores.json".format(equipe, partie)
+        self.mix_path = self.chemin + "game_data/{}/{}/mix.json".format(equipe, partie)
+        self.initial_mix_path = self.chemin + "game_data/mix_init.json"
+        self.aggregated_mix_path = self.chemin + "game_data/{}/{}/mix_aggregated.json".format(equipe, partie)
+        self.occasions_path = self.chemin + "game_data/{}/{}/occasions.json".format(equipe, partie)
+        self.roles_path = self.chemin + "game_data/{}/{}/roles.json".format(equipe, partie)
+        self.round_path = self.chemin + "game_data/{}/{}/current_round.pkl".format(equipe, partie)
+        self.title_path = self.chemin + "game_data/{}/{}/annee.txt".format(equipe, partie)
+        self.infos_path = self.chemin + "game_data/{}/{}/infos.json".format(equipe, partie)
+
+    def verif_fichier(self, fich, format=".json"):
+        ok = True
+        try:
+            src = open(self.chemin + "/" + fich + format, "r")
+            dic = json.load(src)
+        except:
+            ok = False
+        return ok
+
+    def est_ok(self):
+        ok = True
+        for file in DataManager.fichiers:
+            ok = ok and self.verif_fichier(fich=file)
+        return ok
+
+    def get_mdp(self):
+        ## Aller chercher dans le bon fichier self.chemin/infos.json le mot de passe
+        ## et return None si pas de fichier ou autre
+        return None
     def get_info(self):
         with open(self.infos_path, 'r') as json_file:
             infos = json.load(json_file)
@@ -185,7 +251,7 @@ class DataManager:
         return scores
 
     def update_gpt_text(self, character_number, text):
-        file_path = dataPath + "game_data/{}/{}/perso{}.txt".format(self.group, self.team, character_number)
+        file_path = dataPath + "game_data/{}/{}/perso{}.txt".format(self.equipe, self.partie, character_number)
         with open(file_path, 'w') as file:
             file.write(text)
 
@@ -193,3 +259,26 @@ class DataManager:
         with open(self.scores_path, "r") as f:
             scores = json.load(f)
         return scores[role][theme][1]
+
+
+
+
+"""
+Code extérieur à l'archiveur
+"""
+
+json_opts = {"indent": 4, "sort_keys": True}
+
+
+
+
+
+def creer_dossier(chemin_dossier):
+    if not os.path.exists(chemin_dossier):
+        os.makedirs(chemin_dossier)
+
+def get_rol(equipe, partie):
+    data_role = DataManager(equipe=equipe, partie=partie, chemin=dataPath).get_roles()
+    return data_role
+
+

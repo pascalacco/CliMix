@@ -40,15 +40,21 @@
 									{% for team in teams %}
 										<ul>Partie {{ team['team'] }} : 
 											<span class="pull-right strong">
-												<a href="/jeu/jeu_index/manual/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm" {% if team['data'] == '2030' or team['data'] == '2025' %}disabled{% endif %}>
-													<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 
+												<a href="/jeu/manual/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm" {% if team['data'] == '2030' or team['data'] == '2025' %}disabled{% endif %}>
+													<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
 												</a> 
-											</span>     
+											</span>
 											<span class="pull-right strong">
-												<a href="/jeu/authentification/{{ key }}/{{ team['team'] }}" class="btn btn-primary btn-sm">
-													<span class="glyphicon glyphicon-hand-pointer" style="color: blue;" aria-hidden="true"> Scribe </span>
+												<a href="/jeu/init/{{ key }}/{{ team['team'] }}/Voir" class="btn btn-primary btn-sm"{% if team['data'] == '2030' or team['data'] == '2025' %}disabled{% endif %}>
+													<span class="glyphicon glyphicon-cog" style="color: blue;" aria-hidden="true">  </span>
 												</a>
 											</span>
+											<span class="pull-right strong">
+												<a href="/jeu/init/{{ key }}/{{ team['team'] }}/Scribe" class="btn btn-primary btn-sm">
+													<span class="glyphicon glyphicon-lock" style="color: blue;" aria-hidden="true"> </span>
+												</a>
+											</span>
+
 										<div class="progress">
 										
 									<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="{{ team['data'] }}" aria-valuemin="2030" aria-valuemax="2050" style="width:{{ team['percent'] }}%">{{ team['data'] }}</div>

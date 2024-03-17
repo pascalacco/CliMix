@@ -157,6 +157,10 @@ def home_html():
         session['role'] = 'voyeur'
         return(render_template('index.html', role=session['role']))
 
+
+
+
+
 @app.route('/set_group', methods=["POST"])
 @cross_origin(support_credentials=True)
 def set_group():
