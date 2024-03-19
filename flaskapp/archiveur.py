@@ -136,6 +136,22 @@ class DataManager:
             ok = ok and self.verif_fichier(fich=file)
         return ok
 
+    def get_annee(self):
+        # read the json file
+        with open(self.chemin+'resultats.json') as json_file:
+            data = json.load(json_file)
+            annee = 2050
+            # get the first key of the json file
+            for key in data.keys():
+                # check if it's empty
+                if data[key] == {}:
+                    # remove the empty key
+                    annee = key
+                    print(annee)
+                    # exite the for loop
+                    break
+            return annee
+
     def get_mdp(self):
         ## Aller chercher dans le bon fichier self.chemin/infos.json le mot de passe
         ## et return None si pas de fichier ou autre

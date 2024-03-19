@@ -331,7 +331,7 @@ def commitResults():
     if newSave["annee"] == 2055:
         return redirect("/")
     else:
-        return redirect("/manual")
+        return redirect("/jeu/manual/"+group+"/"+team+"/"+newSave["annee"].__str__())
 
 
 

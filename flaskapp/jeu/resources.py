@@ -23,6 +23,12 @@ def get_parties_de_session():
     return session.get("parties")
 
 
+def nouvelle_partie_de_session(equipe, partie):
+    parties = get_parties_de_session()
+    parties[equipe] = {partie: {"Pouvoir": "", "Annee": DataManager(equipe,partie).get_annee()}}
+    session['parties'] = parties
+
+
 def get_partie_courante_de_session():
     """
         retourne les infos de la partie courante :
@@ -41,11 +47,17 @@ def get_partie_courante_de_session():
         equipe = session.get('equipe')
         partie = session.get('partie')
         if (equipe in parties) and (partie in parties[equipe]):
-            pouvoir = parties[equipe][partie]["pouvoir"]
-            annee = parties[equipe][partie]["annee"]
-        else:
+            pouvoir = parties[equipe][partie]["Pouvoir"]
+            annee = parties[equipe][partie]["Annee"]
+        elif equipe == "":
+            equipe = ""
+            partie = ""
             pouvoir = ""
             annee = ""
+        else:
+            nouvelle_partie_de_session(equipe, partie)
+            pouvoir = parties[equipe][partie]["Pouvoir"]
+            annee = parties[equipe][partie]["Annee"]
 
     return equipe, partie, pouvoir, annee
 
@@ -80,14 +92,14 @@ def verifie_bonne_route(equipe, partie):
             session['equipe'] = equipe
             session['partie'] = partie
             status = "Nouvelle"
-            msg = "prise en main de partie"
+            err_msg = "prise en main de partie"
         else:
             erreur_msg = ('Erreur ' + 'pas de bon fichiers dans ' + dm.chemin + ' <a href="/"> Retour </a>', 404)
             return "Erreur", "", "", "", "", erreur_msg
 
         equipe, partie, pouvoir, annee = get_partie_courante_de_session()
 
-        return status, equipe, partie, pouvoir, annee, msg
+    return status, equipe, partie, pouvoir, annee, err_msg
 
 
 def set_scribe_de_partie_dans_session(equipe, partie):
@@ -97,8 +109,20 @@ def set_scribe_de_partie_dans_session(equipe, partie):
 
     """
     parties = get_parties_de_session()
-    parties[equipe][partie]["pouvoir"] = "Scribe"
+    parties[equipe][partie]["Pouvoir"] = "Scribe"
     session["parties"] = parties
+
+
+def set_annee_dans_session(equipe, partie, annee):
+    """
+
+        Met à jour l'annee"parties" .
+
+    """
+    parties = get_parties_de_session()
+    parties[equipe][partie]["Annee"] = annee
+    session["parties"] = parties
+
 
 @jeu_blueprint.route('/jeu/index')
 def index():
@@ -130,12 +154,25 @@ def init(equipe, partie, pouvoir):
         if pouvoir_courant == pouvoir == "Scribe":
             # scribe veut modifier role ou mdp. Pas besoin de vérifier les droits
 
-            return render_template('jeu_init.html', equipe=equipe, partie=partie, scenario="scenario", password="password",
-                                   grouplist="grouplist", player="player")
+            return render_template('jeu_init.html', equipe=equipe, partie=partie,
+                                   scenario="scenario",
+                                   password="password",
+                                   grouplist="grouplist",
+                                   player="player")
+
         elif pouvoir == "Scribe":
             # On est non scribe et on veut devenir scribe : redirect à authentification check passwd?
 
             return redirect("/jeu/authentification/"+equipe+"/"+partie)
+
+        else:
+            # On veut juste voir
+            return render_template('jeu_init.html', equipe=equipe, partie=partie,
+                                   scenario="scenario",
+                                   password="password",
+                                   grouplist="grouplist",
+                                   player="player")
+
 
     elif (status == "Nouvelle") and (DataManager(equipe, partie).get_mdp() is not None):
         # partie nouvelle pour la session d'utilisateur mais déjà prise par un mot de passe de scribe
@@ -172,6 +209,13 @@ def check_pswd(equipe, partie):
 
     return redirect("/jeu/init/"+equipe+"/"+partie+"/Scribe")
 
+
+@jeu_blueprint.route('/jeu/manual/<equipe>/<partie>/<annee>')
+def manual_annual(equipe, partie, annee):
+    set_annee_dans_session(equipe, partie, annee)
+    return manual(equipe, partie)
+
+
 @jeu_blueprint.route('/jeu/manual/<equipe>/<partie>')
 def manual(equipe, partie):
     """
@@ -179,10 +223,16 @@ def manual(equipe, partie):
     """
 
     status, equipe, partie, pouvoir, annee, msg = verifie_bonne_route(equipe, partie)
-    if status=="Courante":
-        return render_template("manual.html", annee_default_value=annee)
-    if status == "Changement":
-        return render_template("manual.html", annee_default_value=annee)
+
+    if status == "Nouvelle":
+        nouvelle_partie_de_session(equipe, partie)
+    if (status == "Courante") or (status == "Changement") or (status == "Nouvelle"):
+
+        return render_template("manual.html", equipe=equipe, partie=partie,
+                               annee=annee,
+                               pouvoir=pouvoir,
+                               annee_max=DataManager(equipe, partie).get_annee())
+
     else:
         return msg
 
@@ -195,8 +245,7 @@ def manual(equipe, partie):
 def jeu_init(equipe, partie):
 
     status, equipe, partie, pouvoir, annee, msg = verifie_bonne_route(equipe, partie)
-    ok, erreur_msg = verifie_bonne_route(equipe, partie)
-    if ok:
+    if status == "Courante":
 
         #   equipe = session['equipe']
         #partie = session['partie']

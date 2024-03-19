@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-venv/
-=======
-
-
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
@@ -273,4 +268,3 @@ flaskapp/constantes.py
 venv/
 
 .vscode
->>>>>>> 84fc7ab9326e42e4812f6ac8c566599650b9eaaf

@@ -1,206 +1,182 @@
 <!DOCTYPE html>
 <html lang="fr">
-    <head>
-        <meta charset="utf-8">
-        <meta name="author" content="Aymeric Shinawi">
-        <meta name="description" content="Jeu Mix Energétique pour l'INSA Toulouse">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="Aymeric Shinawi">
+    <meta name="description" content="Jeu Mix Energétique pour l'INSA Toulouse">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Entrée manuelle - Jeu mix énergétique</title>
+    <title>Entrée manuelle - Jeu mix énergétique</title>
 
-        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
-<style>
-  #region-info {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 10px;
-    background-color: #ffffff;
-    border: 1px solid #000000;
-    display: none;
-  }
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"
+            integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='manual.js') }}"></script>
 
-  .map__image path:hover {
-    fill: #ffcc00;
-    cursor: pointer;
-  }
-
-  .map__image a text {
-    pointer-events: none;
-  }
-
-  .map__image a:hover text {
-    fill: #000;
-  }
-
-  .map__image path.active {
-    fill: #00ff00; /* Change the color to green */
-  }
-  .region {
-    display: none;
-  }
-</style>
-        <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const regionInfo = document.getElementById("region-info");
-    const regions = document.querySelectorAll(".map__image path");
-
-    //hide all regions
-      $('.region').hide();
-
-    //show region on click
-
-    regions.forEach((region) => {
-      region.addEventListener("click", function () {
-        // Reset color for all regions
-        regions.forEach((r) => r.classList.remove("active"));
-
-        // Set color to green for the clicked region
-        this.classList.add("active");
-        $('.region').hide();
-        // Display corresponding region information
-
-          //remove the first letter of the id to get the region name
-            var regionName = this.parentNode.id.substring(1);
-            $('#'+regionName).show();
-      });
-    });
-    function updateYearOptions() {
-        const selectedYear = document.getElementById("annee").value;
-        const yearOptions = document.getElementById("annee").options;
-
-
-        for (let i = 0; i < yearOptions.length; i++) {
-            yearOptions[i].disabled = false;
+    <style>
+        #region-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background-color: #ffffff;
+            border: 1px solid #000000;
+            display: none;
         }
 
-        for (let i = 0; i < yearOptions.length; i++) {
-            if (parseInt(yearOptions[i].value) > parseInt(selectedYear)) {
-                yearOptions[i].disabled = true;
-            }
+        .map__image path:hover {
+            fill: #ffcc00;
+            cursor: pointer;
         }
-    }
-    document.getElementById("annee").addEventListener("change", updateYearOptions);
-  });
-</script>
-    </head>
-    <body>
 
-        <!--Pop-Up d'erreur-->
-        <div class="modal fade" id="errModal">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-            
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h4 class="modal-title">Oups...</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-            
-                <!-- Modal body -->
-                <div class="modal-body" id="errorMsg"></div>
-            
-                <!-- Modal footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
-                </div>
-            
-                </div>
+        .map__image a text {
+            pointer-events: none;
+        }
+
+        .map__image a:hover text {
+            fill: #000;
+        }
+
+        .map__image path.active {
+            fill: #00ff00; /* Change the color to green */
+        }
+
+        .region {
+            display: none;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const regionInfo = document.getElementById("region-info");
+            const regions = document.querySelectorAll(".map__image path");
+
+            //hide all regions
+            $('.region').hide();
+
+            //show region on click
+
+            regions.forEach((region) => {
+                region.addEventListener("click", function () {
+                    // Reset color for all regions
+                    regions.forEach((r) => r.classList.remove("active"));
+
+                    // Set color to green for the clicked region
+                    this.classList.add("active");
+                    $('.region').hide();
+                    // Display corresponding region information
+
+                    //remove the first letter of the id to get the region name
+                    var regionName = this.parentNode.id.substring(1);
+                    $('#' + regionName).show();
+                });
+            });
+
+
+        });
+
+
+    </script>
+
+
+</head>
+<body>
+<!--Pop-Up d'erreur-->
+<div class="modal fade" id="errModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Oups...</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-        </div>
 
-        <h1 id="titre" class="container-fluid pt-2 pb-4 text-center">Interface du jeu de mix énergétique</h1>
+            <!-- Modal body -->
+            <div class="modal-body" id="errorMsg"></div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<h1 id="titre" class="container-fluid pt-2 pb-4 text-center">Interface du jeu de mix énergétique</h1>
+
+<!-- bandeau supérieur -->
 <div id="top" class="container mt-2" style="display: none;">
 
     <!-- Back to home button -->
     <div class="container text-center mb-5">
         <button class="btn btn-outline-secondary backHome" type="button">Retour à l'accueil</button>
     </div>
-    <!-- See old mix-->
+
+    <!-- Navigation dans les années -->
+    {% set precedante = annee | int -5 %}
+    {% set suivante = annee | int +5 %}
+    {% set annee_max_int = annee_max | int -5%}
     <div id="changeYear" class="row justify-content-between mb-5">
-        <button class="btn col-1 btn-lg fs-1" id="previousYear" type="button">⊲</button>
-        <div class="col-3 fs-1 text-center" id="turn"></div>
-        <button class="btn col-1 btn-lg fs-1" id="nextYear" type="button">⊳</button>
-    </div>
-    <!-- Plateau information entry -->
-    <h2 class="container-fluid pb-5 text-center">Entrez les informations de votre plateau</h2>
+        <button class="btn col-1 btn-lg fs-1" id="previousYear" type="button"
+                onclick="window.location.href = '/jeu/manual/{{equipe}}/{{partie}}/{{precedante}}';"
+                {% if precedante
+        < 2030 %}disabled{% endif %}>
+        ⊲
+        </button>
+        <div class="col-3 fs-1 text-center" id="turn"> {{annee}}</div>
 
-    <!-- Form sections for Carte, Année, Stock, Aléa, Politique -->
-    <div class="row justify-content-evenly bg-success bg-opacity-50 rounded pb-2 mb-4">
-        <!-- Carte -->
-        <div class="col-3 mt-2 h2 text-center">Carte</div>
-        <div class="form-outline col-5 mt-2">
-            <form>
-                <select name="carte" id="carte" class="form-select form-select-lg" {% if session['role'] != 'scribe' %} disabled {% endif %}>
-                    <option value="default">Choisir une carte...</option>
-                    <option value="France" {% if session['role'] != 'scribe' %} readonly {% endif %}>France</option>
-                </select>
-            </form>
-        </div>
-    </div>
+        {% if suivante <= annee_max_int %}
+        <button class="btn col-1 btn-lg fs-1" id="nextYear" type="button"
+                onclick="window.location.href = '/jeu/manual/{{equipe}}/{{partie}}/{{suivante}}';">
+            ⊳
+        </button>
+        {% else %}
+        <button class="btn btn-success col-1" type="button" id="btnCalculer"
+                onclick="calculer()" {% if pouvoir !='Scribe' %} disabled {% endif %}> Calculer
+        </button>
+        {% endif %}
 
-    <div class="row justify-content-evenly bg-success bg-opacity-50 rounded pb-2 mb-4">
-        <!-- Année -->
-        <div class="col-3 mt-2 h2 text-center">Année</div>
-        <div class="form-outline col-5 mt-2">
-            <form>
-                <select name="annee" id="annee" class="form-select form-select-lg" {% if session['role'] != 'scribe' %} disabled {% endif %}>
-                    <option value="default">Choisir une année...</option>
-                    <option value="2030" {% if session['role'] != 'scribe' %} readonly {% endif %} {% if annee_default_value == '2030' and annee_default_value != '' %}selected{% endif %}>2030</option>
-                    <option value="2035" {% if session['role'] != 'scribe' %} readonly {% endif %} {% if annee_default_value == '2035' and annee_default_value != '' %}selected{% endif %}>2035</option>
-                    <option value="2040" {% if session['role'] != 'scribe' %} readonly {% endif %} {% if annee_default_value == '2040' and annee_default_value != ''%}selected{% endif %}>2040</option>
-                    <option value="2045" {% if session['role'] != 'scribe' %} readonly {% endif %} {% if annee_default_value == '2045' and annee_default_value != ''%}selected{% endif %}>2045</option>
-                    <option value="2050" {% if session['role'] != 'scribe' %} readonly {% endif %} {% if annee_default_value == '2050' and annee_default_value != ''%}selected{% endif %}>2050</option>
-                </select>
-            </form>
-        </div>
     </div>
 
+
+
+    <!-- Stock -->
     <div class="row justify-content-evenly bg-success bg-opacity-50 rounded pb-2 mb-4">
-        <!-- Stock -->
         <div class="col-3 mt-2 h2 text-center">Stock de batteries</div>
         <div class="form-outline col-5 mt-2">
-            <input value="1" min="1" max="10" type="number" id="stock" class="form-control" {% if session['role'] != 'scribe' %} readonly {% endif %} value="{{battery_default_value}}"/>
+            <input value="1" min="1" max="10" type="number" id="stock" class="form-control" {% if session['role'] !=
+            'scribe' %} readonly {% endif %} value="{{battery_default_value}}"/>
         </div>
     </div>
 
+    <!-- Aléa -->
     <div class="row justify-content-evenly bg-success bg-opacity-50 rounded pb-2 mb-4">
-        <!-- Aléa -->
         <div class="col-3 mt-3 h2 text-center">Aléa</div>
         <div class="col-5">
             <div class="form-floating mt-2">
-                <input type="text" class="form-control" id="alea" placeholder="Code aléa" name="alea" {% if session['role'] != 'scribe' %} readonly {% endif %} value= "{{alea_default_value}}"">
+                <input type="text" class="form-control" id="alea" placeholder="Code aléa" name="alea" {% if session['role']
+                != 'scribe' %} readonly {% endif %} value= "{{alea_default_value}}"">
                 <label for="alea">Code aléa</label>
-            </div>
-        </div>
-    </div>
-
-    <div class="row justify-content-evenly bg-success bg-opacity-50 rounded pb-2 mb-4">
-        <!-- Politique -->
-        <div class="col-3 mt-3 h2 text-center">Politique</div>
-        <div class="col-5">
-            <div class="form-floating mt-2">
-                <input type="text" class="form-control" id="politique" placeholder="Code politique" name="politique" {% if session['role'] != 'scribe' %} readonly {% endif %} value="{{politique_default_value}}">
-                <label for="politique">Code politique</label>
             </div>
         </div>
     </div>
 
 </div>
 
- <div class="container">
-     <div class="row">
-          <div class="col-3">
-            <div class="map" id = "map">
-                <div class = "map__image">
-                    <h2>Carte de France - Equilibre du réseau</h2>
+<!-- Carte de france -->
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            <div class="map" id="map">
+                <div class="map__image">
+                    <h2>Carte de France </h2>
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:amcharts="http://amcharts.com/ammap"
-                        xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox = "0 0 612 583">
+                         xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 612 583">
 
                         <g>
                             <a id="lest">
@@ -257,33 +233,22 @@
                         </g>
                     </svg>
                 </div>
-
-        </div>
-          </div>
-         <div class="col-9">
-          <!--Partie créée dynamiquement-->
-        <div id="mid" class="container mt-2" style="display: none;"></div>
-         </div>
-     </div>
-
- </div>
-
-
-
-
-        <div id="bot" style="display: none;">
-            <div class="mb-5" style="visibility: hidden;">SPACING</div>
-
-            <div class="text-center pt-5 my-5">  
-                <div class="row justify-content-evenly">
-                    <button class="btn btn-danger col-4 backHome" type="button">Je préfère prendre une photo</button>
-                    <button class="btn btn-success col-4" type="button" id="computeResults" {% if session['role'] != 'scribe' %} disabled {% endif %}>Valider</button>
-                </div>
             </div>
-
         </div>
+        <div class="col-9">
+            <!--Partie créée dynamiquement-->
+            <div id="mid" class="container mt-2" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+<div id="bot" style="display: none;">
+    <div class="mb-5" style="visibility: hidden;">SPACING</div>
 
-        
-    </body>
+
+
+</div>
+
+
+</body>
 </html>
         
