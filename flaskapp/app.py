@@ -211,7 +211,7 @@ def prodCompute():
     group = request.cookies.get("groupe")
     team = request.cookies.get("equipe")
     rep = dataPath + "game_data/{}/{}/".format(group, team)
-    team = int(team)
+    #team = int(team)
 
     data = request.get_json()
     errDetails = 0
