@@ -2,7 +2,6 @@ before_script:
   - ls
   - whoami
   - ls flaskapp
-  - ls /var/www/climix_test/flaskapp
 deploy_stage:
     stage: deploy
     environment: Staging
@@ -11,7 +10,9 @@ deploy_stage:
       - rm -rf .git/
       - rm flaskapp/static/logo.png
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
+      - cp -f flaskapp/constantes-sample.php flaskapp/constantes.py
       - cp -r . /var/www/climix-test/
+      - ls /var/www/climix-test/flaskapp
 deploy_production:
   stage: deploy
   environment: Production
