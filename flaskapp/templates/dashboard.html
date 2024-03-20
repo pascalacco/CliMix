@@ -1,112 +1,150 @@
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script>
+    function post_reset(url, equipe, partie) {
+        //$('#computeResults').html('<span class="spinner-border spinner-border-sm"></span>&nbsp;&nbsp;Chargement...');
+        exitConfirm = false;
+        $.ajax({
+            url: url + "/" + equipe + "/" + partie,
+            type: "POST",
+            data: {},
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data, textStatus, jqXHR) {
+                //$('#computeResults').html('Valider');
+                //if (data[0] == "success") {
+
+                //} else {
+                //    displayError(data[0], data[1]);
+                //}
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                //$('#computeResults').html('Valider');
+                //displayError("http", null);
+            }
+        });
+    }
+</script>
+
+<nav class="navbar navbar-dark bg-primary navbar-default navbar-static-top  ">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">
+                ADMIN CLIMIX
+            </a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+
+                <li class="dropdown ">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                        <b>{{username}}</b>
+                        <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li class=""><a href="/logout">Déconnection </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="col col-md-3">
+        <div class="panel-group" id="accordion">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+                            Files</a>
+                    </h4>
+                </div>
+                <div id="collapse1" class="panel-collapse collapse in">
+                    <ul class="list-group">
+                        <li class="list-group-item">Gestion des groupes</li>
+                        <li class="list-group-item">Gestion des équipes</li>
+                        <li class="list-group-item"> Reported</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
+                            Blog</a>
+                    </h4>
+                </div>
+                <div id="collapse2" class="panel-collapse collapse">
+                    <ul class="list-group">
+                        <li class="list-group-item"><span class="badge">12</span> New</li>
+                        <li class="list-group-item"><span class="badge">5</span> Deleted</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">
+                            Settings</a>
+                    </h4>
+                </div>
+                <div id="collapse3" class="panel-collapse collapse">
+                    <ul class="list-group">
+                        <li class="list-group-item"><span class="badge">1</span> Users Reported</li>
+                        <li class="list-group-item"><span class="badge">5</span> User Waiting Activation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col col-md-9">
+        <div class="row">
+            <div class="col col-md-5">
+                <h4>Liste des parties en cours : </h4>
+                {% for key, teams in grouplist.items() %}
+                <h5>Groupe : {{ key }} </h5>
+                {% for team in teams %}
+                <ul>Equipe {{ team['team'] }}
+                    <span class="pull-right strong">
+							<a href="view/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm">
+								<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+							</a>
+							</span>
+                    <span class="pull-right strong">
+							<a id="reset_{{ key }}_{{ team['team'] }}" class="btn btn-success btn-sm">
+								<span class="glyphicon glyphicon-refresh" aria-hidden="true" ,
+                                      onclick="post_reset('/admin/reset', '{{ key }}', '{{ team['team'] }}')">
+                                </span>
+							</a>
+							</span>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped" role="progressbar"
+                             aria-valuenow="{{ team['data'] }}" aria-valuemin="2030" aria-valuemax="2050"
+                             style="width:{{ team['percent'] }}%">{{ team['data'] }}
+                        </div>
+                    </div>
 
 
-    		<nav class="navbar navbar-dark bg-primary navbar-default navbar-static-top  ">
-				<div class="container-fluid">
-					<div class="navbar-header">
-						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-							<span class="sr-only">Toggle navigation</span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</button>
-						<a class="navbar-brand" href="#">
-							ADMIN CLIMIX
-						</a>
-					</div>
-					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-						<ul class="nav navbar-nav navbar-right">
+                </ul>
+                {%- endfor %}
+                {%- endfor %}
+                </ul>
 
-							<li class="dropdown ">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-									<b>{{username}}</b>
-									<span class="caret"></span></a>
-									<ul class="dropdown-menu" role="menu">
-										<li class=""><a href="/logout">Déconnection </a></li>
-									</ul>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</nav>
-				<div class="container-fluid">
-					<div class="col col-md-3">
-						<div class="panel-group" id="accordion">
-						  <div class="panel panel-default">
-							<div class="panel-heading">
-							  <h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
-								Files</a>
-							  </h4>
-							</div>
-							<div id="collapse1" class="panel-collapse collapse in">
-								<ul class="list-group">
-									<li class="list-group-item">Gestion des groupes </li>
-									<li class="list-group-item">Gestion des équipes</li>
-									<li class="list-group-item"> Reported</li>
-								</ul>
-							</div>
-						  </div>
-						  <div class="panel panel-default">
-							<div class="panel-heading">
-							  <h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
-								Blog</a>
-							  </h4>
-							</div>
-							<div id="collapse2" class="panel-collapse collapse">
-								<ul class="list-group">
-									<li class="list-group-item"><span class="badge">12</span> New</li>
-									<li class="list-group-item"><span class="badge">5</span> Deleted</li>
-								</ul>
-							</div>
-						  </div>
-							<div class="panel panel-default">
-							<div class="panel-heading">
-							  <h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion" href="#collapse3">
-								Settings</a>
-							  </h4>
-							</div>
-							<div id="collapse3" class="panel-collapse collapse">
-								<ul class="list-group">
-									<li class="list-group-item"><span class="badge">1</span> Users Reported</li>
-									<li class="list-group-item"><span class="badge">5</span> User Waiting Activation</li>
-								</ul>
-							</div>
-						  </div>
-						</div>
-					</div>
-					<div class="col col-md-9">
-						<div class="row">
-							<div class="col col-md-5">
-								<h4>Liste des parties en cours : </h4>
-                                        {% for key, teams in grouplist.items() %}
-                                            <h5>Groupe : {{ key }} </h5>
-                                            {% for team in teams %}
-                                                <ul>Equipe {{ team['team'] }} <span class="pull-right strong"><a href="view/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> </a> </span>
-                                                 <div class="progress">
-                                                   
-											<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="{{ team['data'] }}" aria-valuemin="2030" aria-valuemax="2050" style="width:{{ team['percent'] }}%">{{ team['data'] }}</div>
-										    </div>
-                                                </ul>
-                                            {%- endfor %}
-                                        {%- endfor %}
-                                        </ul>
+            </div>
 
-							</div>
-
-						</div>
-					</div>
-				</div>
+        </div>
+    </div>
+</div>
 
 
-
-
-
-        </body>
+</body>
 </html>
 
 

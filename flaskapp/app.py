@@ -149,14 +149,14 @@ def verif_fichier(fich, rep="", format=".json"):
 @cross_origin(support_credentials=True)
 def home_html():
     #return render_template("index.html")
-    session['equipe'] = ''
-    session['partie'] = ''
-    if 'role' in session:
-        return(render_template('index.html', role=session['role']))
-    else:
-        session['role'] = 'voyeur'
-        return(render_template('index.html', role=session['role']))
-
+    #session['equipe'] = ''
+    #session['partie'] = ''
+    #if 'role' in session:
+    #    return(render_template('index.html', role=session['role']))
+    #else:
+    #    session['role'] = 'voyeur'
+    #    return(render_template('index.html', role=session['role']))
+    return(redirect("/jeu/index"))
 
 
 

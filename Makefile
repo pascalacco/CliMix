@@ -16,4 +16,7 @@ venv/climix_touche : setup.py foret/*.py
 	venv/bin/pip install -e .
 	touch venv/climix_touche
 
+edit :
+	source venv/bin/activate
+	pycharm.sh .
 .PHONY : venv deploiement exec_locale 

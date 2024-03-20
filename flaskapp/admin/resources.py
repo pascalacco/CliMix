@@ -1,3 +1,7 @@
+"""
+flaskapp.admin.resources
+"""
+
 import os
 import sys, json
 
@@ -7,7 +11,7 @@ from cas import CASClient
 import logging
 from flask import current_app
 
-from flaskapp.archiveur import Parties
+from flaskapp.archiveur import Parties, DataManager
 
 # Creation du Blueprint l'administration
 admin_blueprint = Blueprint('admin', __name__)
@@ -34,7 +38,7 @@ def normap(value, start1, stop1, start2, stop2):
 
 
 def get_group_list():
-    grouplist = Parties(dataPath=dataPath).get_liste_equipes()
+    grouplist = Parties().get_liste_equipes()
 
     for equipe in grouplist:
         for partie in grouplist[equipe] :
@@ -48,20 +52,22 @@ def get_group_list():
 def dashboard(method=['GET']):
     
     if 'username' in session and 'admin_climix_man' in session['attributes']['memberOfCN']:
-        grouplist = get_group_list()
-        return render_template('dashboard.html', username=session['username'], attributes=session['attributes']['memberOfCN'],grouplist=grouplist)
+        return cheatboard()
     return 'Login required. <a href="/admin/login">Login</a>', 403
 
 @admin_blueprint.route('/admin/cheatboard')
 def cheatboard(method=['GET']):    
-    grouplist = get_group_list()
+    grouplist = Parties().get_group_list()
     print(grouplist)
     return render_template('dashboard.html',
                            username="tricheur",
                            attributes='memberOfCN',
-                           grouplist=get_group_list())
+                           grouplist=grouplist)
 
-
+@admin_blueprint.route('/admin/reset/<equipe>/<partie>', methods=['POST'])
+def reset(equipe, partie):
+    DataManager(equipe, partie).reset()
+    return "Succes"
 
 @admin_blueprint.route('/admin/login')
 def login():

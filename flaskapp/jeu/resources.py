@@ -1,3 +1,7 @@
+"""
+Blueprint jeu resources
+"""
+
 import os
 import sys, json
 from flaskapp.constantes import dataPath, host, CAS_SERVICE_URL, CAS_SERVER_URL
@@ -147,18 +151,19 @@ def index():
 def init(equipe, partie, pouvoir):
 
     status, equipe_courante, partie_courante, pouvoir_courant, annee, msg_erreur = verifie_bonne_route(equipe, partie)
+    set_scribe_de_partie_dans_session(equipe, partie)  # pour pouvoir deboguer temporaire !
 
     if (status == "Courante") or (status == "Changement"):
         # On revient éditer la partie en cours, ou une différente déjà prise en main
 
         if pouvoir_courant == pouvoir == "Scribe":
             # scribe veut modifier role ou mdp. Pas besoin de vérifier les droits
-
             return render_template('jeu_init.html', equipe=equipe, partie=partie,
                                    scenario="scenario",
                                    password="password",
                                    grouplist="grouplist",
                                    player="player")
+
 
         elif pouvoir == "Scribe":
             # On est non scribe et on veut devenir scribe : redirect à authentification check passwd?

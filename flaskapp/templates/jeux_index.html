@@ -40,7 +40,7 @@
 									{% for team in teams %}
 										<ul>Partie {{ team['team'] }} : 
 											<span class="pull-right strong">
-												<a href="/jeu/manual/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm" {% if team['data'] == '2030' or team['data'] == '2025' %}disabled{% endif %}>
+												<a href="/jeu/manual/{{ key }}/{{ team['team'] }}" class="btn btn-success btn-sm" {% if False %} disabled {% endif %}>
 													<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
 												</a> 
 											</span>

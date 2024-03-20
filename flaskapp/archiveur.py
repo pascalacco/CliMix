@@ -103,12 +103,14 @@ class DataManager:
     """
 
     fichiers = ["save", "mix", "resultats", "inputs", "logs"]
+    fichiers_init = ["save", "mix", "resultats", "inputs", "logs"]
     json_opts = {"indent": 4, "sort_keys": True}
+    init_path = dataPath + "game_data/"
 
     def __init__(self, equipe, partie, chemin=dataPath):
         self.equipe = equipe
         self.partie = partie
-        self.chemin = "game_data/{}/{}/".format(equipe, partie)
+        self.chemin = chemin+"game_data/{}/{}/".format(equipe, partie)
 
         self.results_path = self.chemin + "game_data/{}/{}/resultats.json".format(equipe, partie)
         self.scores_path = self.chemin + "game_data/{}/{}/scores.json".format(equipe, partie)
@@ -121,10 +123,25 @@ class DataManager:
         self.title_path = self.chemin + "game_data/{}/{}/annee.txt".format(equipe, partie)
         self.infos_path = self.chemin + "game_data/{}/{}/infos.json".format(equipe, partie)
 
+    def init_fichier(self, fich, format=".json"):
+        with open(DataManager.init_path + fich + "_init" + format, "r") as src:
+            dico = json.load(src)
+        with open(self.chemin + fich + format, "w") as dst:
+            json.dump(dico, dst, **json_opts)
+
+    def reset(self):
+        filesToRemove = [os.path.join(self.chemin, f) for f in os.listdir(self.chemin)]
+        for f in filesToRemove:
+            os.remove(f)
+        os.rmdir(self.chemin)
+        os.makedirs(self.chemin, exist_ok=True)
+        for fich in DataManager.fichiers_init :
+            self.init_fichier(fich)
+
     def verif_fichier(self, fich, format=".json"):
         ok = True
         try:
-            src = open(self.chemin + "/" + fich + format, "r")
+            src = open(self.chemin + fich + format, "r")
             dic = json.load(src)
         except:
             ok = False
