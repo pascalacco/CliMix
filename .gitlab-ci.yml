@@ -15,6 +15,7 @@ deploy_stage:
       - chown climix -R flaskapp/game_data/*
       - chmod a+rw -R flaskapp/game_data/*
       - ls -l /var/www/climix-test/flaskapp/
+      - pip install -e .
 
 deploy_production:
   stage: deploy
