@@ -1218,9 +1218,13 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
 
     # Definition des scenarios (Negawatt, ADEME, RTE pour 2050)
     # Les autres scenarios sont faits mains à partir des donnees de Quirion
+    
+    
+    #ADEME = pd.read_csv(dataPath+"mix_data/ADEME_25-50.csv", header=None)
+    #ADEME.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
-    ADEME = pd.read_csv(dataPath+"mix_data/ADEME_25-50.csv", header=None)
-    ADEME.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
+    scenario = pd.read_csv(dataPath + "mix_data/" + team + "_25-50.csv", header=None)
+    scenario.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
     # # RTE = pd.read_csv(dataPath+"mix_data/RTE_25-50.csv", header=None)
     # # RTE.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
@@ -1228,8 +1232,8 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
     # # NEGAWATT = pd.read_csv(dataPath+"mix_data/NEGAWATT_25-50.csv", header=None)
     # # NEGAWATT.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
-
-    result, save = simulation(ADEME.d2025, mix, save, nbPions, nvPions, nvPionsReg)
+    annee_en_cours = "d"+(mix['annee']-5).__str__()
+    result, save = simulation(scenario[annee_en_cours], mix, save, nbPions, nvPions, nvPionsReg)
     
     #modification du fichier save
     with open(dataPath+"game_data/{}/{}/save_tmp.json".format(group, team), "w") as output:

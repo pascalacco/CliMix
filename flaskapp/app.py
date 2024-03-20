@@ -239,7 +239,7 @@ def prodCompute():
     group = session['equipe']
     team = session['partie']
     rep = dataPath + "game_data/{}/{}/".format(group, team)
-    team = int(team)
+    #team = int(team)
 
     data = request.get_json()
     errDetails = 0
