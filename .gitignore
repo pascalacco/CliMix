@@ -268,3 +268,5 @@ flaskapp/constantes.py
 venv/
 
 .vscode
+
+flaskapp/constante.py
