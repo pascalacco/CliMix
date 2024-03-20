@@ -1,7 +1,7 @@
 before_script:
   - ls
   - whoami
-  - cat /var/www/climix_test/flaskapp/constantes.py
+  - ls flaskapp
   - ls /var/www/climix_test/flaskapp
 deploy_stage:
     stage: deploy
