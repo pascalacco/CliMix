@@ -11,8 +11,11 @@ deploy_stage:
       - rm flaskapp/static/logo.png
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
       - cp -r . /var/www/climix-test/
-      - ls /var/www/climix-test/flaskapp/
       - rm -f /var/www/climix-test/flaskapp/constantes.py
+      - chown climix -R flaskapp/game_data/*
+      - chmod a+rw -R flaskapp/game_data/*
+      - ls -l /var/www/climix-test/flaskapp/
+
 deploy_production:
   stage: deploy
   environment: Production
