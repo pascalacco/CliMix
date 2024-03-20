@@ -10,7 +10,7 @@ deploy_stage:
       - rm -rf .git/
       - rm flaskapp/static/logo.png
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
-      - rm flaskapp/constantes.py
+      - rm -f flaskapp/constantes.py
       - cp -r /var/www/climix-test/
       - ls /var/www/climix-test/flaskapp/
 deploy_production:
