@@ -1,7 +1,7 @@
 before_script:
   - ls
   - whoami
-  - ls flaskapp
+
 deploy_stage:
     stage: deploy
     environment: Staging
@@ -12,8 +12,8 @@ deploy_stage:
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
       - cp -r . /var/www/climix-test/
       - rm -f /var/www/climix-test/flaskapp/constantes.py
-      - chown climix -R flaskapp/game_data/*
-      - chmod a+rw -R flaskapp/game_data/*
+      - chown climix -R /var/www/climix-test/flaskapp/game_data/*
+      - chmod a+rw -R /var/www/climix-test/flaskapp/game_data/*
       - ls -l /var/www/climix-test/flaskapp/game_data
 
 deploy_production:
