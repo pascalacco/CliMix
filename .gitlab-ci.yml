@@ -1,6 +1,8 @@
 before_script:
   - ls
   - whoami
+  - cat flaskapp/constantes.py
+  - ls flaskapp
 deploy_stage:
     stage: deploy
     environment: Staging
