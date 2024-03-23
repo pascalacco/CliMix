@@ -1223,8 +1223,8 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
     #ADEME = pd.read_csv(dataPath+"mix_data/ADEME_25-50.csv", header=None)
     #ADEME.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
-    scenario = pd.read_csv(dataPath + "mix_data/" + team + "_25-50.csv", header=None)
-    scenario.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
+    scenario = pd.read_csv(dataPath + "mix_data/" + team + "_25-50.csv")
+    #scenario.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
     # # RTE = pd.read_csv(dataPath+"mix_data/RTE_25-50.csv", header=None)
     # # RTE.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]

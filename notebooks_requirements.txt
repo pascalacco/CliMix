@@ -1,0 +1,12 @@
+numpy
+scipy
+pandas
+pandas_bokeh
+openpyxl
+Pillow
+boto3
+matplotlib
+bokeh
+holoviews
+hvplot
+jupyterlab
