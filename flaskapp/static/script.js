@@ -77,7 +77,7 @@ $(function() {
 
             switch (reason) {
                 case "input":
-                    msg = "Veuillez choisir votre groupe et votre équipe.";
+                    msg = "Veuillez choisir votre po ET groupe ET  équipe ET scénario.";
                     break;
 
                 case "http":
@@ -93,9 +93,31 @@ $(function() {
         }
 
         $(".logInBtn").click((e) => {
-            const data = [$("#grpInput").val(), $("#teamInput").val(), e.target.id];
+            let initOk = true
+            let po = $("#poInput").val()
+            let nom2groupe = "default"
 
-            if (data[0] != "default" && data[1] != "default") {
+            if (po != "default"){
+                nom2groupe = po
+            }else initOk = false ;
+
+            let td = $("#tdInput").val()
+            if (td != "default"){
+                nom2groupe += '_' + td
+            }else initOk = false;
+
+            let equipe = $("#equipeInput").val()
+            if (equipe != "default"){
+                nom2groupe += equipe
+            }else initOk = false;
+
+            let scenario = $("#scenarInput").val()
+            if (scenario != "default") {
+            }else initOk = false;
+
+            const data = [nom2groupe, scenario, e.target.id];
+
+            if (initOk) {
                 $.ajax({
                     url: "/set_group",
                     type: "POST",
@@ -266,6 +288,8 @@ $(function() {
                     btnCallbacks(plusBtn, minusBtn, nb);
                 }
             }
+
+
         }
 
         function displayError(reason, details) {
@@ -323,11 +347,10 @@ $(function() {
             } else if (!(aleas.includes($("#alea").val()))) {
                 alert("Le code aléa est invalide");
                 err = 1;
-
-            } else if (!(politiques.includes($("#politique").val()))) {
+            /*} else if (!(politiques.includes($("#politique").val()))) {
                 alert("Le code politique est invalide");
                 err = 1;
-
+            */
             } else if (stockStr == "" || stock < 1 || stock > 10 || !(Number.isInteger(stock))) {
                 alert("Veuillez entrer une valeur entière de stock entre 1 et 10");
                 err = 1;
@@ -338,7 +361,8 @@ $(function() {
                 data["annee"] = parseInt($("#annee").val());
                 data["stock"] = parseInt($("#stock").val());
                 data["alea"] = $("#alea").val();
-                data["politique"] = $("#politique").val();
+                //data["politique"] = $("#politique").val();
+                data["politique"] = "";
 
 
                 for (const reg of maps[$("#carte").val()]) {
@@ -383,7 +407,7 @@ $(function() {
                 $("#annee").val(mixData.annee.toString());
                 $("#stock").val(mixData.stock.toString());
                 $("#alea").val(mixData.alea);
-                $("#politique").val(mixData.politique);
+                //$("#politique").val(mixData.politique);
                 
                 initContent(mixData.carte);
     
@@ -589,10 +613,10 @@ $(function() {
                 alert("Le code aléa est invalide");
                 err = 1;
 
-            } else if (!(politiques.includes($("#politique").val()))) {
+            /* }  else if (!(politiques.includes($("#politique").val()))) {
                 alert("Le code politique est invalide");
                 err = 1;
-
+            */
             } else if (stockStr == "" || stock < 1 || stock > 10 || !(Number.isInteger(stock))) {
                 alert("Veuillez entrer une valeur entière de stock entre 1 et 10");
                 err = 1;
@@ -603,7 +627,8 @@ $(function() {
                 data["annee"] = parseInt($("#annee").val());
                 data["stock"] = parseInt($("#stock").val());
                 data["alea"] = $("#alea").val();
-                data["politique"] = $("#politique").val();
+                //data["politique"] = $("#politique").val();
+                data["politique"] = "";
 
                 for (const reg of maps[$("#carte").val()]) {
                     data[reg[0]] = {};
@@ -628,16 +653,16 @@ $(function() {
                 $("#carte").val("default");
                 $("#annee").val("default");
                 $("#stock").val("1");
-                $("#alea").val("");
-                $("#politique").val("");
+                $("#alea").val(aleas[Math.floor(Math.random() * aleas.length)]);
+                //$("#politique").val("");
             } 
             
             else {
                 $("#carte").val(mixData.carte);
                 $("#annee").val((Number(mixData.annee) + 5).toString());
                 $("#stock").val(mixData.stock.toString());
-                $("#alea").val(mixData.alea);
-                $("#politique").val(mixData.politique);
+                $("#alea").val(aleas[Math.floor(Math.random() * aleas.length)]);
+                //$("#politique").val(mixData.politique);
 
                 initContent(mixData.carte);
     
