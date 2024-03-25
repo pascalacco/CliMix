@@ -351,18 +351,14 @@ def get_events():
     with open(dataPath + "game_data/{}/{}/resultats.json".format(group, team), "r") as f:
         resultats = json.load(f)
 
-    der = "2025"
+    events = {}
     for annee in resultats:
-        if len(resultats[annee])==0:
-            break
+        if "remplacement" in resultats[annee]:
+            events[annee] = resultats[annee]["remplacement"]
         else:
-            der = annee
-    if der == "2025":
-        remplacements  = []
-    else:
-        remplacements = resultats[der]["remplacement"]
+            events[annee] = []
 
-    return jsonify(remplacements)
+    return jsonify(events)
 
 
 

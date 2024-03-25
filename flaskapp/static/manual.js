@@ -146,15 +146,18 @@ $(function () {
     }
 
     function fillPage() {
+        let annee
         if (!mixData.actif) {
             $("#carte").val(mixData.carte);
-            $("#annee").val((Number(mixData.annee) + 5).toString());
+            annee = Number(mixData.annee) + 5;
+            $("#annee").val(annee.toString());
             $("#stock").val(mixData.stock.toString());
             $("#alea").val(aleas[Math.floor(Math.random() * aleas.length)]);
             //$("#politique").val("");
         } else {
             $("#carte").val(mixData.carte);
-            $("#annee").val((Number(mixData.annee)).toString());
+            annee = Number(mixData.annee);
+            $("#annee").val(annee.toString());
             $("#stock").val(mixData.stock.toString());
             if (mixData.alea == "") {
                 $("#alea").val(aleas[Math.floor(Math.random() * aleas.length)]);
@@ -162,8 +165,13 @@ $(function () {
                 $("#alea").val(mixData.alea);
             }
         }
+        let replace = null;
+        if (annee == "2030"){
+            replace = []
+        }else{
+            replace = evenements[annee-5];
+        }
 
-        const replace = evenements;
         if (replace.length > 0) {
             let replaceStr = "<h6>Des unitées sont en fin de vie :</h6>";
             for (const i of replace) {
