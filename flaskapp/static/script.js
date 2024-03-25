@@ -1,72 +1,70 @@
-$(function() {
+$(function () {
 
     const maps = {
-        "France" : [["hdf", "Hauts-de-France"],
-                    ["bre", "Bretagne"],
-                    ["nor", "Normandie"],
-                    ["idf", "Ile-de-France"],
-                    ["est", "Grand Est"],
-                    ["cvl", "Centre-Val de Loire"],
-                    ["pll", "Pays de la Loire"],
-                    ["bfc", "Bourgogne-Franche-Comté"],
-                    ["naq", "Nouvelle-Aquitaine"],
-                    ["ara", "Auvergne-Rhône-Alpes"],
-                    ["occ", "Occitanie"],
-                    ["pac", "Provence-Alpes-Côte d'Azur"],
-                    ["cor", "Corse"]]
+        "France": [["hdf", "Hauts-de-France"],
+            ["bre", "Bretagne"],
+            ["nor", "Normandie"],
+            ["idf", "Ile-de-France"],
+            ["est", "Grand Est"],
+            ["cvl", "Centre-Val de Loire"],
+            ["pll", "Pays de la Loire"],
+            ["bfc", "Bourgogne-Franche-Comté"],
+            ["naq", "Nouvelle-Aquitaine"],
+            ["ara", "Auvergne-Rhône-Alpes"],
+            ["occ", "Occitanie"],
+            ["pac", "Provence-Alpes-Côte d'Azur"],
+            ["cor", "Corse"]]
     };
 
     const regConvert = {
-        "hdf" : "Hauts-de-France",
-        "bre" : "Bretagne",
-        "nor" : "Normandie",
-        "idf" : "Ile-de-France",
-        "est" : "Grand Est",
-        "cvl" : "Centre-Val de Loire",
-        "pll" : "Pays de la Loire",
-        "bfc" : "Bourgogne-Franche-Comté",
-        "naq" : "Nouvelle-Aquitaine",
-        "ara" : "Auvergne-Rhône-Alpes",
-        "occ" : "Occitanie",
-        "pac" : "Provence-Alpes-Côte d'Azur",
-        "cor" : "Corse"
+        "hdf": "Hauts-de-France",
+        "bre": "Bretagne",
+        "nor": "Normandie",
+        "idf": "Ile-de-France",
+        "est": "Grand Est",
+        "cvl": "Centre-Val de Loire",
+        "pll": "Pays de la Loire",
+        "bfc": "Bourgogne-Franche-Comté",
+        "naq": "Nouvelle-Aquitaine",
+        "ara": "Auvergne-Rhône-Alpes",
+        "occ": "Occitanie",
+        "pac": "Provence-Alpes-Côte d'Azur",
+        "cor": "Corse"
     }
 
-    const pions = [ ["eolienneON", "Eoliennes on."],
-                    ["eolienneOFF", "Eoliennes off."],
-                    ["panneauPV", "Panneaux PV"],
-                    ["centraleNuc", "Ancien nuc."],
-                    ["EPR2", "EPR 2"],
-                    ["methanation", "Méthanation"],
-                    ["biomasse", "Biomasse"]
+    const pions = [["eolienneON", "Eoliennes on."],
+        ["eolienneOFF", "Eoliennes off."],
+        ["panneauPV", "Panneaux PV"],
+        ["centraleNuc", "Ancien nuc."],
+        ["EPR2", "EPR 2"],
+        ["methanation", "Méthanation"],
+        ["biomasse", "Biomasse"]
     ];
 
     const pionsConvert = {
-        "eolienneON" : "Eoliennes on.",
-        "eolienneOFF" : "Eoliennes off.",
-        "panneauPV" : "Panneaux PV",
-        "centraleNuc" : "Ancien nuc.",
-        "EPR2" : "EPR 2",
-        "methanation" : "Méthanation",
-        "biomasse" : "Biomasse"
+        "eolienneON": "Eoliennes on.",
+        "eolienneOFF": "Eoliennes off.",
+        "panneauPV": "Panneaux PV",
+        "centraleNuc": "Ancien nuc.",
+        "EPR2": "EPR 2",
+        "methanation": "Méthanation",
+        "biomasse": "Biomasse"
     }
 
     const aleas = ["", "MEGC1", "MEGC2", "MEGC3", "MEMFDC1", "MEMFDC2", "MEMFDC3",
-                    "MECS1", "MECS2", "MECS3", "MEVUAPV1", "MEVUAPV2", "MEVUAPV3",
-                    "MEMDA1", "MEMDA2", "MEMDA3", "MEMP1", "MEMP2", "MEMP3",
-                    "MEGDT1", "MEGDT2", "MEGDT3"
+        "MECS1", "MECS2", "MECS3", "MEVUAPV1", "MEVUAPV2", "MEVUAPV3",
+        "MEMDA1", "MEMDA2", "MEMDA3", "MEMP1", "MEMP2", "MEMP3",
+        "MEGDT1", "MEGDT2", "MEGDT3"
     ];
 
     const politiques = ["", "CPA1", "CPA2", "CPB1", "CPB2", "CPC1", "CPC2",
-                        "CPD1", "CPD2", "CPE1", "CPE2", "CPF1", "CPF2"];
+        "CPD1", "CPD2", "CPE1", "CPE2", "CPF1", "CPF2"];
 
     let exitConfirm = false; // METTRE A TRUE LORS DU DEPLOIEMENT
 
-    onbeforeunload = function() {
+    onbeforeunload = function () {
         if (exitConfirOupsm) return "Etes-vous sûr(e) de vouloir quitter cette page ? Vos modifications seront perdues."
     }
-
-
 
 
     if (document.title == "Jeu mix énergétique") {
@@ -97,23 +95,23 @@ $(function() {
             let po = $("#poInput").val()
             let nom2groupe = "default"
 
-            if (po != "default"){
+            if (po != "default") {
                 nom2groupe = po
-            }else initOk = false ;
+            } else initOk = false;
 
             let td = $("#tdInput").val()
-            if (td != "default"){
+            if (td != "default") {
                 nom2groupe += '_' + td
-            }else initOk = false;
+            } else initOk = false;
 
             let equipe = $("#equipeInput").val()
-            if (equipe != "default"){
+            if (equipe != "default") {
                 nom2groupe += equipe
-            }else initOk = false;
+            } else initOk = false;
 
             let scenario = $("#scenarInput").val()
             if (scenario != "default") {
-            }else initOk = false;
+            } else initOk = false;
 
             const data = [nom2groupe, scenario, e.target.id];
 
@@ -131,21 +129,20 @@ $(function() {
                             displayError("http");
                         }
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function (jqXHR, textStatus, errorThrown) {
                         displayError("http");
                     }
-                    });
+                });
 
             } else {
                 displayError("input");
             }
         });
 
-        $("#sous-titre").fadeIn(function() {
+        $("#sous-titre").fadeIn(function () {
             $("#submit").fadeIn();
         });
     }
-
 
 
     if (document.title == "Détection photo - Jeu mix énergétique") {
@@ -154,10 +151,10 @@ $(function() {
 
         let processing = false;
 
-        $("#sous-titre").fadeIn(function() {
+        $("#sous-titre").fadeIn(function () {
             $("#noPhoto").fadeIn();
         });
-        
+
 
         function displayError(reason) {
             let msg;
@@ -183,34 +180,34 @@ $(function() {
         }
 
 
-        function sendImg(img) {            
+        function sendImg(img) {
             processing = true;
             $('#imgOutput').html('<span class="spinner-border spinner-border-sm"></span>&nbsp;&nbsp;Chargement...');
-            
+
             $.ajax({
-            url: "/detector",
-            type: "POST",
-            data: JSON.stringify({image: img}),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (data, textStatus, jqXHR) {
-                $('#imgOutput').html('Envoyer');
-                processing = false;
-                if (data[0] == "success") {
-                    location.href = "/detection";
-                } else {
-                    displayError("img");
+                url: "/detector",
+                type: "POST",
+                data: JSON.stringify({image: img}),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data, textStatus, jqXHR) {
+                    $('#imgOutput').html('Envoyer');
+                    processing = false;
+                    if (data[0] == "success") {
+                        location.href = "/detection";
+                    } else {
+                        displayError("img");
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    processing = false;
+                    $('#imgOutput').html('Envoyer');
+                    displayError("http");
                 }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                processing = false;
-                $('#imgOutput').html('Envoyer');
-                displayError("http");
-            }
             });
         }
-       
-        
+
+
         $('#imgOutput').click(() => {
             if (!processing) {
                 const fichier = document.getElementById("imgInput").files[0];
@@ -220,9 +217,7 @@ $(function() {
                         sendImg(reader.result);
                     }
                     reader.readAsDataURL(fichier);
-                } 
-                
-                else {
+                } else {
                     displayError("input");
                 }
             }
@@ -231,9 +226,8 @@ $(function() {
         $('#noPhotoBtn').click(() => {
             location.href = "/manual";
         });
-    
-    }
 
+    }
 
 
     if (document.title == "Vérification - Jeu mix énergétique") {
@@ -243,22 +237,22 @@ $(function() {
 
         function btnCallbacks(plus, minus, nb) {
             minus.click(() => {
-                nb.val((parseInt(nb.val()) > 0 ? parseInt(nb.val())-1 : 0));
+                nb.val((parseInt(nb.val()) > 0 ? parseInt(nb.val()) - 1 : 0));
             });
 
             plus.click(() => {
-                nb.val((parseInt(nb.val()) < 100 ? parseInt(nb.val())+1 : 100));
-            });        
+                nb.val((parseInt(nb.val()) < 100 ? parseInt(nb.val()) + 1 : 100));
+            });
         }
 
         function initContent(map) {
             let divStr = "";
 
             for (const reg of maps[map]) {
-               divStr += `<div class="region"id="${reg[0]}>  <h3 class="row mt-5 ps-2 bg-info rounded bg-opacity-50 justify-content-center" > toto ${reg[1]}</h3>`;
+                divStr += `<div class="region"id="${reg[0]}>  <h3 class="row mt-5 ps-2 bg-info rounded bg-opacity-50 justify-content-center" > toto ${reg[1]}</h3>`;
                 for (const pion of pions) {
                     divStr +=
-                    `<div class="row justify-content-around">
+                        `<div class="row justify-content-around">
 
                         <div class="col-5 mt-2">${pion[1]}</div>
                         
@@ -284,7 +278,7 @@ $(function() {
                     minusBtn = $(`#${reg[0]}_${pion[0]}_minus`);
                     plusBtn = $(`#${reg[0]}_${pion[0]}_plus`);
                     nb = $(`#${reg[0]}_${pion[0]}`);
-                    
+
                     btnCallbacks(plusBtn, minusBtn, nb);
                 }
             }
@@ -347,10 +341,10 @@ $(function() {
             } else if (!(aleas.includes($("#alea").val()))) {
                 alert("Le code aléa est invalide");
                 err = 1;
-            /*} else if (!(politiques.includes($("#politique").val()))) {
-                alert("Le code politique est invalide");
-                err = 1;
-            */
+                /*} else if (!(politiques.includes($("#politique").val()))) {
+                    alert("Le code politique est invalide");
+                    err = 1;
+                */
             } else if (stockStr == "" || stock < 1 || stock > 10 || !(Number.isInteger(stock))) {
                 alert("Veuillez entrer une valeur entière de stock entre 1 et 10");
                 err = 1;
@@ -394,23 +388,21 @@ $(function() {
 
                 // Remplissage de la page avec les valeurs récupérées
                 for (const reg in detectionData) {
-                    if (reg!="carte" && reg!="annee" && reg!="stock") {
+                    if (reg != "carte" && reg != "annee" && reg != "stock") {
                         for (const p in detectionData[reg]) {
                             $(`#${reg}_${p}`).val(detectionData[reg][p]);
                         }
                     }
                 }
-            }
-
-            else {
+            } else {
                 $("#carte").val(mixData.carte);
                 $("#annee").val(mixData.annee.toString());
                 $("#stock").val(mixData.stock.toString());
                 $("#alea").val(mixData.alea);
                 //$("#politique").val(mixData.politique);
-                
+
                 initContent(mixData.carte);
-    
+
                 for (const reg of maps[mixData.carte]) {
                     for (const pion of pions) {
                         $(`#${reg[0]}_${pion[0]}`).val(mixData[reg[0]][pion[0]]);
@@ -451,7 +443,7 @@ $(function() {
                             displayError(data[0], data[1]);
                         }
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function (jqXHR, textStatus, errorThrown) {
                         $('#computeResults').html('Valider');
                         displayError("http", null);
                     }
@@ -462,7 +454,6 @@ $(function() {
         $(".backHome").click(() => {
             location.href = "/";
         });
-
 
 
         // DEBUT EXECUTION PAGE
@@ -481,271 +472,27 @@ $(function() {
                         mixData = data;
                         fillPage();
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function (jqXHR, textStatus, errorThrown) {
                         displayError("http");
                     }
                 });
             },
-            error: function(jqXHR, textStatus, errorThrown) {
+            error: function (jqXHR, textStatus, errorThrown) {
                 displayError("http");
             }
         });
 
-        
 
         $("#top").fadeIn();
         $("#mid").fadeIn();
-        $("#bot").fadeIn();    
+        $("#bot").fadeIn();
     }
 
-
-
-    if (document.title == "Entrée manuelle - Jeu mix énergétique") {
-
-        let mixData = null;
-
-        function btnCallbacks(plus, minus, nb) {
-            minus.click(() => {
-                nb.val((parseInt(nb.val()) > 0 ? parseInt(nb.val())-1 : 0));
-            });
-
-            plus.click(() => {
-                nb.val((parseInt(nb.val()) < 100 ? parseInt(nb.val())+1 : 100));
-            });        
-        }
-
-        function initContent(map) {
-            let divStr = "";
-
-            for (const reg of maps[map]) {
-                divStr += `<div class="region" id="${reg[0]}"> <h3 class="row mt-5 ps-2 bg-info rounded bg-opacity-50 justify-content-center">${reg[1]}</h3>`;
-                for (const pion of pions) {
-                    divStr +=
-                    `<div class="row justify-content-around">
-
-                        <div class="col-4 mt-2">${pion[1]}</div>
-
-                        <div class="col-6 mt-2">
-                            <div class="row justify-content-end">
-                                <div class="form-outline col-6">
-                                    <input value="0" min="0" max="100" type="number" id="${reg[0]}_${pion[0]}" class="form-control"/>
-                                   
-                                </div>
-                                <div class="col-2">
-                                 <button class="btn btn-basic col-2" type="button" id="${reg[0]}_${pion[0]}_minus">➖</button>
-                                    <button class="btn btn-basic col-2" type="button" id="${reg[0]}_${pion[0]}_plus">➕</button>
-                                 </div>
-                                
-                            </div>
-                        </div>
-
-                    </div>`;
-                }
-                divStr += "</div>";
-            }
-
-            $("#mid").html(divStr);
-
-            for (const reg of maps[$("#carte").val()]) {
-                for (const pion of pions) {
-                    minusBtn = $(`#${reg[0]}_${pion[0]}_minus`);
-                    plusBtn = $(`#${reg[0]}_${pion[0]}_plus`);
-                    nb = $(`#${reg[0]}_${pion[0]}`);
-                    
-                    btnCallbacks(plusBtn, minusBtn, nb);
-                }
-            }
-        }
-
-        function displayError(reason, details) {
-            let msg;
-            const modal = new bootstrap.Modal($("#errModal"));
-
-            switch (reason) {
-                case "err":
-                    msg = "Une erreur inattendue est survenue.";
-                    break;
-                case "http":
-                    msg = "Une erreur est survenue avec le serveur.";
-                    break;
-                case "errAnnee":
-                    msg = `L'année sélectionnée ne correpond pas au tour actuel (valeur attendue: ${details}).`;
-                    break;
-                case "errStock":
-                    msg = `Vous ne pouvez pas enlever de batteries (valeur minimale: ${details}).`;
-                    break;
-                case "errCarte":
-                    msg = `Vous ne pouvez pas changer de carte au milieu d'une partie (carte actuelle: ${details}).`;
-                    break;
-                case "errSol":
-                    msg = `Vous avez placé trop de ${details[1]} en ${details[0]} (maximum: ${details[2]}).`;
-                    break;
-                case "errNuc":
-                    msg = `La crise sociale en cours vous empêche de placer plus de réacteurs nucléaires (vous en avez ajouté ${details}).`;
-                    break;
-                case "errMixInit":
-                    msg = "Votre mix ne correspond pas au mix initial imposé. Veuillez vérifier le nombre de réacteurs dans chaque région.";
-                    break;
-                default:
-                    break;
-            }
-
-            $("#errorMsg").html(msg);
-            modal.toggle();
-        }
-
-        function saveData() {
-            let err = 0;
-            let result;
-            const data = {};
-            const stockStr = $("#stock").val();
-            const stock = parseFloat(stockStr);
-
-            if ($("#carte").val() == "default") {
-                alert("Veuillez sélectionner une carte");
-                err = 1;
-
-            } else if ($("#annee").val() == "default") {
-                alert("Veuillez sélectionner une année");
-                err = 1;
-
-            } else if (!(aleas.includes($("#alea").val()))) {
-                alert("Le code aléa est invalide");
-                err = 1;
-
-            /* }  else if (!(politiques.includes($("#politique").val()))) {
-                alert("Le code politique est invalide");
-                err = 1;
-            */
-            } else if (stockStr == "" || stock < 1 || stock > 10 || !(Number.isInteger(stock))) {
-                alert("Veuillez entrer une valeur entière de stock entre 1 et 10");
-                err = 1;
-
-            } else {
-                data["actif"] = true;
-                data["carte"] = $("#carte").val();
-                data["annee"] = parseInt($("#annee").val());
-                data["stock"] = parseInt($("#stock").val());
-                data["alea"] = $("#alea").val();
-                //data["politique"] = $("#politique").val();
-                data["politique"] = "";
-
-                for (const reg of maps[$("#carte").val()]) {
-                    data[reg[0]] = {};
-                    for (const p of pions) {
-                        const str = $(`#${reg[0]}_${p[0]}`).val();
-                        const nb = parseFloat(str);
-                        if (str == "" || nb < 0 || nb > 100 || !(Number.isInteger(nb))) {
-                            alert("Veuillez entrer des nombres entiers entre 0 et 100 seulement.");
-                            err = 1;
-                        }
-                        data[reg[0]][p[0]] = nb;
-                    }
-                }
-            }
-
-            result = err ? false : JSON.stringify(data);
-            return result;
-        }
-
-        function fillPage() {
-            if (!mixData.actif) {
-                $("#carte").val("default");
-                $("#annee").val("default");
-                $("#stock").val("1");
-                $("#alea").val(aleas[Math.floor(Math.random() * aleas.length)]);
-                //$("#politique").val("");
-            } 
-            
-            else {
-                $("#carte").val(mixData.carte);
-                $("#annee").val((Number(mixData.annee) + 5).toString());
-                $("#stock").val(mixData.stock.toString());
-                $("#alea").val(aleas[Math.floor(Math.random() * aleas.length)]);
-                //$("#politique").val(mixData.politique);
-
-                initContent(mixData.carte);
-    
-                for (const reg of maps[mixData.carte]) {
-                    for (const pion of pions) {
-                        $(`#${reg[0]}_${pion[0]}`).val(mixData[reg[0]][pion[0]]);
-                    }
-                }
-
-                $("#mid").hide();
-                $("#bot").hide();
-                $("#mid").fadeIn();
-                $("#bot").fadeIn();
-            }
-        }
-
-        $("#carte").change(() => {
-            const val = $("#carte").val();
-            if (val != "default") {
-                initContent(val);
-                $("#mid").hide();
-                $("#bot").hide();
-                $("#mid").fadeIn();
-                $("#bot").fadeIn();
-            }
-        });
-
-        $('.backHome').click(() => {
-            location.href = "/";
-        });
-
-        $('#computeResults').click(() => {
-            const dataProd = saveData();
-
-            if (dataProd != false) {
-                $('#computeResults').html('<span class="spinner-border spinner-border-sm"></span>&nbsp;&nbsp;Chargement...');
-                exitConfirm = false;
-                $.ajax({
-                    url: "/production",
-                    type: "POST",
-                    data: dataProd,
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: function (data, textStatus, jqXHR) {
-                        $('#computeResults').html('Valider');
-                        if (data[0] == "success") {
-                            location.href = "/results";
-                        } else {
-                            displayError(data[0], data[1]);
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        $('#computeResults').html('Valider');
-                        displayError("http", null);
-                    }
-                });
-            }
-        });
-    
-
-
-        // DEBUT EXECUTION PAGE
-
-        $.ajax({
-            url: "/get_mix",
-            type: "GET",
-            dataType: "json",
-            success: function (data, textStatus, jqXHR) {
-                mixData = data;
-                fillPage();
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                displayError("http");
-            }
-        });
-
-        $("#top").fadeIn();
-    }
 
 
 
     if (document.title == "Résultats - Jeu mix énergétique") {
-        
+
         let resultsData = null;
         let resultsHistory = null;
         let mixData = null;
@@ -766,38 +513,38 @@ $(function() {
             modal.toggle();
         }
 
-        
+
         function PuissanceInst() {
             // Define the chart to be drawn.
             const TotalP = (resultsData.puissanceBatterie +
-                            resultsData.puissanceEolienneOFF +
-                            resultsData.puissanceEolienneON +
-                            resultsData.puissanceGaz +
-                            resultsData.puissanceNucleaire +
-                            resultsData.puissancePV +
-                            resultsData.puissancePhs);
+                resultsData.puissanceEolienneOFF +
+                resultsData.puissanceEolienneON +
+                resultsData.puissanceGaz +
+                resultsData.puissanceNucleaire +
+                resultsData.puissancePV +
+                resultsData.puissancePhs);
 
 
             let result1 = google.visualization.arrayToDataTable([['Technologie', 'Pourcentage', 'Unité'],
-                ['EON', resultsData.puissanceEolienneON/TotalP, 'GW'],
-                ['EOFF', resultsData.puissanceEolienneOFF/TotalP, 'GW'],
-                ['Batterie', resultsData.puissanceBatterie/TotalP, 'GW'],
-                ['Nucléaire', resultsData.puissanceNucleaire/TotalP, 'GW'],
-                ['PV', resultsData.puissancePV/TotalP, 'GW'],
-                ['Phs', resultsData.puissancePhs/TotalP, 'GW'],
-                ['Gaz', resultsData.puissanceGaz/TotalP, 'GW']
+                ['EON', resultsData.puissanceEolienneON / TotalP, 'GW'],
+                ['EOFF', resultsData.puissanceEolienneOFF / TotalP, 'GW'],
+                ['Batterie', resultsData.puissanceBatterie / TotalP, 'GW'],
+                ['Nucléaire', resultsData.puissanceNucleaire / TotalP, 'GW'],
+                ['PV', resultsData.puissancePV / TotalP, 'GW'],
+                ['Phs', resultsData.puissancePhs / TotalP, 'GW'],
+                ['Gaz', resultsData.puissanceGaz / TotalP, 'GW']
             ]);
 
             let options = {
                 title: 'Puissance installée'
             };
-            
+
 
             // Concaténez la valeur à la chaîne 'Puissance Installée' et affichez-la dans l'élément <div>
             let powStr = options.title + " : " + Math.round(TotalP) + " GW";
             $("#output").text(powStr);
 
-        
+
             // Instantiate and draw the chart.
             let chart = new google.visualization.PieChart(document.getElementById('Chart_div'));
             chart.draw(result1, options);
@@ -812,50 +559,50 @@ $(function() {
             ]);
 
             let options = {
-                title: 'Occupation au sol des infrastructures', 
-                slices : {
-                    0 : {color : '#33ac71'}, 
-                    1 : {color : '#b97940'}
+                title: 'Occupation au sol des infrastructures',
+                slices: {
+                    0: {color: '#33ac71'},
+                    1: {color: '#b97940'}
                 }
             };
-        
+
             // Instantiate and draw the chart.
             let chart = new google.visualization.PieChart(document.getElementById('Sol_div'));
             chart.draw(result9, options);
         }
 
-        function conso(){
+        function conso() {
             let result8 = google.visualization.arrayToDataTable([
                 ['Année', 'EON', 'EOFF', 'Batterie', 'Nucléaire',
-                 'PV', 'Hydraulique', 'Phs', 'Gaz Fossile', 'Gaz autres', { role: 'annotation' }],
+                    'PV', 'Hydraulique', 'Phs', 'Gaz Fossile', 'Gaz autres', {role: 'annotation'}],
 
                 ['2030', resultsData.prodOnshore["2030"], resultsData.prodOffshore["2030"], resultsData.prodBatterie["2030"],
-                resultsData.prodNucleaire["2030"], resultsData.prodPv["2030"], resultsData.prodEau["2030"],
-                resultsData.prodPhs["2030"], resultsData.prodGazFossile["2030"], (resultsData.prodGaz["2030"]-resultsData.prodGazFossile["2030"]), ''],
+                    resultsData.prodNucleaire["2030"], resultsData.prodPv["2030"], resultsData.prodEau["2030"],
+                    resultsData.prodPhs["2030"], resultsData.prodGazFossile["2030"], (resultsData.prodGaz["2030"] - resultsData.prodGazFossile["2030"]), ''],
 
                 ['2035', resultsData.prodOnshore["2035"], resultsData.prodOffshore["2035"], resultsData.prodBatterie["2035"],
-                resultsData.prodNucleaire["2035"], resultsData.prodPv["2035"], resultsData.prodEau["2035"],
-                resultsData.prodPhs["2035"], resultsData.prodGazFossile["2035"], (resultsData.prodGaz["2035"]-resultsData.prodGazFossile["2035"]),''],
+                    resultsData.prodNucleaire["2035"], resultsData.prodPv["2035"], resultsData.prodEau["2035"],
+                    resultsData.prodPhs["2035"], resultsData.prodGazFossile["2035"], (resultsData.prodGaz["2035"] - resultsData.prodGazFossile["2035"]), ''],
 
                 ['2040', resultsData.prodOnshore["2040"], resultsData.prodOffshore["2040"], resultsData.prodBatterie["2040"],
-                resultsData.prodNucleaire["2040"], resultsData.prodPv["2040"], resultsData.prodEau["2040"],
-                resultsData.prodPhs["2040"], resultsData.prodGazFossile["2040"], (resultsData.prodGaz["2040"]-resultsData.prodGazFossile["2040"]), ''],
+                    resultsData.prodNucleaire["2040"], resultsData.prodPv["2040"], resultsData.prodEau["2040"],
+                    resultsData.prodPhs["2040"], resultsData.prodGazFossile["2040"], (resultsData.prodGaz["2040"] - resultsData.prodGazFossile["2040"]), ''],
 
                 ['2045', resultsData.prodOnshore["2045"], resultsData.prodOffshore["2045"], resultsData.prodBatterie["2045"],
-                resultsData.prodNucleaire["2045"], resultsData.prodPv["2045"], resultsData.prodEau["2045"],
-                resultsData.prodPhs["2045"], resultsData.prodGazFossile["2045"], (resultsData.prodGaz["2045"]-resultsData.prodGazFossile["2045"]), ''],
-                
+                    resultsData.prodNucleaire["2045"], resultsData.prodPv["2045"], resultsData.prodEau["2045"],
+                    resultsData.prodPhs["2045"], resultsData.prodGazFossile["2045"], (resultsData.prodGaz["2045"] - resultsData.prodGazFossile["2045"]), ''],
+
                 ['2050', resultsData.prodOnshore["2050"], resultsData.prodOffshore["2050"], resultsData.prodBatterie["2050"],
-                resultsData.prodNucleaire["2050"], resultsData.prodPv["2050"], resultsData.prodEau["2050"],
-                resultsData.prodPhs["2050"], resultsData.prodGazFossile["2050"], (resultsData.prodGaz["2050"]-resultsData.prodGazFossile["2050"]), ''],
-              ]);
-        
+                    resultsData.prodNucleaire["2050"], resultsData.prodPv["2050"], resultsData.prodEau["2050"],
+                    resultsData.prodPhs["2050"], resultsData.prodGazFossile["2050"], (resultsData.prodGaz["2050"] - resultsData.prodGazFossile["2050"]), ''],
+            ]);
+
             let options = {
                 width: 600,
-                title : 'Production par technologie (en GWh)',
+                title: 'Production par technologie (en GWh)',
                 height: 400,
-                legend: { position: 'top', maxLines: 3 },
-                bar: { groupWidth: '75%' },
+                legend: {position: 'top', maxLines: 3},
+                bar: {groupWidth: '75%'},
                 isStacked: true,
             };
 
@@ -863,13 +610,14 @@ $(function() {
             let chart = new google.visualization.ColumnChart(document.getElementById('Combine_div'));
             chart.draw(result8, options);
         }
-        function Prod(){
+
+        function Prod() {
             let result2 = google.visualization.arrayToDataTable([
                 ['Technologie', 'Production'],
                 ['EON', resultsData.prodOnshore[resultsData.annee]],            // RGB value
                 ['EOFF', resultsData.prodOffshore[resultsData.annee]],            // English color name
                 ['Batterie', resultsData.prodBatterie[resultsData.annee]],
-                ['Hydraulique', resultsData.prodEau[resultsData.annee]], 
+                ['Hydraulique', resultsData.prodEau[resultsData.annee]],
                 ['Gaz', resultsData.prodGaz[resultsData.annee]],
                 ['Nucléaire', resultsData.prodNucleaire[resultsData.annee]],
                 ['PV', resultsData.prodPv[resultsData.annee]],
@@ -878,32 +626,33 @@ $(function() {
             ]);
 
             let options = {
-                title: 'Production (en GWh)', 
-                legend : 'none'
+                title: 'Production (en GWh)',
+                legend: 'none'
             };
 
             let chart = new google.visualization.ColumnChart(document.getElementById("Bar_div"));
             chart.draw(result2, options);
         }
+
         function EmCO2() {
             let co2Array = [];
             for (let i = 0; i < 5; i++) {
-                co2Array.push((resultsData.co2[i]===undefined) ? 0 : resultsData.co2[i]);
+                co2Array.push((resultsData.co2[i] === undefined) ? 0 : resultsData.co2[i]);
             }
 
             let result3 = google.visualization.arrayToDataTable([
-                ['Année', 'Emissions CO2', { role: "style" }],
+                ['Année', 'Emissions CO2', {role: "style"}],
                 ['2025', 26494417, 'color : green'],
-                ['2030',  co2Array[0], 'color : green'],
-                ['2035',  co2Array[1], 'color : green'],
-                ['2040',  co2Array[2], 'color : green'],
-                ['2045',  co2Array[3], 'color : green'],
+                ['2030', co2Array[0], 'color : green'],
+                ['2035', co2Array[1], 'color : green'],
+                ['2040', co2Array[2], 'color : green'],
+                ['2045', co2Array[3], 'color : green'],
                 ['2050', co2Array[4], 'color : green']
             ]);
 
             let options = {
                 title: 'Emissions de CO2 (en Millions de tonnes de CO2)',
-                hAxis: {title: 'Année',  titleTextStyle: {color: 'black'}},
+                hAxis: {title: 'Année', titleTextStyle: {color: 'black'}},
                 vAxis: {minValue: 0},
                 legend: 'none'
             };
@@ -913,6 +662,7 @@ $(function() {
 
 
         }
+
         function PenSurBar1() {
             let result4 = new google.visualization.arrayToDataTable([
                 ['Heures', 'nombre de pénuries', 'nombre de surplus'],
@@ -927,7 +677,7 @@ $(function() {
                 [{v: [8, 0, 0], f: '8 am'}, resultsData.penuriesHoraire[8], resultsData.surplusHoraire[8]],
                 [{v: [9, 0, 0], f: '9 am'}, resultsData.penuriesHoraire[9], resultsData.surplusHoraire[9]],
                 [{v: [10, 0, 0], f: '10 am'}, resultsData.penuriesHoraire[10], resultsData.surplusHoraire[10]],
-                [{v: [11, 0, 0], f: '11 am'}, resultsData.penuriesHoraire[11], resultsData.surplusHoraire[11]], 
+                [{v: [11, 0, 0], f: '11 am'}, resultsData.penuriesHoraire[11], resultsData.surplusHoraire[11]],
                 [{v: [12, 0, 0], f: '12 am'}, resultsData.penuriesHoraire[12], resultsData.surplusHoraire[12]],
                 [{v: [13, 0, 0], f: '1 pm'}, resultsData.penuriesHoraire[13], resultsData.surplusHoraire[13]],
                 [{v: [14, 0, 0], f: '2 pm'}, resultsData.penuriesHoraire[14], resultsData.surplusHoraire[14]],
@@ -949,26 +699,28 @@ $(function() {
                     title: 'Heures',
                     format: 'h:mm a',
                     viewWindow: {
-                    min: [0, 0, 0],
-                    max: [23, 30, 0]}
+                        min: [0, 0, 0],
+                        max: [23, 30, 0]
+                    }
                 },
                 vAxis: {
                     title: 'Rating (scale of 1-100)'
-                } 
+                }
             };
 
             let chart = new google.visualization.ColumnChart(document.getElementById('chartcolumn_div'));
             chart.draw(result4, options);
-            
+
         }
-        function PenSurBar2() {           
+
+        function PenSurBar2() {
             let result5 = new google.visualization.arrayToDataTable([]);
             result5.addColumn('number', "Jours de l'année");
             result5.addColumn('number', 'nombre de pénuries');
             result5.addColumn('number', 'nombre de surplus');
 
             for (let i = 0; i < 365; i++) {
-                result5.addRow([i+1, resultsData.penuriesQuotidien[i], resultsData.surplusQuotidien[i]]);
+                result5.addRow([i + 1, resultsData.penuriesQuotidien[i], resultsData.surplusQuotidien[i]]);
             }
 
             let options = {
@@ -983,35 +735,43 @@ $(function() {
                 },
                 vAxis: {
                     title: 'Rating (scale of 1-100)'
-                } 
+                }
             };
 
             let chart = new google.visualization.ColumnChart(document.getElementById('chartcolumn2_div'));
             chart.draw(result5, options);
-            
+
         }
+
         function Resultats() {
             let result6 = new google.visualization.arrayToDataTable([]);
             result6.addColumn('string', 'Bilan');
             result6.addColumn('number', '');
             result6.addRows([
-                ['Dépense (en Md€)',  {v :resultsData.cout, f : resultsData.cout + ''}],
-                ['Budget disponible (en Md€)', {v : resultsData.budget, f : resultsData.budget + ''}],
-                ['Demande',   {v:resultsData.demande,   f: resultsData.demande + ' Gwh'}],
+                ['Dépense (en Md€)', {v: resultsData.cout, f: resultsData.cout + ''}],
+                ['Budget disponible (en Md€)', {v: resultsData.budget, f: resultsData.budget + ''}],
+                ['Demande', {v: resultsData.demande, f: resultsData.demande + ' Gwh'}],
                 ['Production', {v: resultsData.production, f: resultsData.production + ' GWh'}],
-                ['Production - Demande',   {v: resultsData.production - resultsData.demande,  f: resultsData.production - resultsData.demande + ' GWh'}],
-                ['Nb Pénuries', {v : resultsData.nbPenuries}], 
-                ['Nb Surplus', {v : resultsData.nbSurplus}], 
-                ['Stock Gaz (fin - debut)', {v : resultsData.stockGaz[8759]-resultsData.stockGaz[0], f: resultsData.stockGaz[8759]-resultsData.stockGaz[0] + ' GW'}],
+                ['Production - Demande', {
+                    v: resultsData.production - resultsData.demande,
+                    f: resultsData.production - resultsData.demande + ' GWh'
+                }],
+                ['Nb Pénuries', {v: resultsData.nbPenuries}],
+                ['Nb Surplus', {v: resultsData.nbSurplus}],
+                ['Stock Gaz (fin - debut)', {
+                    v: resultsData.stockGaz[8759] - resultsData.stockGaz[0],
+                    f: resultsData.stockGaz[8759] - resultsData.stockGaz[0] + ' GW'
+                }],
                 ['Biogaz généré', {v: resultsData.biogaz, f: resultsData.biogaz + ' GW'}]
             ]);
 
             let table = new google.visualization.Table(document.getElementById('table_div'));
             table.draw(result6, {showRowNumber: true, width: '100%', height: '100%'});
         }
-        function Score(){
+
+        function Score() {
             let result7 = google.visualization.arrayToDataTable([
-                ['Matières Premières', 'Score', {role : 'style' }],
+                ['Matières Premières', 'Score', {role: 'style'}],
                 ['Uranium', resultsData.scoreUranium, 'gold'],            // RGB value
                 ['Hydrocarburants/Gaz', resultsData.scoreHydro, 'silver'],            // English color name
                 ['Bois', resultsData.scoreBois, '#33ac71'],
@@ -1020,15 +780,16 @@ $(function() {
             ]);
 
             let options = {
-                title: 'Matières Premières (sur 100)', 
-                legend : 'none'
+                title: 'Matières Premières (sur 100)',
+                legend: 'none'
             };
 
             let chart = new google.visualization.ColumnChart(document.getElementById("Score_div"));
             chart.draw(result7, options);
         }
-        function creerLegende(couleurs, min, coeff) {  
-            divStr = "";          
+
+        function creerLegende(couleurs, min, coeff) {
+            divStr = "";
             for (let i = 0; i < couleurs.length; i++) {
                 let debutIntervalle = Math.round(min + i * coeff);
                 let finIntervalle = Math.round(debutIntervalle + coeff);
@@ -1040,12 +801,11 @@ $(function() {
             $("#legendeItem").html(divStr);
         }
 
-        
 
         function fillPage() {
-            google.charts.load('current', {'packages':['table']});
+            google.charts.load('current', {'packages': ['table']});
             google.charts.load('current', {'packages': ['corechart']});
-            google.charts.load('current', {'packages':['geochart']}, {mapsApiKey: 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'});
+            google.charts.load('current', {'packages': ['geochart']}, {mapsApiKey: 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'});
 
             google.charts.setOnLoadCallback(PuissanceInst);
             google.charts.setOnLoadCallback(Prod);
@@ -1067,26 +827,26 @@ $(function() {
                 NodeList.prototype.forEach = function (callback) {
                     [].forEach.call(this, callback);
                 };
-            } 
+            }
 
             let activeArea = function (id) {
-                map.querySelectorAll('.is-active').forEach(function (item){
+                map.querySelectorAll('.is-active').forEach(function (item) {
                     item.classList.remove('is-active');
                 });
 
-                if (id !== undefined){
-                    document.querySelector("#"+id).classList.add('is-active');
+                if (id !== undefined) {
+                    document.querySelector("#" + id).classList.add('is-active');
                 }
             }
 
-            paths.forEach(function (path){
+            paths.forEach(function (path) {
                 path.addEventListener('mouseenter', function () {
                     activeArea(this.id);
                 });
             });
 
-        
-            map.addEventListener('mouseover', function() {
+
+            map.addEventListener('mouseover', function () {
                 activeArea();
             });
 
@@ -1098,14 +858,14 @@ $(function() {
             }
             let min = Math.min(...listeTransfert);
             let max = Math.max(...listeTransfert);
-            let coeff = (max-min)/6;
+            let coeff = (max - min) / 6;
 
 
             for (const k in resultsData.transfert) {
                 let v = resultsData.transfert[k];
 
                 for (let i = 0; i < couleurs.length; i++) {
-                    if (v >= min + i*coeff && v <= min + (i+1)*coeff) {
+                    if (v >= min + i * coeff && v <= min + (i + 1) * coeff) {
                         $(`#${k}`).css("fill", couleurs[i]);
                     }
                 }
@@ -1121,7 +881,7 @@ $(function() {
                 }
                 $("#replaceInfo").html(replaceStr);
             }
-            
+
             $("#turn").text(`Tour ${(resultsData.annee.toString() - 2030) / 5 + 1}`);
         }
 
@@ -1130,10 +890,9 @@ $(function() {
             location.href = "/commit";
         });
 
-        $('#previousYear').click(() => {
-            ;
+        $('#retourResults').click(() => {
+            location.href = "/manual";
         });
-
 
 
         // DEBUT EXECUTION PAGE
@@ -1153,12 +912,12 @@ $(function() {
                         resultsData = data[mixData.annee.toString()];
                         fillPage();
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function (jqXHR, textStatus, errorThrown) {
                         displayError("http");
                     }
                 });
             },
-            error: function(jqXHR, textStatus, errorThrown) {
+            error: function (jqXHR, textStatus, errorThrown) {
                 displayError("http");
             }
         });

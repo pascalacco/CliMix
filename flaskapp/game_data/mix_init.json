@@ -1,6 +1,6 @@
 {
-    "actif": true,
-    "carte": "France", 
+    "actif": false,
+    "carte": "France",
     "annee": "2025",
     "stock": 1, 
     "alea": "",

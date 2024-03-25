@@ -16,8 +16,47 @@
         <script src="https://www.gstatic.com/charts/loader.js"></script>
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
         <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="static/script.js"></script>
-        
+        <script type="text/javascript" src="static/constantes.js"></script>
+        <script type="text/javascript" src="static/results.js"></script>
+  <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top bg-light navbar-light">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">
+                    <img id="Climix-logo"
+                         src="static/logo.png"
+                         alt="Climix Logo"
+                         draggable="false"
+                         height="60"
+                    />
+                </a>
+                <a class="navbar-brand" href="#" id="nav_titre">
+                    Visualisation Mix
+                </a>
+            </div>
+            <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-mdb-toggle="collapse"
+                    data-mdb-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+            >
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a>Groupe : <span class="badge bg-secondary">{{group}}</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a>Scénario : <span class="badge bg-secondary">{{team}}</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
     </head>
     <body>
 
@@ -46,17 +85,16 @@
 
         
 
-        <h1 id="titre" class="container-fluid pt-2 pb-1 text-center">Interface du jeu de mix énergétique</h1>
+        <h1 id="titre" class="container-fluid pt-2 pb-1 text-center">Visualisation du mix</h1>
 
         
 
         <div id="results" class="container pt-5" style="display: none;">
 
-            <h3 id="replaceInfo" class="container py-2 mb-5 text-danger border border-dark text text-center"></h3>
 
             <div id="changeYear" class="row justify-content-between mb-5">
                 <button class="btn col-1 btn-lg fs-1" id="previousYear" type="button">⊲</button>
-                <div class="col-3 fs-1 text-center" id="turn"></div>
+                <div class="col-10 fs-1 text-s text-center" id="turn"></div>
                 <button class="btn col-1 btn-lg fs-1" id="nextYear" type="button">⊳</button>
             </div>
 
@@ -150,10 +188,9 @@
                 <div id="legendeItem"></div>
             </div>
 
-
-
             <div class="text-center mt-3 mb-5">
-                <button class="btn btn-success" id="commitResults" type="button">Valider ces résultats et passer au tour suivant</button>
+                <button class="btn btn-success" id="retourResults" type="button">< Retourner au mix pour le modifier</button>
+                <button class="btn btn-success" id="commitResults" type="button">Valider ce mix et passer au tour suivant ></button>
             </div>
 
 

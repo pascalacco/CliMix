@@ -182,7 +182,7 @@ def manual_html():
     if (group is None) or (team is None):
         resp = make_response(redirect("/"))
     else:
-        resp = make_response(render_template("manual.html"))
+        resp = make_response(render_template("manual.html", group=group, team=team))
 
     return resp
 
@@ -230,15 +230,16 @@ def prodCompute():
             errDetails = save["stock"]
             raise exc.errStock
 
-        if data["annee"] != 2030 and data["carte"] != save["carte"]:
+        if (data["annee"] != 2030) and (data["carte"] != save["carte"]):
             errDetails = save["carte"]
             raise exc.errCarte
 
         for reg in save["capacite"]:
             for p in save["capacite"][reg]:
-                if data[reg][p] > save["capacite"][reg][p]:
-                    errDetails = [reg, p, save["capacite"][reg][p]]
-                    raise exc.errSol
+                if p!="biomasse" :
+                    if data[reg][p] > save["capacite"][reg][p]:
+                        errDetails = [reg, p, save["capacite"][reg][p]]
+                        raise exc.errSol
 
         input = inputs_from_save_and_data(save, data)
 
@@ -259,7 +260,7 @@ def prodCompute():
         resp = ["success"]
 
         with open(dataPath + "game_data/{}/{}/mix.json".format(group, team), "w") as dst:
-            json.dump(data, dst)
+            json.dump(data, dst, **json_opts)
 
     except exc.errAnnee:
         resp = ["errAnnee", errDetails]
@@ -295,15 +296,18 @@ def commitResults():
     with open(rep + "save_tmp.json", "r") as src:
         newSave = json.load(src)
     with open(rep + "save.json", "w") as dst:
-        json.dump(newSave, dst)
+        json.dump(newSave, dst, **json_opts)
+
+    with open(rep + "mix.json", "r") as src:
+        mix = json.load(src)
+    mix["actif"]=False
+    with open(rep + "mix.json", "w") as dst:
+        json.dump(mix, dst, **json_opts)
 
     if newSave["annee"] == 2055:
         return redirect("/")
     else:
         return redirect("/manual")
-
-
-
 
 
 @app.route('/results')
@@ -315,7 +319,7 @@ def results_html():
     if (group is None) or (team is None):
         resp = make_response(redirect("/"))
     else:
-        resp = make_response(render_template("results.html"))
+        resp = make_response(render_template("results.html", group=group, team=team))
 
     return resp
 
@@ -324,7 +328,6 @@ def results_html():
 @cross_origin(support_credentials=True)
 def results_bis_html():
     return redirect("/results")
-
 
 
 @app.route('/get_results')
@@ -338,6 +341,28 @@ def get_results():
 
     return jsonify(resultats)
 
+
+@app.route('/get_events')
+@cross_origin(support_credentials=True)
+def get_events():
+    group = request.cookies.get("groupe")
+    team = request.cookies.get("equipe")
+
+    with open(dataPath + "game_data/{}/{}/resultats.json".format(group, team), "r") as f:
+        resultats = json.load(f)
+
+    der = "2025"
+    for annee in resultats:
+        if len(resultats[annee])==0:
+            break
+        else:
+            der = annee
+    if der == "2025":
+        remplacements  = []
+    else:
+        remplacements = resultats[der]["remplacement"]
+
+    return jsonify(remplacements)
 
 
 
