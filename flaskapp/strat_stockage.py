@@ -317,7 +317,7 @@ def StratStockage(prodres, H, Phs, Battery, Gas, Lake, Nuclear, endmonthlake):
         
     Tecdestock= {"Battery":Battery , "Phs":Phs , "Gas":Gas , "Lake":Lake}
     
-    for k in range(1,H):
+    for k in range(1, H):
         if prodres[k]>0:
             
             # La production min de nucleaire s'ajoute à la qte d'energie à stocker
@@ -564,12 +564,16 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     if mix["alea"] == "MEMFDC3":
         gazBiomasse -= mix["naq"]["biomasse"] * 2 * 0.1 * 0.71 * 6200
 
+
     # Definition des differentes technologies
     # Methanation : 1 pion = 10 unites de 100 MW = 1 GW
     P=Techno('Phs', np.ones(H)*16, np.zeros(H), 0.95, 0.9, 9.3, 9.3, 180)
     B=Techno('Battery', np.ones(H)*2, np.zeros(H), 0.9, 0.95, mix["stock"]/10*20.08, (mix["stock"]/10)*20.08, (mix["stock"]/10)*74.14)
     G=Techno('Gaz', np.ones(H)*(initGaz+gazBiomasse), np.zeros(H), 0.59, 0.45, 34.44, 1*nbPions["methanation"], 10000000)    
     L=Techno('Lake', storedlake, np.zeros(H), 1, 1, 10, 10, 2000)
+
+    # ACCO prise en compte de la demande en electrolyse
+    G.stored -= np.ones(H) * electrolyse * G.etain
 
     # Puissance centrales territoire : 18.54 GWe repartis sur 24 centrales (EDF)
     # Rendement meca (inutile ici) : ~35% generalement (Wiki)
@@ -672,8 +676,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
                         certitude_interval_inf, certitude_interval_med, certitude_interval_sup, endmonthlake)
 
 
-    # ACCO prise en compte de la demande en electrolyse
-    G.stored[-1] -= electrolyse * G.etain
+
     #Decommenter pour methode 2 (recherche iterative du meilleur seuil)
     #s,p=StratStockagev2(prodresiduelle, H, P, B, M, L, T, N,
     #                    seuils_bot, seuils_mid, seuils_top, endmonthlake)

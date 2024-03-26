@@ -9,4 +9,7 @@ matplotlib
 bokeh
 holoviews
 hvplot
+notebook
+nbconvert
 jupyterlab
+

@@ -10,6 +10,7 @@ $(function () {
 
     let mixData = null;
     let evenements = null;
+
     function btnCallbacks(plus, minus, nb) {
         minus.click(() => {
             nb.val((parseInt(nb.val()) > 0 ? parseInt(nb.val()) - 1 : 0));
@@ -26,8 +27,7 @@ $(function () {
         for (const reg of maps[map]) {
             divStr += `<div class="region" id="${reg[0]}"> <h3 class="row mt-1  ps-3 bg-primary rounded bg-opacity-50 ">${reg[1]}</h3>`;
             for (const pion of pions) {
-                if (pion[1] != "Biomasse") {
-                    divStr += `<div class="row align-items-top">
+                divStr += `<div class="row align-items-top">
                         <div class="col-auto mt-1">${pion[1]}</div>
                         <div class="col-auto mt-1">
                             <input value="0" min="0" max="10" type="number" id="${reg[0]}_${pion[0]}" class="form-control-sm"/>
@@ -37,7 +37,7 @@ $(function () {
                             <button class="btn btn-basic col-1" type="button" id="${reg[0]}_${pion[0]}_plus">➕</button>
                         </div>
                     </div>`;
-                }
+
             }
             divStr += "</div>";
         }
@@ -46,11 +46,9 @@ $(function () {
 
         for (const reg of maps["France"]) {
             for (const pion of pions) {
-                if (pion[1] != "Biomasse") {
-                    minusBtn = $(`#${reg[0]}_${pion[0]}_minus`);
-                    plusBtn = $(`#${reg[0]}_${pion[0]}_plus`);
-                    nb = $(`#${reg[0]}_${pion[0]}`);
-                }
+                minusBtn = $(`#${reg[0]}_${pion[0]}_minus`);
+                plusBtn = $(`#${reg[0]}_${pion[0]}_plus`);
+                nb = $(`#${reg[0]}_${pion[0]}`);
                 btnCallbacks(plusBtn, minusBtn, nb);
             }
         }
@@ -128,18 +126,14 @@ $(function () {
             for (const reg of maps["France"]) {
                 data[reg[0]] = {};
                 for (const p of pions) {
-                    if (p[1] != "Biomasse") {
-                        const str = $(`#${reg[0]}_${p[0]}`).val();
-                        const nb = parseFloat(str);
-                        if (str == "" || nb < 0 || nb > 100 || !(Number.isInteger(nb))) {
-                            alert("Veuillez entrer des nombres entiers entre 0 et 100 seulement.");
-                            err = 1;
-                        }
-                        data[reg[0]][p[0]] = nb;
+                    const str = $(`#${reg[0]}_${p[0]}`).val();
+                    const nb = parseFloat(str);
+                    if (str == "" || nb < 0 || nb > 100 || !(Number.isInteger(nb))) {
+                        alert("Veuillez entrer des nombres entiers entre 0 et 100 seulement.");
+                        err = 1;
                     }
-                    else {
-                        data[reg[0]][p[0]] = 0;
-                    }
+                    data[reg[0]][p[0]] = nb;
+
                 }
             }
         }
@@ -169,10 +163,10 @@ $(function () {
             }
         }
         let replace = null;
-        if (annee == "2030"){
+        if (annee == "2030") {
             replace = []
-        }else{
-            replace = evenements[annee-5];
+        } else {
+            replace = evenements[annee - 5];
         }
 
         if (replace.length > 0) {
@@ -180,15 +174,14 @@ $(function () {
             for (const i of replace) {
                 replaceStr += `${i[0]} ${pionsConvert[i[1]]} en ${regConvert[i[2]]}</br>`;
             }
-            $("#replaceInfo").html(replaceStr+'<h6 class="container text-primary">+0 = prolonger et -1 = démanteler </h6>');
+            $("#replaceInfo").html(replaceStr + '<h6 class="container text-primary">+0 = prolonger et -1 = démanteler </h6>');
         }
         initContent(mixData.carte);
 
         for (const reg of maps[mixData.carte]) {
             for (const pion of pions) {
-                if (pion[1] != "Biomasse") {
-                    $(`#${reg[0]}_${pion[0]}`).val(mixData[reg[0]][pion[0]]);
-                }
+                $(`#${reg[0]}_${pion[0]}`).val(mixData[reg[0]][pion[0]]);
+
             }
         }
 
@@ -247,21 +240,18 @@ $(function () {
     $.ajax({
         url: "/get_events", type: "GET", dataType: "json", success: function (data, textStatus, jqXHR) {
             evenements = data;
+            $.ajax({
+                url: "/get_mix", type: "GET", dataType: "json", success: function (data, textStatus, jqXHR) {
+                    mixData = data;
+                    fillPage();
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    displayError("http");
+                }
+            });
         }, error: function (jqXHR, textStatus, errorThrown) {
             displayError("http");
         }
     });
-
-    $.ajax({
-        url: "/get_mix", type: "GET", dataType: "json", success: function (data, textStatus, jqXHR) {
-            mixData = data;
-            fillPage();
-        }, error: function (jqXHR, textStatus, errorThrown) {
-            displayError("http");
-        }
-    });
-
-
 
     $("#top").fadeIn();
 

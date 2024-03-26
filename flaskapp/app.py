@@ -236,10 +236,12 @@ def prodCompute():
 
         for reg in save["capacite"]:
             for p in save["capacite"][reg]:
-                if p!="biomasse" :
-                    if data[reg][p] > save["capacite"][reg][p]:
-                        errDetails = [reg, p, save["capacite"][reg][p]]
-                        raise exc.errSol
+                #if p != "biomasse":
+                if data[reg][p] > save["capacite"][reg][p]:
+                    errDetails = [reg, p, save["capacite"][reg][p]]
+                    raise exc.errSol
+
+
 
         input = inputs_from_save_and_data(save, data)
 
