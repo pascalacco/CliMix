@@ -137,6 +137,9 @@ $(function () {
                         }
                         data[reg[0]][p[0]] = nb;
                     }
+                    else {
+                        data[reg[0]][p[0]] = 0;
+                    }
                 }
             }
         }

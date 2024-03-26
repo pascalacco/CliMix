@@ -423,7 +423,7 @@ def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2, en
     return Surplus, Manque
 
 
-def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg):
+def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     """ Optimisation de strategie de stockage et de destockage du Mix energetique
     
     Args:
@@ -433,6 +433,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg):
         nbPions (dict) : nombre de pions total pour chaque techno
         nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
         nvPionsReg (dict) : nombre de pions total pour chaque techno
+        electrolyse (float) : demande en electrolyse du scenar (kWh)
     Returns:
         result (dict) : dictionnaire contenant les résultats d'une seule année (result sans s à la fin)
     """
@@ -558,7 +559,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg):
     initGaz = 1000000
     gazBiomasse = nbPions["biomasse"] * 2 * 0.1 * 0.71 * 6200  # nbPions * nbCentraleParPion * puissance * fdc * nbHeures
 
-#note Hugo : il semble que cet effet soit mal implémenté : à tester
+    #note Hugo : il semble que cet effet soit mal implémenté : à tester
     #carte alea MEMFDC (lance 2 / 3)
     if mix["alea"] == "MEMFDC3":
         gazBiomasse -= mix["naq"]["biomasse"] * 2 * 0.1 * 0.71 * 6200
@@ -669,7 +670,10 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg):
     #Decommenter pour methode 1 (intervalles de confiance)
     s, p = StratStockagev2(prodresiduelle, H, P, B, G, L, N,
                         certitude_interval_inf, certitude_interval_med, certitude_interval_sup, endmonthlake)
-    
+
+
+    # ACCO prise en compte de la demande en electrolyse
+    G.stored[-1] -= electrolyse * G.etain
     #Decommenter pour methode 2 (recherche iterative du meilleur seuil)
     #s,p=StratStockagev2(prodresiduelle, H, P, B, M, L, T, N,
     #                    seuils_bot, seuils_mid, seuils_top, endmonthlake)
@@ -1202,7 +1206,7 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
             nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
             nvPionsReg (dict) : nombre de pions total pour chaque techno
             group (str) : groupe de TD de l'equipe qui joue
-            team (int) : numero de l'equipe qui joue dans ce groupe      
+            team (int) : numero de l'equipe qui joue dans ce groupe
 
         Returns:
             result (dict) : tous les résultat de l'année
@@ -1232,8 +1236,12 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
     # # NEGAWATT = pd.read_csv(dataPath+"mix_data/NEGAWATT_25-50.csv", header=None)
     # # NEGAWATT.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
-    annee_en_cours = "d"+(mix['annee']-5).__str__()
-    result, save = simulation(scenario[annee_en_cours], mix, save, nbPions, nvPions, nvPionsReg)
+    annee_en_cours = (mix['annee']-5).__str__()
+    if ("e"+annee_en_cours) in scenario:
+        electrolyse = scenario["e"+annee_en_cours].sum()
+    else:
+        electrolyse = 0.
+    result, save = simulation(scenario["d"+annee_en_cours], mix, save, nbPions, nvPions, nvPionsReg, electrolyse=electrolyse)
     
     #modification du fichier save
     with open(dataPath+"game_data/{}/{}/save_tmp.json".format(group, team), "w") as output:
