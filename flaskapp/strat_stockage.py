@@ -1199,7 +1199,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
 
 
 
-def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
+def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, scenario):
     """Fonction principale
         
         Args:
@@ -1208,8 +1208,7 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
             nbPions (dict) : nombre de pions total pour chaque techno
             nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
             nvPionsReg (dict) : nombre de pions total pour chaque techno
-            group (str) : groupe de TD de l'equipe qui joue
-            team (int) : numero de l'equipe qui joue dans ce groupe
+            scenario (string) : nom du scenario (fichier <scenario>_25-50.csv  de mix_data)
 
         Returns:
             result (dict) : tous les résultat de l'année
@@ -1230,7 +1229,7 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
     #ADEME = pd.read_csv(dataPath+"mix_data/ADEME_25-50.csv", header=None)
     #ADEME.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
-    scenario = pd.read_csv(dataPath + "mix_data/" + team + "_25-50.csv")
+    scenario = pd.read_csv(dataPath + "mix_data/" + scenario+ "_25-50.csv")
     #scenario.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
     # # RTE = pd.read_csv(dataPath+"mix_data/RTE_25-50.csv", header=None)
@@ -1244,11 +1243,9 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, group, team):
         electrolyse = scenario["e"+annee_en_cours].sum()
     else:
         electrolyse = 0.
+
     result, save = simulation(scenario["d"+annee_en_cours], mix, save, nbPions, nvPions, nvPionsReg, electrolyse=electrolyse)
     
-    #modification du fichier save
-    with open(dataPath+"game_data/{}/{}/save_tmp.json".format(group, team), "w") as output:
-        json.dump(save, output)
 
-    return result
+    return result, save
  

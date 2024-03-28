@@ -1,20 +1,18 @@
-from flask import Flask, request, jsonify, render_template, redirect, make_response, Blueprint
+from flask import Flask, request, jsonify, render_template, redirect, make_response
 from flask_cors import CORS, cross_origin
-import base64
+
 import json
 import datetime
 import traceback
 import exc
-import api
-import detection
+
 import strat_stockage
 from constantes import *
-from jinja2 import Template
+
 from api.resources import api_blueprint
 from bokeh.resources import INLINE
 
-# with open(dataPath+'logs.txt', 'a') as logs:
-#     logs.write("[{}] error: {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+from flaskapp.archiveur import DataManager
 
 # Set up Flask:
 app = Flask(__name__)
@@ -30,6 +28,9 @@ json_opts = {"indent": 4, "sort_keys": True}
 
 def inputs_from_save_and_data(save, data):
     # TRAITEMENT SUPPLEMENTAIRE POUR LE NUCLEAIRE AU 1ER TOUR
+
+    """
+
     if data["annee"] == 2030:
         save["hdf"]["centraleNuc"][0:6] = [1995, 1995, 1995, 1995, 1995, 1995]
         save["occ"]["centraleNuc"][0:2] = [2020, 2020]
@@ -40,7 +41,7 @@ def inputs_from_save_and_data(save, data):
         save["est"]["centraleNuc"][0:5] = [2005, 2010, 2010, 2010, 2010]
         save["ara"]["centraleNuc"][0:3] = [2010, 2010, 2010]
         save["nor"]["centraleNuc"][0:8] = [2010, 2010, 2010, 2020, 2020, 2020, 2020, 2020]
-
+    """
     # CALCUL NOMBRE DE NOUVEAU PIONS + TOTAL A CE TOUR
     nvPionsReg = {
         "hdf": {"eolienneON": 0, "eolienneOFF": 0, "panneauPV": 0, "methanation": 0, "EPR2": 0, "biomasse": 0},
@@ -107,33 +108,6 @@ def inputs_from_save_and_data(save, data):
     return {"mix": data, "save": save, "nbPions": nbPions, "nvPions": nvPions, "nvPionsReg": nvPionsReg}
 
 
-def ajoute_annee(fichier, annee, val):
-    with open(fichier, 'r') as src:
-        dico = json.load(src)
-
-    dico[annee] = val
-
-    with open(fichier, 'w') as dst:
-        json.dump(dico, dst, **json_opts)
-
-
-def init_fichier(fich, cible, format=".json", init_path=dataPath + "game_data"):
-    os.makedirs(cible, exist_ok=True)
-    with open(init_path + "/" + fich + "_init" + format, "r") as src:
-        dico = json.load(src)
-    with open(cible + "/" + fich + format, "w") as dst:
-        json.dump(dico, dst, **json_opts)
-
-
-def verif_fichier(fich, rep="", format=".json"):
-    ok = True
-    try:
-        src = open(rep + "/" + fich + format, "r")
-        dic = json.load(src)
-    except:
-        ok = False
-    return ok
-
 
 @app.route('/')
 @cross_origin(support_credentials=True)
@@ -146,24 +120,18 @@ def home_html():
 def set_group():
     try:
         data = request.get_json()
-        group = data[0]
-        team = data[1]
+        equipe = data[0]
+        partie = data[1]
         action = data[2]
 
+        dm = DataManager(equipe=equipe, partie=partie)
         if action == "new":
-            data_dir = dataPath + "game_data/{}/{}".format(group, team)
-            for file in ["save", "mix", "resultats", "inputs", "logs"]:
-                init_fichier(file, data_dir)
+            dm.init_partie()
 
-        ok = True
-        data_dir = dataPath + "game_data/{}/{}".format(group, team)
-        for file in ["save", "mix", "resultats", "inputs", "logs"]:
-            ok = ok and verif_fichier(file, data_dir)
-
-        if ok:
+        if dm.est_ok():
             resp = make_response(jsonify(["log_in_success"]))
-            resp.set_cookie(key="groupe", value=group, samesite="Lax")
-            resp.set_cookie(key="equipe", value=team, samesite="Lax")
+            resp.set_cookie(key="groupe", value=equipe, samesite="Lax")
+            resp.set_cookie(key="equipe", value=partie, samesite="Lax")
         else:
             resp = make_response(jsonify(["log_in_error"]))
 
@@ -196,11 +164,11 @@ def manual_html():
 @app.route('/get_mix')
 @cross_origin(support_credentials=True)
 def get_mix():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
+    equipe = request.cookies.get("groupe")
+    partie = request.cookies.get("equipe")
+    dm = DataManager(equipe=equipe, partie=partie)
 
-    with open(dataPath + "game_data/{}/{}/mix.json".format(group, team), "r") as f:
-        mix = json.load(f)
+    mix = dm.get_fichier("mix")
 
     return jsonify(mix)
 
@@ -209,18 +177,15 @@ def get_mix():
 @app.route("/production", methods=["POST"])
 @cross_origin(supports_credentials=True)
 def prodCompute():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-    rep = dataPath + "game_data/{}/{}/".format(group, team)
-    # team = int(team)
+    equipe = request.cookies.get("groupe")
+    partie = request.cookies.get("equipe")
+    dm = DataManager(equipe=equipe, partie=partie)
 
     data = request.get_json()
     errDetails = 0
 
     try:
-
-        with open(rep + "save.json", "r") as f:
-            save = json.load(f)
+        save = dm.get_fichier("save")
 
         # VERIF ANNEE / STOCK / CARTE / CAPACITE LEGITIMES
         if data["annee"] != save["annee"]:
@@ -244,23 +209,25 @@ def prodCompute():
 
         input = inputs_from_save_and_data(save, data)
 
+
         if data["alea"] == "MECS3":
             if input["nvPions"]["EPR2"] > 0:
                 errDetails = input["nvPions"]["EPR2"]
                 raise exc.errNuc
 
         annee = str(data["annee"])
-        ajoute_annee(rep + "inputs.json", annee, input)
 
-        input["group"] = group
-        input["team"] = team
-        result = strat_stockage.strat_stockage_main(**input)
+        dm.set_item_fichier(fichier='inputs', item=annee, val=input)
 
-        ajoute_annee(rep + 'resultats.json', annee, result)
+        input["scenario"] = partie
+        result, save = strat_stockage.strat_stockage_main(**input)
+
+        dm.set_fichier(fichier='save_tmp', dico= save)
+        dm.set_item_fichier(fichier='resultats', item=annee, val=result)
 
         resp = ["success"]
 
-        with open(dataPath + "game_data/{}/{}/mix.json".format(group, team), "w") as dst:
+        with open(dataPath + "game_data/{}/{}/mix.json".format(equipe, partie), "w") as dst:
             json.dump(data, dst, **json_opts)
 
     except exc.errAnnee:
@@ -290,20 +257,12 @@ def prodCompute():
 @app.route("/commit")
 @cross_origin(supports_credentials=True)
 def commitResults():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-    rep = dataPath + "game_data/{}/{}/".format(group, team)
+    equipe = request.cookies.get("groupe")
+    partie = request.cookies.get("equipe")
+    dm = DataManager(equipe=equipe, partie=partie)
 
-    with open(rep + "save_tmp.json", "r") as src:
-        newSave = json.load(src)
-    with open(rep + "save.json", "w") as dst:
-        json.dump(newSave, dst, **json_opts)
-
-    with open(rep + "mix.json", "r") as src:
-        mix = json.load(src)
-    mix["actif"] = False
-    with open(rep + "mix.json", "w") as dst:
-        json.dump(mix, dst, **json_opts)
+    newSave = dm.cp_fichier(src='save_tmp', dst='save')
+    mix = dm.set_item_fichier(fichier='mix', item='actif', val=False)
 
     if newSave["annee"] == 2055:
         return redirect("/")
@@ -316,13 +275,13 @@ def commitResults():
 @app.route('/vues')
 @cross_origin(support_credentials=True)
 def vues(vue="production"):
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
+    equipe = request.cookies.get("groupe")
+    partie = request.cookies.get("equipe")
 
-    if (group is None) or (team is None):
+    if (equipe is None) or (partie is None):
         resp = make_response(redirect("/"))
     else:
-        with open("/home/pacco/Documents/climix_test/StratStockage/production.json") as json_file:
+        with open(dataPath+"../StratStockage/production.json") as json_file:
             composant = json.load(json_file)
 
         resources = INLINE.render()
@@ -331,7 +290,7 @@ def vues(vue="production"):
 
         #return make_response(html)
         resp = make_response(render_template("vue_"+vue+".html",
-                                             group=group, team=team, vue=vue,
+                                             group=equipe, team=partie, vue=vue,
                                              bokeh_ressources=INLINE.render(),
                                              bokeh_script=composant["script"],
                                              bokeh_div=composant["div"],
@@ -343,13 +302,13 @@ def vues(vue="production"):
 @app.route('/results/')
 @cross_origin(support_credentials=True)
 def results_html():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
+    equipe = request.cookies.get("groupe")
+    partie = request.cookies.get("equipe")
 
-    if (group is None) or (team is None):
+    if (equipe is None) or (partie is None):
         resp = make_response(redirect("/"))
     else:
-        resp = make_response(render_template("results.html", group=group, team=team))
+        resp = make_response(render_template("results.html", group=equipe, team=partie))
 
     return resp
 
@@ -357,11 +316,11 @@ def results_html():
 @app.route('/get_results')
 @cross_origin(support_credentials=True)
 def get_results():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
+    equipe = request.cookies.get("groupe")
+    partie = request.cookies.get("equipe")
+    dm = DataManager(equipe=equipe, partie=partie)
 
-    with open(dataPath + "game_data/{}/{}/resultats.json".format(group, team), "r") as f:
-        resultats = json.load(f)
+    resultats = dm.get_fichier(fichier='resultats')
 
     return jsonify(resultats)
 
@@ -369,11 +328,11 @@ def get_results():
 @app.route('/get_events')
 @cross_origin(support_credentials=True)
 def get_events():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
+    equipe = request.cookies.get("groupe")
+    partie = request.cookies.get("equipe")
+    dm = DataManager(equipe=equipe, partie=partie)
 
-    with open(dataPath + "game_data/{}/{}/resultats.json".format(group, team), "r") as f:
-        resultats = json.load(f)
+    resultats = dm.get_fichier(fichier='resultats')
 
     events = {}
     for annee in resultats:
