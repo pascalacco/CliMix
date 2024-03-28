@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, make_response,Blueprint
+from flask import Flask, request, jsonify, render_template, redirect, make_response, Blueprint
 from flask_cors import CORS, cross_origin
 import base64
 import json
@@ -9,24 +9,24 @@ import api
 import detection
 import strat_stockage
 from constantes import *
-
+from jinja2 import Template
 from api.resources import api_blueprint
-
+from bokeh.resources import INLINE
 
 # with open(dataPath+'logs.txt', 'a') as logs:
 #     logs.write("[{}] error: {} \n".format(datetime.datetime.now(), traceback.format_exc()))
 
-#Set up Flask:
+# Set up Flask:
 app = Flask(__name__)
-
 
 app.register_blueprint(api_blueprint)
 
-#Bypass CORS at the front end:
+# Bypass CORS at the front end:
 cors = CORS(app)
 CORS(app, support_credentials=True)
 
 json_opts = {"indent": 4, "sort_keys": True}
+
 
 def inputs_from_save_and_data(save, data):
     # TRAITEMENT SUPPLEMENTAIRE POUR LE NUCLEAIRE AU 1ER TOUR
@@ -106,6 +106,7 @@ def inputs_from_save_and_data(save, data):
 
     return {"mix": data, "save": save, "nbPions": nbPions, "nvPions": nvPions, "nvPionsReg": nvPionsReg}
 
+
 def ajoute_annee(fichier, annee, val):
     with open(fichier, 'r') as src:
         dico = json.load(src)
@@ -113,14 +114,14 @@ def ajoute_annee(fichier, annee, val):
     dico[annee] = val
 
     with open(fichier, 'w') as dst:
-        json.dump(dico, dst, **json_opts)  
+        json.dump(dico, dst, **json_opts)
 
 
 def init_fichier(fich, cible, format=".json", init_path=dataPath + "game_data"):
     os.makedirs(cible, exist_ok=True)
-    with open(init_path + "/" + fich + "_init"+format, "r") as src:
+    with open(init_path + "/" + fich + "_init" + format, "r") as src:
         dico = json.load(src)
-    with open(cible+"/" + fich + format, "w") as dst:
+    with open(cible + "/" + fich + format, "w") as dst:
         json.dump(dico, dst, **json_opts)
 
 
@@ -129,14 +130,16 @@ def verif_fichier(fich, rep="", format=".json"):
     try:
         src = open(rep + "/" + fich + format, "r")
         dic = json.load(src)
-    except :
+    except:
         ok = False
     return ok
+
 
 @app.route('/')
 @cross_origin(support_credentials=True)
 def home_html():
     return render_template("index.html")
+
 
 @app.route('/set_group', methods=["POST"])
 @cross_origin(support_credentials=True)
@@ -148,7 +151,7 @@ def set_group():
         action = data[2]
 
         if action == "new":
-            data_dir = dataPath+"game_data/{}/{}".format(group, team)
+            data_dir = dataPath + "game_data/{}/{}".format(group, team)
             for file in ["save", "mix", "resultats", "inputs", "logs"]:
                 init_fichier(file, data_dir)
 
@@ -167,13 +170,14 @@ def set_group():
     except:
         resp = jsonify(["log_in_error"])
 
-        with open(dataPath+'logs.txt', 'a') as logs:
+        with open(dataPath + 'logs.txt', 'a') as logs:
             logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
 
     return resp
 
 
 @app.route('/manual')
+@app.route('/manual/')
 @cross_origin(support_credentials=True)
 def manual_html():
     group = request.cookies.get("groupe")
@@ -187,10 +191,6 @@ def manual_html():
     return resp
 
 
-@app.route('/manual/')
-@cross_origin(support_credentials=True)
-def manual_bis_html():
-    return redirect("/manual")
 
 
 @app.route('/get_mix')
@@ -199,10 +199,11 @@ def get_mix():
     group = request.cookies.get("groupe")
     team = request.cookies.get("equipe")
 
-    with open(dataPath+"game_data/{}/{}/mix.json".format(group, team), "r") as f:
+    with open(dataPath + "game_data/{}/{}/mix.json".format(group, team), "r") as f:
         mix = json.load(f)
 
     return jsonify(mix)
+
 
 # Create the production API POST endpoint:
 @app.route("/production", methods=["POST"])
@@ -211,7 +212,7 @@ def prodCompute():
     group = request.cookies.get("groupe")
     team = request.cookies.get("equipe")
     rep = dataPath + "game_data/{}/{}/".format(group, team)
-    #team = int(team)
+    # team = int(team)
 
     data = request.get_json()
     errDetails = 0
@@ -236,12 +237,10 @@ def prodCompute():
 
         for reg in save["capacite"]:
             for p in save["capacite"][reg]:
-                #if p != "biomasse":
+                # if p != "biomasse":
                 if data[reg][p] > save["capacite"][reg][p]:
                     errDetails = [reg, p, save["capacite"][reg][p]]
                     raise exc.errSol
-
-
 
         input = inputs_from_save_and_data(save, data)
 
@@ -302,7 +301,7 @@ def commitResults():
 
     with open(rep + "mix.json", "r") as src:
         mix = json.load(src)
-    mix["actif"]=False
+    mix["actif"] = False
     with open(rep + "mix.json", "w") as dst:
         json.dump(mix, dst, **json_opts)
 
@@ -312,7 +311,36 @@ def commitResults():
         return redirect("/manual")
 
 
+@app.route('/vues/<vue>')
+@app.route('/vues/')
+@app.route('/vues')
+@cross_origin(support_credentials=True)
+def vues(vue="production"):
+    group = request.cookies.get("groupe")
+    team = request.cookies.get("equipe")
+
+    if (group is None) or (team is None):
+        resp = make_response(redirect("/"))
+    else:
+        with open("/home/pacco/Documents/climix_test/StratStockage/production.json") as json_file:
+            composant = json.load(json_file)
+
+        resources = INLINE.render()
+        script = composant["script"]
+        div = composant["div"]
+
+        #return make_response(html)
+        resp = make_response(render_template("vue_"+vue+".html",
+                                             group=group, team=team, vue=vue,
+                                             bokeh_ressources=INLINE.render(),
+                                             bokeh_script=composant["script"],
+                                             bokeh_div=composant["div"],
+                                             ))
+    return resp
+
+
 @app.route('/results')
+@app.route('/results/')
 @cross_origin(support_credentials=True)
 def results_html():
     group = request.cookies.get("groupe")
@@ -326,19 +354,13 @@ def results_html():
     return resp
 
 
-@app.route('/results/')
-@cross_origin(support_credentials=True)
-def results_bis_html():
-    return redirect("/results")
-
-
 @app.route('/get_results')
 @cross_origin(support_credentials=True)
 def get_results():
     group = request.cookies.get("groupe")
     team = request.cookies.get("equipe")
 
-    with open(dataPath+"game_data/{}/{}/resultats.json".format(group, team), "r") as f:
+    with open(dataPath + "game_data/{}/{}/resultats.json".format(group, team), "r") as f:
         resultats = json.load(f)
 
     return jsonify(resultats)
@@ -361,97 +383,6 @@ def get_events():
             events[annee] = []
 
     return jsonify(events)
-
-
-
-@app.route('/photo')
-@cross_origin(support_credentials=True)
-def photo_html():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-
-    if (group is None) or (team is None):
-        resp = make_response(redirect("/"))
-    else:
-        resp = make_response(render_template("photo.html"))
-    
-    return resp
-
-
-@app.route('/photo/')
-@cross_origin(support_credentials=True)
-def photo_bis_html():
-    return redirect("/photo")
-
-
-@app.route('/detection')
-@cross_origin(support_credentials=True)
-def detection_html():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-
-    if (group is None) or (team is None):
-        resp = make_response(redirect("/"))
-    else:
-        resp = make_response(render_template("detection.html"))
-    
-    return resp
-
-
-@app.route('/detection/')
-@cross_origin(support_credentials=True)
-def detection_bis_html():
-    return redirect("/detection")
-
-@app.route('/get_detection')
-@cross_origin(support_credentials=True)
-def get_detection():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-
-    with open(dataPath+"game_data/{}/{}/detection.json".format(group, team), "r") as f:
-        detection = json.load(f)
-
-    return jsonify(detection)
-
-#Create the detector API POST endpoint:
-@app.route("/detector", methods=["POST"])
-@cross_origin(supports_credentials=True)
-def imgProcess():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
-
-    team = int(team)
-
-    data = request.get_json()
-    b64str = data['image'].partition(",")[2]
-    img = base64.b64decode(b64str + "==")
-    # Padding --> https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding
-
-    with open(dataPath+"game_data/{}/{}/image.png".format(group, team), 'wb') as imgFile:
-        imgFile.write(img)
-
-    try:
-        detection.detection_main(group, team)
-        resp = ["success"]
-        
-        with open(dataPath+"game_data/{}/{}/mix.json".format(group, team), "r") as f:
-            mix = json.load(f)
-        mix["actif"] = False
-        with open(dataPath+"game_data/{}/{}/mix.json".format(group, team), "w") as f:
-            json.dump(mix, f)
-
-    except:
-        resp = ["error", None]
-
-        with open(dataPath+'logs.txt', 'a') as logs:
-            logs.write("[{}] Groupe {} Equipe {} \n {} \n".format(datetime.datetime.now(), group, team, traceback.format_exc()))
-
-    resp = jsonify(resp)
-
-    return resp
-
-
 
 
 

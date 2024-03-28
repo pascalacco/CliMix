@@ -567,10 +567,10 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
 
     # Definition des differentes technologies
     # Methanation : 1 pion = 10 unites de 100 MW = 1 GW
-    P=Techno('Phs', np.ones(H)*16, np.zeros(H), 0.95, 0.9, 9.3, 9.3, 180)
-    B=Techno('Battery', np.ones(H)*2, np.zeros(H), 0.9, 0.95, mix["stock"]/10*20.08, (mix["stock"]/10)*20.08, (mix["stock"]/10)*74.14)
-    G=Techno('Gaz', np.ones(H)*(initGaz+gazBiomasse), np.zeros(H), 0.59, 0.45, 34.44, 1*nbPions["methanation"], 10000000)    
-    L=Techno('Lake', storedlake, np.zeros(H), 1, 1, 10, 10, 2000)
+    P = Techno('Phs', np.ones(H)*16, np.zeros(H), 0.95, 0.9, 9.3, 9.3, 180)
+    B = Techno('Battery', np.ones(H)*2, np.zeros(H), 0.9, 0.95, mix["stock"]/10*20.08, (mix["stock"]/10)*20.08, (mix["stock"]/10)*74.14)
+    G = Techno('Gaz', np.ones(H)*(initGaz+gazBiomasse), np.zeros(H), 0.59, 0.45, 34.44, 1*nbPions["methanation"], 10000000)
+    L = Techno('Lake', storedlake, np.zeros(H), 1, 1, 10, 10, 2000)
 
     # ACCO prise en compte de la demande en electrolyse
     G.stored -= np.ones(H) * electrolyse * G.etain

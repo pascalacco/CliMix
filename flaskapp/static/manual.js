@@ -222,7 +222,7 @@ $(function () {
                 success: function (data, textStatus, jqXHR) {
                     $('#computeResults').html('Valider');
                     if (data[0] == "success") {
-                        location.href = "/results";
+                        location.href = "/vues";
                     } else {
                         displayError(data[0], data[1]);
                     }

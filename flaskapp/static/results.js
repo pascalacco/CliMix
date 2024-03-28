@@ -382,7 +382,6 @@ $(function () {
         creerLegende(couleurs, min, coeff);
 
 
-
         $("#turn").text(`Tour ${(resultsData.annee.toString() - 2030) / 5 + 1} : Année ${(resultsData.annee.toString())}`);
     }
 
