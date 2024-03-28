@@ -225,7 +225,7 @@ def prodCompute():
         # VERIF ANNEE / STOCK / CARTE / CAPACITE LEGITIMES
         if data["annee"] != save["annee"]:
             errDetails = save["annee"]
-            raise exc.errAnnee
+            raise exc.errAnnee {{ bokeh_ressources|safe }}
 
         if data["stock"] < save["stock"]:
             errDetails = save["stock"]

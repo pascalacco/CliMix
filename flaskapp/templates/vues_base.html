@@ -19,24 +19,66 @@
 
 </head>
 <body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg  bg-light navbar-light">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">
+                <img id="Climix-logo"
+                     src="/static/logo.png"
+                     alt="Climix Logo"
+                     draggable="false"
+                     height="60"
+                />
+            </a>
+            <a class="navbar-brand" href="#">
+                Saisie Mix
+            </a>
+        </div>
+        <button
+                class="navbar-toggler"
+                type="button"
+                data-mdb-toggle="collapse"
+                data-mdb-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+        >
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a>Groupe : <span class="badge bg-secondary">{{group}}</span></a>
+                </li>
+                <li class="nav-item">
+                    <a>Scénario : <span class="badge bg-secondary">{{team}}</span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-<ul class="nav nav-tabs">
-    <li class="nav-item">
-        <a class="nav-link" href="/vues/general">Général</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" aria-current="page" href="/vues/production">Production</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/vues/ressources">Ressources</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/vues/impacts">Impacts</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/results">Résultats</a>
-    </li>
-</ul>
+<div class="row">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link {% if vue == 'general' %} active {% endif %}" href="/vues/general">Général</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if vue == 'production' %} active {% endif %}" aria-current="page"
+               href="/vues/production">Production</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/vues/ressources">Ressources</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/vues/impacts">Impacts</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/results">Résultats</a>
+        </li>
+    </ul>
+</div>
 
 {% block content %} {% endblock %}
 
