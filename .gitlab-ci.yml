@@ -7,6 +7,7 @@ deploy_stage:
     script:
       - pwd
       - rm -rf .git/
+      - rm flaskapp/app.wsgi
       - rm flaskapp/static/logo.png
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
       - cp -r . /var/www/climix-test/
@@ -18,5 +19,6 @@ deploy_production:
   script:
       - pwd
       - rm -rf .git/
+      - rm flaskapp/app.wsgi
       - cp -r . /var/www/climix/
 
