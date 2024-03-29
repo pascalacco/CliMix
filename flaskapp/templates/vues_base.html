@@ -32,7 +32,7 @@
                 />
             </a>
             <a class="navbar-brand" href="#">
-                Saisie Mix
+                Résultats
             </a>
         </div>
         <button
@@ -81,6 +81,12 @@
 </div>
 
 {% block content %} {% endblock %}
+
+ <div class="text-center mt-3 mb-5">
+            <button class="btn btn-success" onclick="window.location.href = '/manual';" type="button">< Retourner au mix pour le modifier</button>
+            <button class="btn btn-success" onclick="window.location.href = '/commit';" type="button">Valider ce mix et passer au tour suivant >
+            </button>
+ </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

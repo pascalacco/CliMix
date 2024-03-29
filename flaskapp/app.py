@@ -274,7 +274,7 @@ def commitResults():
 @app.route('/vues/')
 @app.route('/vues')
 @cross_origin(support_credentials=True)
-def vues(vue="production"):
+def vues(vue="general"):
     equipe = request.cookies.get("groupe")
     partie = request.cookies.get("equipe")
 
