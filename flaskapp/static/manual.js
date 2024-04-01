@@ -65,23 +65,8 @@ $(function () {
             case "http":
                 msg = "Une erreur est survenue avec le serveur.";
                 break;
-            case "errAnnee":
-                msg = `L'année sélectionnée ne correpond pas au tour actuel (valeur attendue: ${details}).`;
-                break;
-            case "errStock":
-                msg = `Vous ne pouvez pas enlever de batteries (valeur minimale: ${details}).`;
-                break;
-            case "errCarte":
-                msg = `Vous ne pouvez pas changer de carte au milieu d'une partie (carte actuelle: ${details}).`;
-                break;
-            case "errSol":
-                msg = `Vous avez placé trop de ${details[1]} en ${details[0]} (maximum: ${details[2]}).`;
-                break;
-            case "errNuc":
-                msg = `La crise sociale en cours vous empêche de placer plus de réacteurs nucléaires (vous en avez ajouté ${details}).`;
-                break;
-            case "errMixInit":
-                msg = "Votre mix ne correspond pas au mix initial imposé. Veuillez vérifier le nombre de réacteurs dans chaque région.";
+            case "errJeu":
+                msg = details
                 break;
             default:
                 break;

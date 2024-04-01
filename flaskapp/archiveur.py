@@ -1,8 +1,10 @@
+import pandas
+
 from constantes import *
 from journal.utils import *
 import json
 import pickle
-
+#import numpy as np
 
 def normap(value, start1, stop1, start2, stop2):
     """
@@ -93,6 +95,7 @@ class Parties:
             return None, "Mauvais fichiers dans " + dm.chemin
 
 
+
 class DataManager:
     """
     DataManager gère les données d'une partie
@@ -180,6 +183,14 @@ class DataManager:
         self.set_fichier(fichier, dico)
         return dico
 
+    def set_chroniques(self, chroniques):
+        df = pandas.DataFrame(chroniques)
+        df.to_hdf(path_or_buf=self.chemin+"chroniques.hdf5", key='df', mode='w')
+        #np.savez_compressed(self.chemin+"chroniques.npz", **chroniques)
+
+    def get_chroniques(self):
+        df = pandas.read_hdf(path_or_buf=self.chemin+"chroniques.hdf5",key='df')
+        return df
 
     def get_annee(self):
         # read the json file

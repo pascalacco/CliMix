@@ -3,6 +3,7 @@ flask_cors
 numpy
 opencv-contrib-python
 pandas
+tables
 sphynx
 myst-parser
 sphinxcontrib-mermaid
