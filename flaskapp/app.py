@@ -189,12 +189,12 @@ def vues(vue="resultats"):
             resources = INLINE.render()
             script = composants["script"]
             div = composants["div"]
-            jinja_params = {"group":equipe,
-                            "team":partie,
-                            "vue":vue,
-                            "bokeh_ressources":INLINE.render(),
-                            "bokeh_script":composants["script"],
-                            "bokeh_div":composants["div"]
+            jinja_params = {"group": equipe,
+                            "team": partie,
+                            "vue": vue,
+                            "bokeh_ressources": INLINE.render(),
+                            "bokeh_script": composants["script"],
+                            "bokeh_div": composants["div"]
                             }
             try:
                 # return make_response(html)

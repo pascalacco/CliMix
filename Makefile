@@ -19,4 +19,8 @@ venv/climix_touche : setup.py foret/*.py
 edit :
 	source venv/bin/activate
 	pycharm.sh .
+
+
+deploiment :
+	./deploiement.sh
 .PHONY : venv deploiement exec_locale 
