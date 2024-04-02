@@ -11,6 +11,11 @@ deploy_stage:
       - rm flaskapp/static/logo.png
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
       - cp -r . /var/www/climix-test/
+      - cd /var/www/climix-test/
+      - source venv/bin/activate
+      - pip install -r requirements.txt
+      - pip install -r notebooks_requirements.txt
+      
 deploy_production:
   stage: deploy
   environment: Production
