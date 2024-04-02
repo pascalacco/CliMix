@@ -28,4 +28,10 @@ deploy_production:
       - rm -rf .git/
       - rm flaskapp/app.wsgi
       - cp -r . /var/www/climix/
+      - cd /var/www/climix/
+      - source venv/bin/activate
+      - pip install -r requirements.txt
+      - pip install -r notebooks_requirements.txt
+      - pip install -e .
+      - sudo /etc/init.d/apache2 restart
 
