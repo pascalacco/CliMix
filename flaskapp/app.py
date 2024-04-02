@@ -184,17 +184,20 @@ def vues(vue="resultats"):
 
             chroniques = dm.get_chroniques()
             vw = visualiseur.vuesClasses[vue](chroniques)
-            vw.set_fig()
+            vw.set_figs()
             composants = vw.get_composants(vue)
             resources = INLINE.render()
             script = composants["script"]
-            div = composants["div"]
+            divs = composants["divs"]
+            if not isinstance(divs, (list, tuple)):
+                divs = [divs]
+
             jinja_params = {"group": equipe,
                             "team": partie,
                             "vue": vue,
                             "bokeh_ressources": INLINE.render(),
-                            "bokeh_script": composants["script"],
-                            "bokeh_div": composants["div"]
+                            "bokeh_script": script,
+                            "bokeh_divs": divs
                             }
             try:
                 # return make_response(html)

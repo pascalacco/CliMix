@@ -19,8 +19,9 @@
 {% block content %}
     <h1>{% block title %} {{ vue }} * {% endblock %}</h1>
     <div class="embed-wrapper">
-        {{ for div in bokeh_divs}}
-    {{ bokeh_div|safe }}
+        {% for div in bokeh_divs%}
+            {{ div|safe }}
+        {% endfor %}
     </div>
     {{ bokeh_script|safe  }}
 

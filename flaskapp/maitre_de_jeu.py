@@ -25,7 +25,7 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, scenario):
             nbPions (dict) : nombre de pions total pour chaque techno
             nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
             nvPionsReg (dict) : nombre de pions total pour chaque techno
-            scenario (string) : nom du scenario (fichier <scenario>_25-50.csv  de mix_data)
+            df (string) : nom du scenario (fichier <scenario>_25-50.csv  de mix_data)
 
         Returns:
             result (dict) : tous les résultat de l'année
@@ -45,7 +45,7 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, scenario):
     # ADEME = pd.read_csv(dataPath+"mix_data/ADEME_25-50.csv", header=None)
     # ADEME.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
-    scenario = pd.read_csv(dataPath + "mix_data/" + scenario + "_25-50.csv")
+    #scenario = pd.read_csv(dataPath + "mix_data/" + scenario + "_25-50.csv")
     # scenario.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
     # # RTE = pd.read_csv(dataPath+"mix_data/RTE_25-50.csv", header=None)
@@ -54,18 +54,14 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, scenario):
     # # NEGAWATT = pd.read_csv(dataPath+"mix_data/NEGAWATT_25-50.csv", header=None)
     # # NEGAWATT.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
+    df = pd.read_hdf(dataPath + "mix_data/" + scenario + "_25-50.h5", "df")
     annee_en_cours = (mix['annee'] - 5).__str__()
-    if ("e" + annee_en_cours) in scenario:
-        electrolyse = scenario["e" + annee_en_cours].values
-    else:
-        electrolyse = scenario["heures"].values * 0.
 
+    df = df.loc[annee_en_cours+"-1-1 0:0" : annee_en_cours+"-12-31 23:0"]
+    result, save, chroniques = stratege.simulation(df["demande"].values, mix, save, nbPions, nvPions, nvPionsReg,
+                                                   electrolyse=df["electrolyse"].values)
 
-
-    result, save, chroniques = stratege.simulation(scenario["d" + annee_en_cours].values, mix, save, nbPions, nvPions, nvPionsReg,
-                              electrolyse=electrolyse)
-
-    chroniques['heures']= scenario["heures"]
+    chroniques["date"] = df.index.values
     return result, save, chroniques
 
 
