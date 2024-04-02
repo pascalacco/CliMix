@@ -15,7 +15,8 @@ deploy_stage:
       - source venv/bin/activate
       - pip install -r requirements.txt
       - pip install -r notebooks_requirements.txt
-      
+      - pip install -e .
+
 deploy_production:
   stage: deploy
   environment: Production
