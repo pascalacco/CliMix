@@ -5,15 +5,16 @@ $(function () {
     let resultsHistory = null;
     let mixData = null;
 
-    function displayError(reason) {
+    function displayError(reason, details) {
         let msg;
         const modal = new bootstrap.Modal($("#errModal"));
 
         switch (reason) {
             case "http":
-                msg = "Une erreur est survenue avec le serveur.";
+                msg = details;
                 break;
             default:
+                msg  = details
                 break;
         }
 
@@ -413,12 +414,12 @@ $(function () {
                     fillPage();
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    displayError("http");
+                    displayError("http", errorThrown);
                 }
             });
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            displayError("http");
+            displayError("http", errorThrown);
         }
     });
     $("#results").fadeIn();

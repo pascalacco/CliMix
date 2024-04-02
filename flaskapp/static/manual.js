@@ -60,15 +60,16 @@ $(function () {
 
         switch (reason) {
             case "err":
-                msg = "Une erreur inattendue est survenue.";
+                msg = details;
                 break;
             case "http":
-                msg = "Une erreur est survenue avec le serveur.";
+                msg = details;
                 break;
             case "errJeu":
                 msg = details
                 break;
             default:
+                msg = details
                 break;
         }
 
@@ -214,7 +215,7 @@ $(function () {
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     $('#computeResults').html('Valider');
-                    displayError("http", null);
+                    displayError("http", errorThrown);
                 }
             });
         }
@@ -230,11 +231,11 @@ $(function () {
                     mixData = data;
                     fillPage();
                 }, error: function (jqXHR, textStatus, errorThrown) {
-                    displayError("http");
+                    displayError("http", errorThrown);
                 }
             });
         }, error: function (jqXHR, textStatus, errorThrown) {
-            displayError("http");
+            displayError("http", errorThrown);
         }
     });
 

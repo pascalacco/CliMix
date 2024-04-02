@@ -62,20 +62,14 @@
 <div class="row">
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a class="nav-link {% if vue == 'general' %} active {% endif %}" href="/vues/general">Général</a>
+            <a class="nav-link {% if vue == 'resultats' %} active {% endif %}" href="/vues/resultats">Résultats</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if vue == 'production' %} active {% endif %}" aria-current="page"
-               href="/vues/production">Production</a>
+            <a class="nav-link {% if vue == 'scenario' %} active {% endif %}" aria-current="page"
+               href="/vues/scenario">Scenario</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/vues/ressources">Ressources</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/vues/impacts">Impacts</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/results">Résultats</a>
+            <a class="nav-link" href="/results">Résultats (old)</a>
         </li>
     </ul>
 </div>
@@ -91,5 +85,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+
+{% block endscripts %} {% endblock %}
 </body>
 </html>

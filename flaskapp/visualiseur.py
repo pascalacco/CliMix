@@ -31,4 +31,4 @@ class vScenario(Visualiseur):
         self.cumul_plot(cols=['demande', 'electrolyse'])
 
 
-vuesClasses = {"general": Visualiseur, "production": vScenario}
+vuesClasses = {"resultats": Visualiseur, "scenario": vScenario}

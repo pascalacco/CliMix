@@ -48,13 +48,15 @@ def set_group():
             resp.set_cookie(key="groupe", value=equipe, samesite="Lax")
             resp.set_cookie(key="equipe", value=partie, samesite="Lax")
         else:
-            resp = make_response(jsonify(["log_in_error"]))
-
+            if action != "new":
+                resp = make_response(["err", "Partie " + equipe +"/" + partie + " n'existe pas. <br>Cliquez sur le bouton 'nouvelle partie' pour la créer "])
+            else:
+                resp = make_response(jsonify(["log_in_error pour " +equipe + "/" + partie]))
     except:
-        resp = jsonify(["log_in_error"])
-
         with open(dataPath + 'logs.txt', 'a') as logs:
             logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+
+        resp = ["err", traceback.format_exc()]
 
     return resp
 
@@ -63,13 +65,20 @@ def set_group():
 @app.route('/manual/')
 @cross_origin(support_credentials=True)
 def manual_html():
-    group = request.cookies.get("groupe")
-    team = request.cookies.get("equipe")
+    try:
+        group = request.cookies.get("groupe")
+        team = request.cookies.get("equipe")
 
-    if (group is None) or (team is None):
-        resp = make_response(redirect("/"))
-    else:
-        resp = make_response(render_template("manual.html", group=group, team=team))
+        if (group is None) or (team is None):
+            resp = make_response(redirect("/"))
+        else:
+            resp = make_response(render_template("manual.html", group=group, team=team))
+
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+
+        resp = ["err", traceback.format_exc()]
 
     return resp
 
@@ -77,27 +86,32 @@ def manual_html():
 @app.route('/get_mix')
 @cross_origin(support_credentials=True)
 def get_mix():
-    equipe = request.cookies.get("groupe")
-    partie = request.cookies.get("equipe")
-    dm = DataManager(equipe=equipe, partie=partie)
+    try:
+        equipe = request.cookies.get("groupe")
+        partie = request.cookies.get("equipe")
+        dm = DataManager(equipe=equipe, partie=partie)
 
-    mix = dm.get_fichier("mix")
+        mix = dm.get_fichier("mix")
 
-    return jsonify(mix)
+        return jsonify(mix)
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+
+        return ["err", traceback.format_exc()]
 
 
 # Create the production API POST endpoint:
 @app.route("/production", methods=["POST"])
 @cross_origin(supports_credentials=True)
 def prodCompute():
-    equipe = request.cookies.get("groupe")
-    partie = request.cookies.get("equipe")
-    dm = DataManager(equipe=equipe, partie=partie)
-
-    data = request.get_json()
-    save = dm.get_fichier("save")
-
     try:
+        equipe = request.cookies.get("groupe")
+        partie = request.cookies.get("equipe")
+        dm = DataManager(equipe=equipe, partie=partie)
+
+        data = request.get_json()
+        save = dm.get_fichier("save")
 
         maitre_de_jeu.assert_capacitees(save, data)
 
@@ -133,49 +147,69 @@ def prodCompute():
 @app.route("/commit")
 @cross_origin(supports_credentials=True)
 def commitResults():
-    equipe = request.cookies.get("groupe")
-    partie = request.cookies.get("equipe")
-    dm = DataManager(equipe=equipe, partie=partie)
+    try :
+        equipe = request.cookies.get("groupe")
+        partie = request.cookies.get("equipe")
+        dm = DataManager(equipe=equipe, partie=partie)
 
-    newSave = dm.cp_fichier(src='save_tmp', dst='save')
-    mix = dm.set_item_fichier(fichier='mix', item='actif', val=False)
+        newSave = dm.cp_fichier(src='save_tmp', dst='save')
+        mix = dm.set_item_fichier(fichier='mix', item='actif', val=False)
 
-    if newSave["annee"] == 2055:
-        return redirect("/")
-    else:
-        return redirect("/manual")
+        if newSave["annee"] == 2055:
+            return redirect("/")
+        else:
+            return redirect("/manual")
 
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+        resp = ["err", traceback.format_exc()]
+    resp = jsonify(resp)
+
+    return resp
 
 @app.route('/vues/<vue>')
 @app.route('/vues/')
 @app.route('/vues')
 @cross_origin(support_credentials=True)
-def vues(vue="general"):
-    equipe = request.cookies.get("groupe")
-    partie = request.cookies.get("equipe")
-    dm = DataManager(equipe=equipe, partie=partie)
+def vues(vue="resultats"):
+    try:
+        equipe = request.cookies.get("groupe")
+        partie = request.cookies.get("equipe")
+        dm = DataManager(equipe=equipe, partie=partie)
 
-    if (equipe is None) or (partie is None):
-        resp = make_response(redirect("/"))
-    else:
+        if (equipe is None) or (partie is None):
+            resp = make_response(redirect("/"))
+        else:
 
-        chroniques = dm.get_chroniques()
-        vw = visualiseur.vuesClasses[vue](chroniques)
-        vw.set_fig()
-        composants = vw.get_composants(vue)
-        resources = INLINE.render()
-        script = composants["script"]
-        div = composants["div"]
+            chroniques = dm.get_chroniques()
+            vw = visualiseur.vuesClasses[vue](chroniques)
+            vw.set_fig()
+            composants = vw.get_composants(vue)
+            resources = INLINE.render()
+            script = composants["script"]
+            div = composants["div"]
+            jinja_params = {"group":equipe,
+                            "team":partie,
+                            "vue":vue,
+                            "bokeh_ressources":INLINE.render(),
+                            "bokeh_script":composants["script"],
+                            "bokeh_div":composants["div"]
+                            }
+            try:
+                # return make_response(html)
+                resp = make_response(
+                    render_template("vue_" + vue + ".html", **jinja_params)
+                )
+            except:
+                resp = make_response(
+                    render_template("vue_generique.html", **jinja_params)
+                    )
 
-        # return make_response(html)
-        resp = make_response(
-            render_template("vue_" + vue + ".html",
-                            group=equipe, team=partie, vue=vue,
-                            bokeh_ressources=INLINE.render(),
-                            bokeh_script=composants["script"],
-                            bokeh_div=composants["div"],
-                            )
-        )
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+        resp = ["err", traceback.format_exc()]
     return resp
 
 
@@ -183,46 +217,66 @@ def vues(vue="general"):
 @app.route('/results/')
 @cross_origin(support_credentials=True)
 def results_html():
-    equipe = request.cookies.get("groupe")
-    partie = request.cookies.get("equipe")
+    try:
+        equipe = request.cookies.get("groupe")
+        partie = request.cookies.get("equipe")
 
-    if (equipe is None) or (partie is None):
-        resp = make_response(redirect("/"))
-    else:
-        resp = make_response(render_template("results.html", group=equipe, team=partie))
+        if (equipe is None) or (partie is None):
+            resp = make_response(redirect("/"))
+        else:
+            resp = make_response(render_template("results.html", group=equipe, team=partie))
 
-    return resp
+        return resp
+
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+        resp = ["err", traceback.format_exc()]
+        return resp
 
 
 @app.route('/get_results')
 @cross_origin(support_credentials=True)
 def get_results():
-    equipe = request.cookies.get("groupe")
-    partie = request.cookies.get("equipe")
-    dm = DataManager(equipe=equipe, partie=partie)
+    try:
+        equipe = request.cookies.get("groupe")
+        partie = request.cookies.get("equipe")
+        dm = DataManager(equipe=equipe, partie=partie)
 
-    resultats = dm.get_fichier(fichier='resultats')
+        resultats = dm.get_fichier(fichier='resultats')
 
-    return jsonify(resultats)
+        return jsonify(resultats)
+
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+        resp = ["err", traceback.format_exc()]
+        return resp
 
 
 @app.route('/get_events')
 @cross_origin(support_credentials=True)
 def get_events():
-    equipe = request.cookies.get("groupe")
-    partie = request.cookies.get("equipe")
-    dm = DataManager(equipe=equipe, partie=partie)
+    try:
+        equipe = request.cookies.get("groupe")
+        partie = request.cookies.get("equipe")
+        dm = DataManager(equipe=equipe, partie=partie)
 
-    resultats = dm.get_fichier(fichier='resultats')
+        resultats = dm.get_fichier(fichier='resultats')
 
-    events = {}
-    for annee in resultats:
-        if "remplacement" in resultats[annee]:
-            events[annee] = resultats[annee]["remplacement"]
-        else:
-            events[annee] = []
+        events = {}
+        for annee in resultats:
+            if "remplacement" in resultats[annee]:
+                events[annee] = resultats[annee]["remplacement"]
+            else:
+                events[annee] = []
 
-    return jsonify(events)
+        return jsonify(events)
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+        resp = ["err", traceback.format_exc()]
+        return resp
 
 
 # TESTS EN LOCAL:
