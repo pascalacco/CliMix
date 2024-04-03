@@ -159,7 +159,7 @@ def inputs_from_save_and_data(save, mix):
                     elif mix["annee"] - 15 in save[reg][p]:
                         save[reg][p].remove(mix["annee"] - 15)
                     else:
-                        raise Exception(f"Perdu dans les éoliennes ! avant {mix[reg][p]} pour la région {reg} et le pion {p} <br> maintenant on veut {save[reg]} pions...")
+                        raise errJeu(f"On ne peut pas enlever {eolSuppr} jeunes {p} en {reg} leur age est {save[reg][p]}<br> Remetez {len(save[reg][p])} pions svp")
 
             if p != "centraleNuc":
                 nvPionsReg[reg][p] = mix[reg][p] - len(save[reg][p])
