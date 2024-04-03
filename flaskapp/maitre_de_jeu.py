@@ -55,7 +55,7 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, scenario):
     # # NEGAWATT.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
 
     df = pd.read_hdf(dataPath + "mix_data/" + scenario + "_25-50.h5", "df")
-    annee_en_cours = (mix['annee'] - 5).__str__()
+    annee_en_cours = (mix['annee']).__str__()
 
     df = df.loc[annee_en_cours+"-1-1 0:0" : annee_en_cours+"-12-31 23:0"]
     result, save, chroniques = stratege.simulation(df["demande"].values, mix, save, nbPions, nvPions, nvPionsReg,

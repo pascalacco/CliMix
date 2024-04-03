@@ -500,26 +500,27 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
 
     # Techno params : name, stored, prod, etain, etaout, Q, S, vol
 
-    initGaz = 1000000
-    gazBiomasse = nbPions[
-                      "biomasse"] * 2 * 0.1 * 0.71 * 6200  # nbPions * nbCentraleParPion * puissance * fdc * nbHeures
+    volume_gaz = 10000000
+    initGaz = volume_gaz/2
+    gazBiomasse = nbPions["biomasse"] *      2          * 0.1     * 0.71 * H
+    #  gaz =        nbPions      * nbCentraleParPion * puissance * fdc * nbHeures
 
     # note Hugo : il semble que cet effet soit mal implémenté : à tester
     # carte alea MEMFDC (lance 2 / 3)
-    if mix["alea"] == "MEMFDC3":
-        gazBiomasse -= mix["naq"]["biomasse"] * 2 * 0.1 * 0.71 * 6200
+    # un an de moins de biomasse en nouvelle aquitaine (impact sur cette année)
+    if mix["alea"] == "MEMFDC2":
+        gazBiomasse -= mix["naq"]["biomasse"] * 2. * 0.1 * 0.71 * H
 
     # Definition des differentes technologies
     # Methanation : 1 pion = 10 unites de 100 MW = 1 GW
     P = Techno('Phs', np.ones(H) * 16, np.zeros(H), 0.95, 0.9, 9.3, 9.3, 180)
     B = Techno('Battery', np.ones(H) * 2, np.zeros(H), 0.9, 0.95, mix["stock"] / 10 * 20.08,
                (mix["stock"] / 10) * 20.08, (mix["stock"] / 10) * 74.14)
-    G = Techno('Gaz', np.ones(H) * (initGaz + gazBiomasse), np.zeros(H), 0.59, 0.45, 34.44, 1 * nbPions["methanation"],
-               10000000)
+    G = Techno('Gaz', np.ones(H) * (initGaz),
+               np.zeros(H), 0.59, 0.45, 34.44, 1 * nbPions["methanation"],
+               volume_gaz)
     L = Techno('Lake', storedlake, np.zeros(H), 1, 1, 10, 10, 2000)
 
-    # ACCO prise en compte de la demande en electrolyse
-    G.stored -= np.ones(H) * electrolyse.sum() * G.etain
 
     # Puissance centrales territoire : 18.54 GWe repartis sur 24 centrales (EDF)
     # Rendement meca (inutile ici) : ~35% generalement (Wiki)
@@ -897,9 +898,15 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
             listePenuriesQuotidien[i // 24] += 1
             listePenuriesHoraire[i % 24] += 1
 
-    consoGaz = G.stored[0] - G.stored[8759]
-    prodGazFossile = 0 if consoGaz < gazBiomasse else (consoGaz - gazBiomasse) * G.etaout
-    save["prodGazFossile"][str(mix["annee"])] = prodGazFossile
+    consoGaz = (G.stored[0] - G.stored[-1]) * G.etaout
+    prodGazFossile = consoGaz - gazBiomasse + electrolyse.sum()
+    if prodGazFossile <0.:
+        prodGazFossile = 0.
+
+
+    save["consoGaz"] = round(consoGaz)
+    save["GazElectrolyse"] = round(electrolyse.sum())
+    save["prodGazFossile"][str(mix["annee"])] = round(prodGazFossile)
 
     EmissionCO2 = prodOn * 10 + prodOff * 9 + prodPv * 55 + prodEau * 10 + prodNuc * 6 + prodGazFossile * 443  # variable EmissionCO2
 
@@ -1087,8 +1094,9 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
               "cout": round(cout),
               "budget": round(budget),
               "sol": round((Sol / 551695) * 100, 4),
-              "stockGaz": list(G.stored),
               "biogaz": round(gazBiomasse),
+              "consoGaz": save["consoGaz"],
+              "GazElectrolyse": save["GazElectrolyse"],
               "prodGazFossile": save["prodGazFossile"],
               "demande": int(demande), "production": prodTotale,
               "scoreUranium": Uranium, "scoreHydro": Hydro, "scoreBois": Bois, "scoreDechets": dechet,

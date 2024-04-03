@@ -14,7 +14,7 @@ $(function () {
                 msg = details;
                 break;
             default:
-                msg  = details
+                msg = details
                 break;
         }
 
@@ -257,21 +257,32 @@ $(function () {
         result6.addColumn('string', 'Bilan');
         result6.addColumn('number', '');
         result6.addRows([
-            ['Dépense (en Md€)', {v: resultsData.cout, f: resultsData.cout + ''}],
-            ['Budget disponible (en Md€)', {v: resultsData.budget, f: resultsData.budget + ''}],
-            ['Demande', {v: resultsData.demande, f: resultsData.demande + ' Gwh'}],
-            ['Production', {v: resultsData.production, f: resultsData.production + ' GWh'}],
-            ['Production - Demande', {
+            ['Dépense', {v: resultsData.cout, f: resultsData.cout + ' Md€'}],
+            ['Budget disponible', {v: resultsData.budget, f: resultsData.budget + ' Md€'}],
+            ['Demande électrique', {v: resultsData.demande, f: resultsData.demande + ' GWh/an'}],
+            ['Production électrique', {v: resultsData.production, f: resultsData.production + ' GWh/an'}],
+            ['Production - Demande électrique', {
                 v: resultsData.production - resultsData.demande,
-                f: resultsData.production - resultsData.demande + ' GWh'
+                f: resultsData.production - resultsData.demande + ' GWh/an'
             }],
-            ['Nb Pénuries', {v: resultsData.nbPenuries}],
-            ['Nb Surplus', {v: resultsData.nbSurplus}],
-            ['Stock Gaz (fin - debut)', {
-                v: resultsData.stockGaz[8759] - resultsData.stockGaz[0],
-                f: resultsData.stockGaz[8759] - resultsData.stockGaz[0] + ' GW'
+            ["Nb d'heures de Pénuries", {v: resultsData.nbPenuries}],
+            ["Nb d'heures de Surplus", {v: resultsData.nbSurplus}],
+            ['Conso Gaz (stock debut - stock fin)', {
+                v: resultsData.consoGaz,
+                f: resultsData.consoGaz + ' GWh/an'
             }],
-            ['Biogaz généré', {v: resultsData.biogaz, f: resultsData.biogaz + ' GW'}]
+            ['Biogaz produit (équivalent électrique)', {
+                v: resultsData.biogaz,
+                f: resultsData.biogaz + ' GWh/an'
+            }],
+            ['Gaz généré par electrolyse (équivalent électrique)', {
+                v: resultsData.GazElectrolyse,
+                f: resultsData.GazElectrolyse + ' GWh/an'
+            }],
+                ['Gaz fossile brulé (équivalent électrique)', {
+                v: resultsData.prodGazFossile[resultsData.annee],
+                f: resultsData.prodGazFossile[resultsData.annee] + ' GWh/an'
+            }]
         ]);
 
         let table = new google.visualization.Table(document.getElementById('table_div'));
