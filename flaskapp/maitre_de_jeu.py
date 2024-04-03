@@ -154,7 +154,12 @@ def inputs_from_save_and_data(save, mix):
             if p == "eolienneON" or p == "eolienneOFF":
                 eolSuppr = len(save[reg][p]) - mix[reg][p]
                 for i in range(eolSuppr):
-                    save[reg][p].remove(mix["annee"] - 15)
+                    if mix["annee"] in save[reg][p]:
+                        save[reg][p].remove(mix["annee"])
+                    elif mix["annee"] - 15 in save[reg][p]:
+                        save[reg][p].remove(mix["annee"] - 15)
+                    else:
+                        raise Exception(f"Perdu dans les éoliennes ! avant {mix[reg][p]} pour la région {reg} et le pion {p} <br> maintenant on veut {save[reg]} pions...")
 
             if p != "centraleNuc":
                 nvPionsReg[reg][p] = mix[reg][p] - len(save[reg][p])
