@@ -193,6 +193,10 @@ $(function () {
         location.href = "/";
     });
 
+    $('.resetMix').click(() => {
+        fillPage();
+    });
+
     $('#computeResults').click(() => {
         const dataProd = saveData();
 
