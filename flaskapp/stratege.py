@@ -412,6 +412,14 @@ def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2, en
     return Surplus, Manque
 
 
+def extraire_chroniques(s, p, prodresiduelle, H, P, B, G, L, N):
+    chroniques = {"s": s, "p": p, "prodResiduelle" : prodresiduelle}
+    techs = {P, B, G, L, N}
+    for tech in techs:
+        chroniques[tech.name[0]+"prod"] = tech.prod
+        chroniques[tech.name[0]+"stored"] = tech.stored
+    return chroniques
+
 def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     """ Optimisation de strategie de stockage et de destockage du Mix energetique
     
@@ -531,7 +539,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     # reacteurs nucleaires effectifs qu'après 1 tour
     nbProdNuc = nbPions["centraleNuc"]
     nbProdNuc2 = (nbPions["EPR2"] - nvPions["EPR2"])
-    N = Techno('Reacteur nucleaire', None, np.zeros(H), None, 1, 1.08 * nbProdNuc + 1.67 * nbProdNuc2, None, None)
+    N = Techno('Nucleaire', None, np.zeros(H), None, 1, 1.08 * nbProdNuc + 1.67 * nbProdNuc2, None, None)
 
     if mix["alea"] == "MEMFDC3":
         N.Q *= 45 / 60
@@ -619,12 +627,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     # s,p=StratStockagev2(prodresiduelle, H, P, B, M, L, T, N,
     #                    seuils_bot, seuils_mid, seuils_top, endmonthlake)
 
-    chroniques = {"demande": scenario,
-                  "electrolyse" : electrolyse,
-                  "prodPV": prodPV,
-                  "prodOnshore": prodOnshore,
-                  "prodOffshore": prodOffshore,
-                  }
+    chroniques = extraire_chroniques(s, p, prodresiduelle, H, P, B, G, L, N)
     ####Demande des choix de la fiche Usage à l'utilisateur
     # choix_utilisateur = input("Entrez les valeurs separees par des espaces : ")
 

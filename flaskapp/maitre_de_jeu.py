@@ -169,10 +169,13 @@ def inputs_from_save_and_data(save, mix):
                     save[reg][p].append(mix["annee"])
             else:
                 nucSuppr = len(save[reg][p]) - mix[reg][p]
-                if nucSuppr < 0 :
+                if nucSuppr < 0:
                     raise errJeu(f"Impossible de créer {-nucSuppr} centrales nucléaires d'ancienne génération dans la région {reg}! Choisissez des EPR2 à la place.")
                 for i in range(nucSuppr):
-                    save[reg][p].remove(mix["annee"] - 40)
+                    if (mix["annee"] - 40) in save[reg][p] :
+                        save[reg][p].remove(mix["annee"] - 40)
+                    else:
+                        raise errJeu(f"On ne peut pas enlever {eolSuppr} jeunes {p} en {reg} leur age est {save[reg][p]}<br> Remetez {len(save[reg][p])} pions svp")
 
     if mix["alea"] == "MECS3":
         if nvPions["EPR2"] > 0:

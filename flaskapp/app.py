@@ -185,13 +185,10 @@ def vues(vue="resultats"):
             chroniques = dm.get_chroniques()
             vw = visualiseur.vuesClasses[vue](chroniques)
             vw.set_figs()
-            composants = vw.get_composants(vue)
+            composants = vw.get_composants()
             resources = INLINE.render()
             script = composants["script"]
             divs = composants["divs"]
-            if not isinstance(divs, (list, tuple)):
-                divs = [divs]
-
             jinja_params = {"group": equipe,
                             "team": partie,
                             "vue": vue,

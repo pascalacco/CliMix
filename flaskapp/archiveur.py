@@ -189,7 +189,7 @@ class DataManager:
         #np.savez_compressed(self.chemin+"chroniques.npz", **chroniques)
 
     def get_chroniques(self):
-        df = pandas.read_hdf(path_or_buf=self.chemin+"chroniques.hdf5",key='df')
+        df = pandas.read_hdf(path_or_buf=self.chemin+"chroniques.hdf5", key='df')
         return df
 
     def get_annee(self):
@@ -208,6 +208,11 @@ class DataManager:
                     break
             return annee
 
+    def get_results(self):
+
+        return self.get_fichier(fichier="resultats")
+
+    ### Pas à jour
     def get_mdp(self):
         ## Aller chercher dans le bon fichier self.chemin/infos.json le mot de passe
         ## et return None si pas de fichier ou autre
@@ -307,10 +312,6 @@ class DataManager:
         with open(self.aggregated_mix_path, "w") as dst:
             json.dump(mix_dict, dst)
 
-    def get_results(self):
-        with open(self.results_path, "r") as f:
-            resultats = json.load(f)
-        return resultats
 
     def get_occasions(self):
         with open(self.occasions_path, "r") as f:
