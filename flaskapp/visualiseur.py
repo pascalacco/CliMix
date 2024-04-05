@@ -9,6 +9,38 @@ import pandas as pd
 
 
 class Visualiseur:
+    cols = ['demande', 'electrolyse',
+            'prodOffshore', 'prodOnshore', 'prodPV', 'rivprod', 'lakeprod',
+            'Bprod', 'Bstored',
+            'Gprod', 'Gstored',
+            'Lprod', 'Lstored',
+            'Nprod', 'Nstored',
+            'Pprod', 'Pstored',
+            'prodResiduelle', '-prodResiduelle',
+            's', 'p'
+            ]
+    couleurs = ["black", "grey",
+                "seagreen", "yellowgreen", "yellow", "aquamarine", "blue",
+                "darkolivegreen", "darkolivegreen",
+                "darksalmon", "darksalmon",
+                "darkblue", "darkblue",
+                "coral", "coral",
+                "red", "red",
+                "darkslategray", "darkslategray",
+                "green", "red"
+                ]
+    noms = [
+        'demande', 'electrolyse',
+        'prodOffshore', 'prodOnshore', 'prodPV', 'rivprod', 'lakeprod',
+        'Bprod', 'Bstored',
+        'Gprod', 'Gstored',
+        'Lprod', 'Lstored',
+        'Nprod', 'Nstored',
+        'Pprod', 'Pstored',
+        'prodResiduelle', '-prodResiduelle',
+        'surplus', "pénuries"
+    ]
+
     def __init__(self, chroniques, data_mix="./data_mix/"):
         self.data_mix = data_mix
         self.figs = {}
@@ -18,6 +50,17 @@ class Visualiseur:
         self.source = bk.models.ColumnDataSource(chroniques)
 
         self.dates = np.array(chroniques['date'], dtype=np.datetime64)
+
+    def couleurs_et_noms(self, cols):
+        couleurs = []
+        noms = []
+        i = 0
+        for colone in Visualiseur.cols:
+            if colone in cols:
+                couleurs.append(Visualiseur.couleurs[i])
+                noms.append(Visualiseur.noms[i])
+            i += 1
+        return couleurs, noms
 
     def get_dates_et_source(self):
         return self.dates, self.source
@@ -32,22 +75,22 @@ class Visualiseur:
         script, divs = components(self.figs)
         return {"script": script, "divs": divs}
 
-    def cumul_plot(self, cols, palette=bk.palettes.Category10_10):
-        couleurs = iter(palette)
-        fig = bkp.figure(x_axis_type="datetime")
-        fig.varea_stack(stackers=cols, x="date", color=[next(couleurs) for col in cols], legend_label=cols, source=self.source )
+    def cumul_plot(self, cols, fig=bkp.figure(x_axis_type="datetime")):
+        couleurs, noms = self.couleurs_et_noms(cols)
+        fig.varea_stack(stackers=cols, x="date", color=couleurs,
+                        legend_label=noms, source=self.source)
         fig.legend.click_policy = "mute"
         return fig
 
     def range_fig(self, deb=24 * 31, fin=24 * 31 + 24 * 7):
         p = bkp.figure(height=300, width=800, tools="xpan", toolbar_location=None,
-                   x_axis_type="datetime", x_axis_location="above",
-                   background_fill_color="#efefef", x_range=(self.dates[deb], self.dates[fin]))
+                       x_axis_type="datetime", x_axis_location="above",
+                       background_fill_color="#efefef", x_range=(self.dates[deb], self.dates[fin]))
 
         select = bkp.figure(title="Déplacez le milieu ou un bord du rectangle",
-                        height=130, width=800, y_range=p.y_range,
-                        x_axis_type="datetime", y_axis_type=None,
-                        tools="", toolbar_location=None, background_fill_color="#efefef")
+                            height=130, width=800, y_range=p.y_range,
+                            x_axis_type="datetime", y_axis_type=None,
+                            tools="", toolbar_location=None, background_fill_color="#efefef")
 
         range_tool = RangeTool(x_range=p.x_range)
         range_tool.overlay.fill_color = "navy"
@@ -65,10 +108,9 @@ class vScenario(Visualiseur):
         df = pd.read_csv(self.data_mix + fich)
 
     def set_figs(self):
-        palette = bk.palettes.Category10_10
-        couleurs = iter(palette)
         fig = self.cumul_plot(cols=['demande', 'electrolyse'])
         self.set_fig(fig, "Scenario")
+
 
 class vProduction(Visualiseur):
 
@@ -78,10 +120,11 @@ class vProduction(Visualiseur):
         p, select = self.range_fig()
 
         colonnes = self.chroniques.columns.values
-        prod = [col for col in colonnes if
-                ("prod" in col) and ("prodResiduelle" not in col) and ("prod_stock" not in col)]
+        prod = ['prodOffshore', 'prodOnshore', 'prodPV', 'rivprod', 'lakeprod']
         # p.line('date', 'prodResiduelle', source=source)
-        p.varea_stack(stackers=prod, x='date', color=tol['Bright'][6][:len(prod)], legend_label=prod, source=self.source)
+        # p.varea_stack(stackers=prod, x='date', color=tol['Bright'][6][:len(prod)], legend_label=prod,
+        #              source=self.source)
+        p = self.cumul_plot(cols=prod, fig=p)
         p.line(x='date', y='-prodResiduelle', source=self.source, legend_label='production résiduelle')
         p.yaxis.axis_label = 'production (GW)'
         p.legend.click_policy = "mute"
@@ -95,9 +138,9 @@ class vProduction(Visualiseur):
 
         p, select = self.range_fig()
 
-        colonnes = ["s", "p"]
+        cols = ["s", "p"]
 
-        p.varea_stack(stackers=colonnes, x='date', color=tol['Bright'][6][:len(colonnes)], legend_label=colonnes, source=self.source)
+        p = self.cumul_plot(cols, p)
         p.line(x='date', y='-prodResiduelle', source=self.source, legend_label='production résiduelle')
         p.yaxis.axis_label = 'surplus penuries (GW)'
         p.legend.click_policy = "mute"
@@ -105,10 +148,12 @@ class vProduction(Visualiseur):
         select.line('date', '-prodResiduelle', source=self.source)
         fig = column(p, select)
         return fig
+
     def set_figs(self):
         fig = self.fig_prod()
         self.set_fig(fig, "production")
         self.set_fig(self.fig_penuries())
+
 
 vuesClasses = {"resultats": Visualiseur,
                "scenario": vScenario,
@@ -123,8 +168,6 @@ if __name__ == "__main__":
     resultats = dm.get_results()
     chroniques.describe()
     self = vProduction(chroniques)
-    #bkp.show(self.fig_prod())
     self.set_figs()
     composants = self.get_composants()
     print(composants["divs"])
-

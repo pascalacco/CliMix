@@ -413,12 +413,14 @@ def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2, en
 
 
 def extraire_chroniques(s, p, prodresiduelle, H, P, B, G, L, N):
-    chroniques = {"s": s, "p": p, "prodResiduelle" : prodresiduelle}
+    chroniques = {"s": s, "p": p, "prodResiduelle": prodresiduelle}
     techs = {P, B, G, L, N}
     for tech in techs:
-        chroniques[tech.name[0]+"prod"] = tech.prod
-        chroniques[tech.name[0]+"stored"] = tech.stored
+        chroniques[tech.name[0] + "prod"] = tech.prod
+        if tech != "N":
+            chroniques[tech.name[0] + "stored"] = tech.stored
     return chroniques
+
 
 def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     """ Optimisation de strategie de stockage et de destockage du Mix energetique
@@ -505,12 +507,19 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     # Calcul de la production residuelle
     # prodresiduelle = prod2006_offshore + prod2006_onshore + prod2006_pv + rivprod - scenario
     prodresiduelle = prodOffshore + prodOnshore + prodPV + rivprod - scenario
+    chroniques = {"demande": scenario,
+                  "electrolyse": electrolyse,
+                  "prodOffshore": prodOffshore,
+                  "prodOnshore": prodOnshore,
+                  "prodPV": prodPV,
+                  "rivprod": rivprod,
+                  }
 
     # Techno params : name, stored, prod, etain, etaout, Q, S, vol
 
     volume_gaz = 10000000
-    initGaz = volume_gaz/2
-    gazBiomasse = nbPions["biomasse"] *      2          * 0.1     * 0.71 * H
+    initGaz = volume_gaz / 2
+    gazBiomasse = nbPions["biomasse"] * 2 * 0.1 * 0.71 * H
     #  gaz =        nbPions      * nbCentraleParPion * puissance * fdc * nbHeures
 
     # note Hugo : il semble que cet effet soit mal implémenté : à tester
@@ -528,7 +537,6 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
                np.zeros(H), 0.59, 0.45, 34.44, 1 * nbPions["methanation"],
                volume_gaz)
     L = Techno('Lake', storedlake, np.zeros(H), 1, 1, 10, 10, 2000)
-
 
     # Puissance centrales territoire : 18.54 GWe repartis sur 24 centrales (EDF)
     # Rendement meca (inutile ici) : ~35% generalement (Wiki)
@@ -627,7 +635,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     # s,p=StratStockagev2(prodresiduelle, H, P, B, M, L, T, N,
     #                    seuils_bot, seuils_mid, seuils_top, endmonthlake)
 
-    chroniques = extraire_chroniques(s, p, prodresiduelle, H, P, B, G, L, N)
+    chroniques.update(extraire_chroniques(s, p, prodresiduelle, H, P, B, G, L, N))
     ####Demande des choix de la fiche Usage à l'utilisateur
     # choix_utilisateur = input("Entrez les valeurs separees par des espaces : ")
 
@@ -903,9 +911,8 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
 
     consoGaz = (G.stored[0] - G.stored[-1]) * G.etaout
     prodGazFossile = consoGaz - gazBiomasse + electrolyse.sum()
-    if prodGazFossile <0.:
+    if prodGazFossile < 0.:
         prodGazFossile = 0.
-
 
     save["consoGaz"] = round(consoGaz)
     save["GazElectrolyse"] = round(electrolyse.sum())
