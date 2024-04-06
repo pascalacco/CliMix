@@ -9,7 +9,7 @@ deploy_stage:
       - rm flaskapp/app.wsgi
       - rm flaskapp/static/logo.png
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
-      - sudo rsync -av --delete --exclude={'.git','flaskapp/game_data/*/*','venv','doc/build'} --include={'flaskapp/game_data/*.json'} ./ /var/www/climix-test
+      - rsync -av --delete --exclude={'.git','flaskapp/game_data/*/*','venv','doc/build'} --include={'flaskapp/game_data/*.json'} ./ /var/www/climix-test
       - cd /var/www/climix-test/
       - source venv/bin/activate
       - ./deploiement.sh
