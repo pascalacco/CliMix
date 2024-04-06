@@ -20,7 +20,9 @@ edit :
 	source venv/bin/activate
 	pycharm.sh .
 
+doc :
+	make -C doc html
 
 deploiment :
 	./deploiement.sh
-.PHONY : venv deploiement exec_locale 
+.PHONY : venv deploiement exec_locale doc
