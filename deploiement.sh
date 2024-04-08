@@ -5,7 +5,9 @@ copy(){
     rm -f "$2"/game_back/*.*
     rm -rf $2/flaskapp
     rm -f "$1"/flaskapp/constantes.py
+    cp "$1"/flaskapp/constantes-sample.php "$1"/flaskapp/constantes.py
     rm -f "$1"/flaskapp/app.wsgi
+    cp "$1"/flaskapp/app-test-sample.wsgi  "$1"/flaskapp/app.wsgi
     rm -rf "$1"/flaskapp/game_data/*/*
     cp -rf "$1"/flaskapp "$2"/flaskapp
     cp -rf "$1"/*.sh "$2"/

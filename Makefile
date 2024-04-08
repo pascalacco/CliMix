@@ -7,7 +7,7 @@ venv :
 maj_python : venv/touche venv/climix_touche
 
 venv/touche : requirements.txt notebooks_requirements.txt
-	. venv/bin/activate && pip install -r requirements.txt
+	. venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt
 	. venv/bin/activate && pip install -r notebooks_requirements.txt
 	touch venv/touche
 
@@ -23,7 +23,7 @@ edit :
 	pycharm.sh .
 
 doc :
-	make -C doc html
+	. venv/bin/activate && make -C doc html
 
 deploiement_test :
 	. ./deploiement.sh && redeplois . /var/www/climix-test
