@@ -513,6 +513,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
                   "prodOnshore": prodOnshore,
                   "prodPV": prodPV,
                   "rivprod": rivprod,
+                  "lakeprod": storedlake
                   }
 
     # Techno params : name, stored, prod, etain, etaout, Q, S, vol

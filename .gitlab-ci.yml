@@ -1,18 +1,18 @@
 before_script:
   - ls
   - whoami
+  - python --version
+  - pip --version
 deploy_stage:
     stage: deploy
     environment: Staging
     script:
       - pwd
-      - rm flaskapp/app.wsgi
+      - cat /var/www/climix-test/flaskapp/app.wsgi
       - rm flaskapp/static/logo.png
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
-      - rsync -av --delete --exclude={'.git','flaskapp/game_data/*/*','venv','doc/build'} --include={'flaskapp/game_data/*.json'} ./ /var/www/climix-test
       - cd /var/www/climix-test/
-      - source venv/bin/activate
-      - ./deploiement.sh
+      - cat flaskapp/constantes.py
       - sudo /etc/init.d/apache2 restart
 
 deploy_production:

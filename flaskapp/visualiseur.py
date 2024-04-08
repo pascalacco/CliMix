@@ -8,8 +8,8 @@ import numpy as np
 import pandas as pd
 
 
-class Visualiseur:
-    cols = ['demande', 'electrolyse',
+def init_couleur_et_noms():
+    init_cols = ['demande', 'electrolyse',
             'prodOffshore', 'prodOnshore', 'prodPV', 'rivprod', 'lakeprod',
             'Bprod', 'Bstored',
             'Gprod', 'Gstored',
@@ -19,17 +19,17 @@ class Visualiseur:
             'prodResiduelle', '-prodResiduelle',
             's', 'p'
             ]
-    couleurs = ["black", "grey",
+    init_couls = ["black", "grey",
                 "seagreen", "yellowgreen", "yellow", "aquamarine", "blue",
                 "darkolivegreen", "darkolivegreen",
-                "darksalmon", "darksalmon",
+                "purple", "purple",
                 "darkblue", "darkblue",
                 "coral", "coral",
-                "red", "red",
+                "lightblue", "lightblue",
                 "darkslategray", "darkslategray",
                 "green", "red"
                 ]
-    noms = [
+    init_noms = [
         'demande', 'electrolyse',
         'prodOffshore', 'prodOnshore', 'prodPV', 'rivprod', 'lakeprod',
         'Bprod', 'Bstored',
@@ -41,6 +41,25 @@ class Visualiseur:
         'surplus', "pénuries"
     ]
 
+    couleurs = {}
+    noms = {}
+
+    i=0
+    for col in init_cols:
+        couleurs[col] = init_couls[i]
+        noms[col] = init_noms[i]
+        i += 1
+
+    couleurs = pd.Series(couleurs)
+    noms = pd.Series(noms)
+    return init_cols, couleurs, noms
+
+
+colonnes, couleurs, noms = init_couleur_et_noms()
+
+
+class Visualiseur:
+
     def __init__(self, chroniques, data_mix="./data_mix/"):
         self.data_mix = data_mix
         self.figs = {}
@@ -50,17 +69,6 @@ class Visualiseur:
         self.source = bk.models.ColumnDataSource(chroniques)
 
         self.dates = np.array(chroniques['date'], dtype=np.datetime64)
-
-    def couleurs_et_noms(self, cols):
-        couleurs = []
-        noms = []
-        i = 0
-        for colone in Visualiseur.cols:
-            if colone in cols:
-                couleurs.append(Visualiseur.couleurs[i])
-                noms.append(Visualiseur.noms[i])
-            i += 1
-        return couleurs, noms
 
     def get_dates_et_source(self):
         return self.dates, self.source
@@ -76,9 +84,8 @@ class Visualiseur:
         return {"script": script, "divs": divs}
 
     def cumul_plot(self, cols, fig=bkp.figure(x_axis_type="datetime")):
-        couleurs, noms = self.couleurs_et_noms(cols)
-        fig.varea_stack(stackers=cols, x="date", color=couleurs,
-                        legend_label=noms, source=self.source)
+        fig.varea_stack(stackers=cols, x="date", color=couleurs[cols].to_list(),
+                        legend_label=noms[cols].to_list(), source=self.source)
         fig.legend.click_policy = "mute"
         return fig
 
@@ -118,19 +125,33 @@ class vProduction(Visualiseur):
         from bokeh.palettes import tol
 
         p, select = self.range_fig()
-
-        colonnes = self.chroniques.columns.values
-        prod = ['prodOffshore', 'prodOnshore', 'prodPV', 'rivprod', 'lakeprod']
-        # p.line('date', 'prodResiduelle', source=source)
-        # p.varea_stack(stackers=prod, x='date', color=tol['Bright'][6][:len(prod)], legend_label=prod,
-        #              source=self.source)
-        p = self.cumul_plot(cols=prod, fig=p)
-        p.line(x='date', y='-prodResiduelle', source=self.source, legend_label='production résiduelle')
+        non_pilot = ['rivprod',  'prodOffshore', 'prodOnshore', 'prodPV']
+        p = self.cumul_plot(cols=non_pilot, fig=p)
+        p.line(x='date', y='demande', source=self.source, legend_label=noms['demande'])
         p.yaxis.axis_label = 'production (GW)'
         p.legend.click_policy = "mute"
 
-        select.line('date', '-prodResiduelle', source=self.source)
-        fig = column(p, select)
+        pilot = ["Nprod", "Gprod", 'Lprod']
+        n = bkp.figure(height=300, width=800, tools="xpan", toolbar_location=None,
+                       x_axis_type="datetime", x_axis_location="above",
+                       background_fill_color="#efefef", x_range=p.x_range)
+
+        n.line('date', '-prodResiduelle', source=self.source, legend_label="demande résiduelle")
+        n = self.cumul_plot(cols=pilot, fig=n)
+        n.yaxis.axis_label = 'production (GW)'
+        n.legend.click_policy = "mute"
+
+        stock = ["Bprod", 'Pprod']
+        s = bkp.figure(height=300, width=800, tools="xpan", toolbar_location=None,
+                       x_axis_type="datetime", x_axis_location="above",
+                       background_fill_color="#efefef", x_range=p.x_range)
+        n.line('date', '-prodResiduelle', source=self.source, legend_label="demande résiduelle")
+        s = self.cumul_plot(cols=stock, fig=s)
+        s.yaxis.axis_label = 'production (GW)'
+        s.legend.click_policy = "mute"
+
+        select.line('date', 'demande', source=self.source)
+        fig = column(p, n, s, select)
         return fig
 
     def fig_penuries(self):
@@ -163,11 +184,12 @@ vuesClasses = {"resultats": Visualiseur,
 if __name__ == "__main__":
     import archiveur
 
-    dm = archiveur.DataManager(equipe="IMACS_A1", partie="S1")
+    dm = archiveur.DataManager(equipe="IMACS_A1", partie="S4")
     chroniques = dm.get_chroniques()
     resultats = dm.get_results()
     chroniques.describe()
     self = vProduction(chroniques)
-    self.set_figs()
-    composants = self.get_composants()
-    print(composants["divs"])
+    bkp.show(self.fig_prod())
+#    self.set_figs()
+#    composants = self.get_composants()
+#    print(composants["divs"])

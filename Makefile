@@ -2,19 +2,21 @@
 
 venv :
 	./creer_venv.sh
-
-exec_locale : 
-	. venv/bin/activate && python flaskapp/app.py
+	touch venv/touche
 
 maj_python : venv/touche venv/climix_touche
 
-venv/touche : requirements.txt
-	venv/bin/pip install -r requirements.txt
+venv/touche : requirements.txt notebooks_requirements.txt
+	. venv/bin/activate && pip install -r requirements.txt
+	. venv/bin/activate && pip install -r notebooks_requirements.txt
 	touch venv/touche
 
 venv/climix_touche : setup.py foret/*.py
 	venv/bin/pip install -e .
 	touch venv/climix_touche
+
+exec_locale : 
+	. venv/bin/activate && python flaskapp/app.py
 
 edit :
 	source venv/bin/activate
@@ -23,6 +25,10 @@ edit :
 doc :
 	make -C doc html
 
-deploiment :
-	./deploiement.sh
-.PHONY : venv deploiement exec_locale doc
+deploiement_test :
+	. ./deploiement.sh && redeplois . /var/www/climix-test
+
+deploiement_stable :
+	. ./deploiement.sh && redeplois . /var/www/climix
+
+.PHONY : venv deploiement_test deploiement_stable  exec_locale doc
