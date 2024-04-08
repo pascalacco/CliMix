@@ -1,18 +1,18 @@
 before_script:
   - ls
   - whoami
-  - /usr/bin/python3 --version
-  - cat /var/www/climix-test/flaskapp/constantes.py
-  - cat /var/www/climix-test/flaskapp/app.wsgi
  
 deploy_stage:
     stage: deploy
     environment: Staging
     script:
       - pwd
+      - cat /var/www/climix-test/flaskapp/constantes.py
+      - cat /var/www/climix-test/flaskapp/app.wsgi
+      - ls /var/www/climix-test/flaskapp/game_data
       - rm flaskapp/static/logo.png
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
-      - cd /var/www/climix-test/
+      - make deploiement_test
       - sudo /etc/init.d/apache2 restart
 
 deploy_production:

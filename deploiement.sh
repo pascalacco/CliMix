@@ -1,30 +1,24 @@
-TMP="/tmp"
-
-sauve(){
-    cp -rf "$1"/flaskapp/game_data "$2"/flaskapp/game_data
-    rm -f "$2"/flaskapp/game_data/*.*
-    cp -rf "$1"/venv "$2"/venv
-}
 
 
 copy(){
-    cp -r "$1"/flaskapp "$2"/flaskapp
-    cp -r "$1"/*.sh "$2"/
-    
-  rm -rf "$2"/.git
+    mv "$2"/flaskapp/game_data "$2"/game_back
+    rm -f "$2"/game_back/*.*
+    rm -rf $2/flaskapp
+    rm -f "$1"/flaskapp/constantes.py
+    rm -f "$1"/flaskapp/app.wsgi
+    rm -rf "$1"/flaskapp/game_data/*/*
+    cp -rf "$1"/flaskapp "$2"/flaskapp
+    cp -rf "$1"/*.sh "$2"/
+    cp -rf "$1"/*.txt "$2"/
+    cp -rf "$1"/Makefile "$2"/
+    cp -rf "$1"/setup.py "$2"/
 }
 
 
 synchronise()
 {
-    rm -rf "$1/tmp" &&
-	mkdir "$1/tmp" &&
-	mkdir "$1/tmp/flaskapp" &&
-	sauve "$2" "$1/tmp" &&
-	rm -rf "$2/*"&&
-	copy "$1" "$2" &&
-	sauve "$1/tmp" "$2" &&
-	rm -rf "$1/tmp" "$2/tmp"
+    
+    copy "$1" "$2"
 }
 
 rsynchronise(){

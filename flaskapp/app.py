@@ -7,7 +7,6 @@ import traceback
 
 from constantes import *
 
-from api.resources import api_blueprint
 from bokeh.resources import INLINE
 
 from flaskapp.archiveur import DataManager
@@ -17,7 +16,6 @@ from flaskapp import visualiseur
 # Set up Flask:
 app = Flask(__name__)
 
-app.register_blueprint(api_blueprint)
 
 # Bypass CORS at the front end:
 cors = CORS(app)
