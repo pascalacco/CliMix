@@ -1,8 +1,7 @@
 before_script:
   - ls
   - whoami
-  - python --version
-  - pip --version
+  - ls /usr/bin
 deploy_stage:
     stage: deploy
     environment: Staging
