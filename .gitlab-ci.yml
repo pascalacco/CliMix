@@ -7,8 +7,6 @@ deploy_stage:
     environment: Staging
     script:
       - pwd
-      - cat /var/www/climix-test/flaskapp/constantes.py
-      - cat /var/www/climix-test/flaskapp/app.wsgi
       - ls /var/www/climix-test/flaskapp/game_data
       - rm flaskapp/static/logo.png
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
