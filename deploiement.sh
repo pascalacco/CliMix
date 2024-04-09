@@ -1,12 +1,10 @@
 
 
 copy(){
-    rm -f "$2"/game_back
+    rm -rf "$2"/game_back
     mv -f "$2"/flaskapp/game_data "$2"/game_back
     rm -f "$2"/game_back/*.*
     rm -rf "$2"/flaskapp
-    rm -f "$1"/flaskapp/constantes.py
-    cp "$1"/flaskapp/constantes-sample.php "$1"/flaskapp/constantes.py
     rm -f "$1"/flaskapp/app.wsgi
     cp "$1"/flaskapp/app-test-sample.wsgi  "$1"/flaskapp/app.wsgi
     rm -rf "$1"/flaskapp/game_data/*/*
@@ -37,6 +35,7 @@ redeplois(){
     cd "$2" && make maj_python
 
     echo "Droits de modifs pour $PWD/flaskapp/game_data"
+    mkdir -p flaskapp/game_data
     chmod -R a+rw flaskapp/game_data/*/*
 
     echo "compilation de la doc"
