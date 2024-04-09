@@ -6,7 +6,6 @@ import json
 
 
 from flaskapp import strat_stockage
-from flaskapp import constantes
 
 from tests  import joueur
 

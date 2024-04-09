@@ -3,10 +3,10 @@ import sys, os
 import shutil, json
 
 
-from flaskapp import constantes
-
 ce_chemin = os.path.dirname(os.path.abspath(__file__))
+dataPath = ce_chemin+"../flaskapp/"
 jeu_de_test_rep = ce_chemin + "/jeux_de_test"
+
 class Cas :
     def __init__(self,rep_test):
         self.tests_rep = jeu_de_test_rep+"/"+rep_test    
@@ -59,7 +59,7 @@ def parse_groupe_team(argv):
     if team not in ["1", "2", "3", "4"]:
         raise ValueError(team + " n' est pas une équipe")
     
-    rep = constantes.dataPath + "game_data/" + group + "/" + team 
+    rep = dataPath + "game_data/" + group + "/" + team
     if os.path.isdir(rep):
         print("Importe le "+ rep +" comme test")
     else:
@@ -139,9 +139,10 @@ if __name__=="__main__":
             print ("indiquez un chemin source et cible \n    >python joueur.py telepath /var/www/html/flaskapp/game_data/ /var/www/html/flaskapp/game_data/sauv_15_nov\n par exemple") 
 
     elif "import" in sys.argv[1]:
+
         print("import d'un répertoire de tests entier")
         if len(sys.argv) > 3:
-            source = constantes.dataPath + "game_data/" + sys.argv[2]
+            source = dataPath + "game_data/" + sys.argv[2]
             if os.path.isdir(source):
                 print("Importe le "+ source +" comme test")
             else:

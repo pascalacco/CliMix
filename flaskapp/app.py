@@ -1,17 +1,17 @@
 from flask import Flask, request, jsonify, render_template, redirect, make_response
 from flask_cors import CORS, cross_origin
 
-import json
 import datetime
 import traceback
+import os
 
-from constantes import *
+dataPath = os.path.dirname(os.path.realpath(__file__))+'/'
 
 from bokeh.resources import INLINE
 
 from flaskapp.archiveur import DataManager
 from flaskapp import maitre_de_jeu
-from flaskapp import visualiseur
+from climix import visualiseur
 
 # Set up Flask:
 app = Flask(__name__)

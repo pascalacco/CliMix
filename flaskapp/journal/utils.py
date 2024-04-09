@@ -1,7 +1,7 @@
 import random
 import json
 import numpy as np
-from constantes import *
+
 
 def create_roles(names,path):
     roles = [

@@ -11,7 +11,8 @@ venv/touche : requirements.txt notebooks_requirements.txt
 	. venv/bin/activate && pip install -r notebooks_requirements.txt
 	touch venv/touche
 
-venv/climix_touche : setup.py 
+venv/climix_touche : setup.py climix/*.py climix/*/*.py flaskapp/*.py pythonapp/*.py 
+
 	. venv/bin/activate && pip install -e .
 	touch venv/climix_touche
 

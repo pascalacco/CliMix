@@ -2,7 +2,9 @@ import numpy as np
 
 import pandas as pd
 
-from flaskapp.constantes import *
+import os
+
+dataPath = os.path.dirname(os.path.realpath(__file__))+"/"
 
 #########################
 ### TOUT EST EN GW(h) ###

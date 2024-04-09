@@ -7,3 +7,4 @@ sphynx
 myst-parser
 sphinxcontrib-mermaid
 sphinx-automodapi
+flask-restx

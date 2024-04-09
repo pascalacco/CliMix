@@ -1,10 +1,11 @@
+import os
 import pandas as pd
 
-import stratege
-import numpy as np
-from flaskapp.constantes import *
+from climix import stratege
 
 
+ceChemin = os.path.dirname(os.path.realpath(__file__))+'/'
+chemin_scenarios = ceChemin + "../climix/mix_data/"
                                 #########################
                                 ### TOUT EST EN GW(h) ###
                                 #########################
@@ -39,22 +40,7 @@ def strat_stockage_main(mix, save, nbPions, nvPions, nvPionsReg, scenario):
             * biomasse --> 1 unite = une fraction de flux E/S en methanation
     """
 
-    # Definition des scenarios (Negawatt, ADEME, RTE pour 2050)
-    # Les autres scenarios sont faits mains à partir des donnees de Quirion
-
-    # ADEME = pd.read_csv(dataPath+"mix_data/ADEME_25-50.csv", header=None)
-    # ADEME.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
-
-    #scenario = pd.read_csv(dataPath + "mix_data/" + scenario + "_25-50.csv")
-    # scenario.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
-
-    # # RTE = pd.read_csv(dataPath+"mix_data/RTE_25-50.csv", header=None)
-    # # RTE.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
-
-    # # NEGAWATT = pd.read_csv(dataPath+"mix_data/NEGAWATT_25-50.csv", header=None)
-    # # NEGAWATT.columns = ["heures", "d2050", "d2045", "d2040", "d2035", "d2030", "d2025"]
-
-    df = pd.read_hdf(dataPath + "mix_data/" + scenario + "_25-50.h5", "df")
+    df = pd.read_hdf(chemin_scenarios + scenario + "_25-50.h5", "df")
     annee_en_cours = (mix['annee']).__str__()
 
     df = df.loc[annee_en_cours+"-1-1 0:0" : annee_en_cours+"-12-31 23:0"]
@@ -255,7 +241,7 @@ def applique_politique(code_pol, save, scenario):
         save["varConso"] -= 1.3e4
 
     import numpy as np
-    from stratege import H
+    from climix.stratege import H
     scenario += np.ones(H)*(save["varConso"]/H)
 
     return save, scenario

@@ -4,7 +4,8 @@ import cv2 as cv
 import sys
 from math import sqrt
 import json
-from constantes import *
+
+dataPath = os.path.dirname(os.path.realpath(__file__))+'/'
 
 
 # Localise la region

@@ -1,10 +1,10 @@
 import pandas
-
-from constantes import *
-from journal.utils import *
-import json
 import pickle
-#import numpy as np
+import os
+import json
+
+from flaskapp.journal.utils import *
+
 
 def normap(value, start1, stop1, start2, stop2):
     """
@@ -25,9 +25,14 @@ class Parties:
         Gère la vision globale de toutes les parties
 
     """
-    def __init__(self, chemin=dataPath):
-        self.chemin = chemin
-        self.data_managers={}
+    chemin = os.path.dirname(os.path.realpath(__file__))
+
+    def __init__(self, chemin=None):
+        if chemin is None:
+            self.chemin = Parties.chemin+"/game_data/"
+        else:
+            self.chemin = chemin
+        self.data_managers = {}
 
     def get_liste_equipes(self):
         grouplist = {}
@@ -42,8 +47,7 @@ class Parties:
                     if os.path.isdir(os.path.join(dataPath + 'game_data/' + filename, fileteam)) == True:
 
                         # read the json file
-                        with open(
-                                dataPath + 'game_data/' + filename + '/' + fileteam + '/resultats.json') as json_file:
+                        with open(dataPath + 'game_data/' + filename + '/' + fileteam + '/resultats.json') as json_file:
                             data = json.load(json_file)
                             currentYear = 0
                             # get the first key of the json file
@@ -104,16 +108,21 @@ class DataManager:
     @revision : rempalcer group par équipe et team par équipe
 
     """
-
+    chemin = os.path.dirname(os.path.realpath(__file__))
     fichiers = ["save", "mix", "resultats", "inputs", "logs"]
     fichiers_init = ["save", "mix", "resultats", "inputs", "logs"]
     json_opts = {"indent": 4, "sort_keys": False}
-    init_path = dataPath + "game_data/"
+    init_path = chemin+ "/game_data/"
 
-    def __init__(self, equipe, partie, chemin=dataPath):
+    def __init__(self, equipe, partie, chemin=None):
+
         self.equipe = equipe
         self.partie = partie
-        self.chemin = chemin+"game_data/{}/{}/".format(equipe, partie)
+        if chemin is None:
+            self.chemin = Parties.chemin+"/game_data/{}/{}/".format(equipe, partie)
+        else:
+            self.chemin = chemin + "game_data/{}/{}/".format(equipe, partie)
+        self.data_managers = {}
 
         self.results_path = self.chemin + "game_data/{}/{}/resultats.json".format(equipe, partie)
         self.scores_path = self.chemin + "game_data/{}/{}/scores.json".format(equipe, partie)
@@ -212,6 +221,9 @@ class DataManager:
 
         return self.get_fichier(fichier="resultats")
 
+    def get_mix(self):
+        return self.get_fichier(fichier="mix")
+
     ### Pas à jour
     def get_mdp(self):
         ## Aller chercher dans le bon fichier self.chemin/infos.json le mot de passe
@@ -296,10 +308,6 @@ class DataManager:
             mix_dict = json.load(file)
         return mix_dict
 
-    def get_mix(self):
-        with open(self.mix_path, 'r') as file:
-            mix_dict = json.load(file)
-        return mix_dict
 
     def update_mix(self, data):
         with open(self.mix_path, "w") as dst:  #
@@ -341,9 +349,6 @@ Code extérieur à l'archiveur
 """
 
 json_opts = {"indent": 4, "sort_keys": True}
-
-
-
 
 
 def creer_dossier(chemin_dossier):

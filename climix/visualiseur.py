@@ -182,9 +182,12 @@ vuesClasses = {"resultats": Visualiseur,
                }
 
 if __name__ == "__main__":
-    import archiveur
+    from flaskapp import archiveur
+    import os
+    chemin = os.path.dirname(os.path.realpath(__file__))
+    dataPath = chemin + "/../flaskapp/"
+    dm = archiveur.DataManager(equipe="winn", partie="S1", chemin=dataPath)
 
-    dm = archiveur.DataManager(equipe="IMACS_A1", partie="S4")
     chroniques = dm.get_chroniques()
     resultats = dm.get_results()
     chroniques.describe()
