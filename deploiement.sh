@@ -1,9 +1,10 @@
 
 
 copy(){
-    mv "$2"/flaskapp/game_data "$2"/game_back
+    rm -f "$2"/game_back
+    mv -f "$2"/flaskapp/game_data "$2"/game_back
     rm -f "$2"/game_back/*.*
-    rm -rf $2/flaskapp
+    rm -rf "$2"/flaskapp
     rm -f "$1"/flaskapp/constantes.py
     cp "$1"/flaskapp/constantes-sample.php "$1"/flaskapp/constantes.py
     rm -f "$1"/flaskapp/app.wsgi
