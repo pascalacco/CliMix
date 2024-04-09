@@ -1,9 +1,8 @@
+import os
 import numpy as np
-
 import pandas as pd
 
-import os
-
+import climix.technologies as te
 dataPath = os.path.dirname(os.path.realpath(__file__))+"/"
 
 #########################
@@ -12,200 +11,6 @@ dataPath = os.path.dirname(os.path.realpath(__file__))+"/"
 
 # Nombre d'heures dans l'année
 H = (24 * 365)
-
-np.seterr('raise')  # A ENLEVER SUR LE CODE FINAL
-
-
-class Techno:
-    """Classe regroupant toutes les technologies de stockage et de production pilotables
-
-    """
-
-    def __init__(self, name, stored, prod, etain, etaout, Q, S, Vol):
-        """ Créateur de la classe
-        Args:
-            name (str): nom de la techno
-            stored (array) : niveau des stocks a chaque heure
-            prod (array) : ce qui est produit chaque heure
-            etain (float) : coefficient de rendement a la charge
-            etaout (float) : coefficient de rendement a la decharge
-            Q (float) : capacite installee (flux sortant)
-            S (float) : capacite de charge (flux entrant)
-            vol (float) : capacite maximale de stockage
-        
-        Returns:
-            l'objet de la classe créé (Techno)
-        """
-        self.name = name  # . nom de la techno
-        self.stored = stored  # . ce qui est stocke
-        self.prod = prod  # . ce qui est produit
-        self.etain = etain  # . coefficient de rendement à la charge
-        self.etaout = etaout  # . coefficient de rendement à la decharge
-        self.Q = Q  # . capacite installee (flux sortant)
-        self.S = S  # . capacite de charge d'une techno de stockage (flux entrant)
-        self.vol = Vol  # . Capacite maximale de stockage de la techno (Volume max)
-
-
-def load(tec, k, astocker):
-    """Recharge les moyens de stockage quand on a trop d'energie
-        
-    Args:
-        tec : technologie de stockage a recharger (batterie, phs, ...)
-        k (int) : heure courante
-        astocker (float) : qte d'energie a stocker
-    
-    Returns:
-        out()
-    """
-    if astocker == 0:
-        out = 0
-
-    else:
-        temp = min(astocker * tec.etain, tec.vol - tec.stored[k - 1], tec.S * tec.etain)
-        tec.stored[k:] = tec.stored[k - 1] + temp
-        out = astocker - temp / tec.etain
-
-    return out
-
-
-def unload(tec, k, aproduire, endmonthlake, prod=True):
-    """ Decharge les moyens de stockage quand on a besoin d'energie
-
-    Args:
-        tec : technologie de stockage a utiliser pour la production (batterie, phs, ...)
-        k (int) : heure courante
-        aproduire (float) : qte d'energie a fournir
-        endmonthlake (array) : qte d'energie restante dans les lacs jusqu'a la fin du mois
-        prod (boolean) : indique si l'energie dechargee est a prendre en compte pour la production globale (faux pour les echanges internes)
-    """
-    if aproduire <= 0:
-        out = 0
-
-    else:
-        temp = min(aproduire / tec.etaout, tec.stored[k], tec.Q / tec.etaout)
-
-        if tec.name == 'Lake':
-            tec.stored[k:int(endmonthlake[k])] = tec.stored[k] - temp
-        else:
-            tec.stored[k:] = tec.stored[k] - temp
-
-        if prod:
-            tec.prod[k] = temp * tec.etaout
-
-        out = aproduire - temp * tec.etaout
-
-    return out
-
-
-def cycle(k):
-    """ Renvoie la puissance dispo actuellement pour le nucleaire, par rapport a la puissance max
-
-    Args:
-        k (int) : heure courante
-
-    Sur ATH : pas de penurie avec 56 centrales min.
-    Sur ATL : 28 centrales min. (50%)
-    Diviser en 4 ou 8 groupes (plutôt 8 pour les besoins humains)
-    1/8 = 0.125, 7/8 = 0.875
-    2180, 2920, 3650, 4400, 5130, 5900, 6732, 7580
-    Tiers de 8760 : 2920(4*730), 5840, 8460
-    DANS le dernier tiers : 50% croissance lineaire min, 25% baisse de 20% prod min/max, 25% arret
-    """
-
-    # La production nucleaire est divisee en 8 groupes, chacun a son cycle d'arret. 
-    # Dans cette fonction, on regarde dans quel partie du cycle on est pour chaque groupe, 
-    # pour calibrer la production min et max.
-
-    H = 8760
-    N = 8
-    n = 1 / N
-
-    # Intervalles des 3 parties importantes du cycle, pour chaque groupe
-    A_ranges = [((2180 + 6570) % H, (2180 + 8030) % H), ((2920 + 6570) % H, (2920 + 8030) % H),
-                ((3650 + 6570) % H, (3650 + 8030) % H), ((4400 + 6570) % H, (4400 + 8030) % H),
-                ((5130 + 6570) % H, (5130 + 8030) % H), ((5900 + 6570) % H, (5900 + 8030) % H),
-                ((6732 + 6570) % H, (6732 + 8030) % H), ((7580 + 6570) % H, (7580 + 8030) % H)]
-
-    B_ranges = [((2180 + 8030) % H, 2180), ((2920 + 8030) % H, 2920), ((3650 + 8030) % H, 3650),
-                ((4400 + 8030) % H, 4400), ((5130 + 8030) % H, 5130), ((5900 + 8030) % H, 5900),
-                ((6732 + 8030) % H, 6732), ((7580 + 8030) % H, 7580)]
-
-    C_ranges = [(2180, (2180 + 730) % H), (2920, (2920 + 730) % H), (3650, (3650 + 730) % H),
-                (4400, (4400 + 730) % H), (5130, (5130 + 730) % H), (5900, (5900 + 730) % H),
-                (6732, (6732 + 730) % H), (7580, (7580 + 730) % H)]
-
-    inA = [lower <= k < upper for (lower, upper) in A_ranges]
-    inB = [lower <= k < upper for (lower, upper) in B_ranges]
-    inC = [lower <= k < upper for (lower, upper) in C_ranges]
-
-    sMin = 0
-    sMax = 0
-
-    # Pour chaque groupe, on regarde sa zone et on ajuste son min et son max
-    for i in range(N):
-        if inA[i]:
-            start = A_ranges[i][0]
-            sMin += n * (0.2 + 0.00054795 * (k - start))
-            sMax += n * 1
-        elif inB[i]:
-            start = B_ranges[i][0]
-            sMin += n * (1 - 0.00027397260274 * (k - start))
-            sMax += n * (1 - 0.00027397260274 * (k - start))
-        elif inC[i]:
-            sMin += n * 0
-            sMax += n * 0
-        else:
-            sMin += n * 0.2
-            sMax += n * 1
-
-    return (sMin, sMax)
-
-
-def nucProd(tec, k, aproduire):
-    """ Lance la production des centrales nucleaires
-
-    Args:
-        tec : objet à utiliser pour la production  (ici, Techno Nucleaire)
-        k (int) : heure courante
-        aproduire (float) : qte d'energie a fournir
-    """
-    if aproduire <= 0:
-        out = 0
-
-    else:
-        # Si la demande est trop faible ou nulle, on produit quand meme à hauteur de 20%
-        MinMax = cycle(k)
-        Pmin = MinMax[0]
-        Pmax = MinMax[1]
-
-        if aproduire > tec.Q / tec.etaout * Pmin:
-            temp = min(aproduire / tec.etaout, tec.Q * Pmax / tec.etaout)
-            tec.prod[k] = temp * tec.etaout
-        else:
-            tec.prod[k] = tec.Q / tec.etaout * Pmin
-
-        out = aproduire - tec.prod[k]
-
-    return out
-
-
-def thermProd(tec, k, aproduire):
-    """ Lance la production des centrales thermiques
-
-    Args:
-        tec : objet à utiliser pour la production  (ici, Techno Thermique)
-        k (int) : heure courante
-        aproduire (float) : qte d'energie a fournir
-    """
-    if aproduire <= 0:
-        out = 0
-
-    else:
-        temp = min(aproduire / tec.etaout, tec.Q / tec.etaout)
-        tec.prod[k] = temp * tec.etaout
-        out = aproduire - tec.prod[k]
-
-    return out
 
 
 def certitudeglobal(y1, y2, y3, stockmax):
@@ -293,7 +98,7 @@ def seuil(a, b, c, crit, mode):
     return bestStock
 
 
-def StratStockage(prodres, H, Phs, Battery, Gas, Lake, Nuclear, endmonthlake):
+def StratStockage(prodres, H, Phs, Battery, Gas, Lake, Nuclear):
     """ Premiere strat de stockage naive
 
     Args:
@@ -315,21 +120,21 @@ def StratStockage(prodres, H, Phs, Battery, Gas, Lake, Nuclear, endmonthlake):
         if prodres[k] > 0:
 
             # La production min de nucleaire s'ajoute à la qte d'energie à stocker
-            nucMin = nucProd(Nuclear, k, 0)
+            nucMin = Nuclear.pilote_prod(k, 0)
             Astocker = prodres[k] + abs(nucMin)
 
             for tec in Tecstock:
-                Astocker = load(Tecstock[tec], k, Astocker)
+                Astocker = Tecstock[tec].charger(k, Astocker)
 
             Surplus[k] = Astocker
 
         else:
             Aproduire = -prodres[k]
 
-            Aproduire = nucProd(Nuclear, k, Aproduire)
+            Aproduire = Nuclear.pilote_prod(k, Aproduire)
 
             for tec in Tecdestock:
-                Aproduire = unload(Tecdestock[tec], k, Aproduire, endmonthlake)
+                Aproduire = Tecdestock[tec].décharger(k, Aproduire)
 
             ##liste penurie --> pour savoir si il y a penurie dans la production d'electricite 
             Manque[k] = Aproduire
@@ -337,7 +142,7 @@ def StratStockage(prodres, H, Phs, Battery, Gas, Lake, Nuclear, endmonthlake):
     return Surplus, Manque
 
 
-def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2, endmonthlake):
+def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2):
     """Strat de stockage optimisee
         
     Args:
@@ -361,7 +166,7 @@ def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2, en
     Tecdestock3 = {"Gas": Gas, "Battery": Battery, "Phs": Phs, "Lake": Lake}  ## zone 3,4
 
     for k in range(H):
-        stock_PB = Phs.stored[k] + Battery.stored[k]
+        stock_PB = Phs.stock[k] + Battery.stock[k]
 
         # Suivant le niveau de stock, on change l'ordre de de/stockage et on fait du power2gaz ou
         # gaz2power si besoin
@@ -369,10 +174,13 @@ def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2, en
         if 0 <= stock_PB < I0[k % 24]:
             strat_stock = Tecstock4
             strat_destock = Tecdestock3
-            qteInit = min(Gas.Q, Phs.S + Battery.S)
-            reste = unload(Gas, k, qteInit, endmonthlake, prod=False)
-            reste = load(Battery, k, qteInit - reste)
-            load(Phs, k, reste)
+            # si electreo  = Gstored > start + electro + Gnaif
+            # Nuke ((Batt + PHS + P2G si electro)-prodres)
+
+            #ACCO qteInit = min(Gas.Q, Phs.S + Battery.S)
+            #ACCO reste = décharger(Gas, k, qteInit, endmonthlake, prod=False)
+            #ACCO reste = charger(Battery, k, qteInit - reste)
+            #ACCO charger(Phs, k, reste)
 
         elif I0[k % 24] <= stock_PB < I1[k % 24]:
             strat_stock = Tecstock3
@@ -385,28 +193,47 @@ def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2, en
         else:
             strat_stock = Tecstock2
             strat_destock = Tecdestock1
-            qteInit = min(Phs.Q + Battery.Q, Gas.S)
-            reste = unload(Battery, k, qteInit, endmonthlake, prod=False)
-            reste = unload(Phs, k, reste, endmonthlake, prod=False)
-            load(Gas, k, qteInit - reste)
+            # Nuke ((P2G) si electro -prodres)
+
+
+
+            #Nuke(P2G si electro >0)"
+            #
+            #ACCO qteInit = min(Phs.Q + Battery.Q, Gas.S)
+            #ACCO reste = décharger(Battery, k, qteInit, endmonthlake, prod=False)
+            #ACCO reste = décharger(Phs, k, reste, endmonthlake, prod=False)
+            #ACCO charger(Gas, k, qteInit - reste)
 
         if prodres[k] > 0:
+            # Nuke (start_stock ubtil "Gaz") si electro
+            #
             # La production min de nucleaire s'ajoute à la qte d'energie à stocker
-            nucMin = nucProd(Nuclear, k, 0)
+            """
+            energie horaire = watt - charger(, watt, rpdo=False)
+            capa maw PHS +Battery charger avec prod = False
+            capa max P2G    charger avec prod = False
+            if electrol >0:
+                proNuke = NukeProd(capa max  PHS+ Batt + P2G )- prodres)
+            else 
+                if 
+                proNuke = NukeProd(capa max  PHS+ Batt  )- prodres)
+            """
+            # calcul max capa stockage (Phs+Batt+P2G)
+            nucMin = Nuclear.pilote_prod(k, 0)
             Astocker = prodres[k] + abs(nucMin)
 
             for tec in strat_stock:
-                Astocker = load(strat_stock[tec], k, Astocker)
+                Astocker = strat_stock[tec].charger( k, Astocker)
 
             Surplus[k] = Astocker
 
         else:
             Aproduire = -prodres[k]
 
-            Aproduire = nucProd(Nuclear, k, Aproduire)
+            Aproduire = Nuclear.pilote_prod(k, Aproduire)
 
             for tec in strat_destock:
-                Aproduire = unload(strat_destock[tec], k, Aproduire, endmonthlake)
+                Aproduire = strat_destock[tec].décharger(k, Aproduire)
 
             ##liste penurie --> pour savoir si il y a penurie dans la production d'electricite 
             Manque[k] = Aproduire
@@ -418,9 +245,9 @@ def extraire_chroniques(s, p, prodresiduelle, H, P, B, G, L, N):
     chroniques = {"s": s, "p": p, "prodResiduelle": prodresiduelle}
     techs = {P, B, G, L, N}
     for tech in techs:
-        chroniques[tech.name[0] + "prod"] = tech.prod
-        if tech != "N":
-            chroniques[tech.name[0] + "stored"] = tech.stored
+        chroniques[tech.nom[0] + "prod"] = tech.décharge
+        if tech != N:
+            chroniques[tech.nom[0] + "stored"] = tech.stock
     return chroniques
 
 
@@ -481,47 +308,19 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     prodPV += save["innovPV"] * prodPV
 
     # Definition des productions electriques des rivières et lacs
-    coefriv = 13
+    coefriv = 13.
     river = pd.read_csv(dataPath + "mix_data/run_of_river.csv", header=None)
     river.columns = ["heures", "prod2"]
     rivprod = np.array(river.prod2) * coefriv
 
-    lake = pd.read_csv(dataPath + "mix_data/lake_inflows.csv", header=None)
-    lake.columns = ["month", "prod2"]
-    lakeprod = np.array(lake.prod2)
-
-    # Calcul de ce qui est stocke dans les lacs pour chaque mois
-    horlake = np.array(
-        [0, 31, 31 + 28, 31 + 28 + 31, 31 + 28 + 31 + 30, 31 + 28 + 31 + 30 + 31, 31 + 28 + 31 + 30 + 31 + 30,
-         31 + 28 + 31 + 30 + 31 + 30 + 31 \
-            , 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31, 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30,
-         31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 \
-            , 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30,
-         31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31]) * 24
-
-    storedlake = np.zeros(H)
-    endmonthlake = np.zeros(H)
-    for k in range(12):
-        storedlake[horlake[k]:horlake[k + 1]] = 1000 * lakeprod[k]
-    for k in range(12):
-        endmonthlake[horlake[k]:horlake[k + 1]] = int(horlake[k + 1])
 
     # Calcul de la production residuelle
     # prodresiduelle = prod2006_offshore + prod2006_onshore + prod2006_pv + rivprod - scenario
     prodresiduelle = prodOffshore + prodOnshore + prodPV + rivprod - scenario
-    chroniques = {"demande": scenario,
-                  "electrolyse": electrolyse,
-                  "prodOffshore": prodOffshore,
-                  "prodOnshore": prodOnshore,
-                  "prodPV": prodPV,
-                  "rivprod": rivprod,
-                  "lakeprod": storedlake
-                  }
 
     # Techno params : name, stored, prod, etain, etaout, Q, S, vol
 
-    volume_gaz = 10000000
-    initGaz = volume_gaz / 2
+
     gazBiomasse = nbPions["biomasse"] * 2 * 0.1 * 0.71 * H
     #  gaz =        nbPions      * nbCentraleParPion * puissance * fdc * nbHeures
 
@@ -532,32 +331,33 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
         gazBiomasse -= mix["naq"]["biomasse"] * 2. * 0.1 * 0.71 * H
 
     # Definition des differentes technologies
-    # Methanation : 1 pion = 10 unites de 100 MW = 1 GW
-    P = Techno('Phs', np.ones(H) * 16, np.zeros(H), 0.95, 0.9, 9.3, 9.3, 180)
-    B = Techno('Battery', np.ones(H) * 2, np.zeros(H), 0.9, 0.95, mix["stock"] / 10 * 20.08,
-               (mix["stock"] / 10) * 20.08, (mix["stock"] / 10) * 74.14)
-    G = Techno('Gaz', np.ones(H) * (initGaz),
-               np.zeros(H), 0.59, 0.45, 34.44, 1 * nbPions["methanation"],
-               volume_gaz)
-    L = Techno('Lake', storedlake, np.zeros(H), 1, 1, 10, 10, 2000)
 
-    # Puissance centrales territoire : 18.54 GWe repartis sur 24 centrales (EDF)
-    # Rendement meca (inutile ici) : ~35% generalement (Wiki)
-    # T = Techno('Centrale thermique', None, np.zeros(H), None, 1, 0.7725*nbTherm, None, None)
+    S = te.TechnoStep()
+    B = te.TechnoBatteries(nb_units=mix["stock"])
+    G = te.TechnoGaz(nb_units=nbPions["methanation"])
+    L = te.TechnoLacs()
 
-    # Puissance : 1.08 GWe (EDF)
-    # Meme rendement
+    chroniques = {"demande": scenario,
+                  "electrolyse": electrolyse,
+                  "prodOffshore": prodOffshore,
+                  "prodOnshore": prodOnshore,
+                  "prodPV": prodPV,
+                  "rivprod": rivprod,
+                  "lakeprod": L.stock
+                  }
+
+
     # reacteurs nucleaires effectifs qu'après 1 tour
     nbProdNuc = nbPions["centraleNuc"]
     nbProdNuc2 = (nbPions["EPR2"] - nvPions["EPR2"])
-    N = Techno('Nucleaire', None, np.zeros(H), None, 1, 1.08 * nbProdNuc + 1.67 * nbProdNuc2, None, None)
+    N = te.TechnoNucleaire(nb_units_EPR=nbProdNuc, nb_units_EPR2=nbProdNuc2)
 
     if mix["alea"] == "MEMFDC3":
-        N.Q *= 45 / 60
+        N.Pout *= 45 / 60
 
     # resultats de la strat initiale
     # Renvoie Surplus,Penurie et met à jour Phs,Battery,Methanation,Lake,Therm,Nuc
-    s, p = StratStockage(prodresiduelle, H, P, B, G, L, N, endmonthlake)
+    s, p = StratStockage(prodresiduelle, H, S, B, G, L, N)
 
     #############################
     ## NUAGES DE POINTS POUR OPTIMISER LE STOCKAGE
@@ -565,7 +365,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     stockage_PB = np.zeros(
         365)  ##liste qui va servir à enregister les stockages Phs + Battery à l'heure H pour tous les jours
 
-    stockmax = B.vol + P.vol  ##stockage maximum total = max total stockage Phs + max total stockage Battery
+    stockmax = B.capacité + S.capacité  ##stockage maximum total = max total stockage Phs + max total stockage Battery
 
     ##listes pour ecretage : x1 enregistre les jours où le lendemain il y a ecretage
     ##y1 enregistre la valeur du stock Phs + Battery où le lendemain il y a ecretage
@@ -582,7 +382,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
 
     ##on enlevera les -1 des listes x1, x2, x3, y1, y2, y3 pour ne recuperer que les points essentiels
 
-    StockPB = P.stored + B.stored  ##valeur des deux stocks
+    StockPB = S.stock + B.stock  ##valeur des deux stocks
 
     ###############################################################################
     ##Certitude interval pour toutes les heures
@@ -631,14 +431,14 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     # Renvoie Surplus,Penurie, et met à jour les technos
 
     # Decommenter pour methode 1 (intervalles de confiance)
-    s, p = StratStockagev2(prodresiduelle, H, P, B, G, L, N,
-                           certitude_interval_inf, certitude_interval_med, certitude_interval_sup, endmonthlake)
+    s, p = StratStockagev2(prodresiduelle, H, S, B, G, L, N,
+                           certitude_interval_inf, certitude_interval_med, certitude_interval_sup)
 
     # Decommenter pour methode 2 (recherche iterative du meilleur seuil)
     # s,p=StratStockagev2(prodresiduelle, H, P, B, M, L, T, N,
     #                    seuils_bot, seuils_mid, seuils_top, endmonthlake)
 
-    chroniques.update(extraire_chroniques(s, p, prodresiduelle, H, P, B, G, L, N))
+    chroniques.update(extraire_chroniques(s, p, prodresiduelle, H, S, B, G, L, N))
     ####Demande des choix de la fiche Usage à l'utilisateur
     # choix_utilisateur = input("Entrez les valeurs separees par des espaces : ")
 
@@ -663,11 +463,11 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     prodOn = int(np.sum(prodOnshore))
     prodOff = int(np.sum(prodOffshore))
     prodPv = int(np.sum(prodPV))
-    prodEau = int(np.sum(L.prod + rivprod))
-    prodNuc = int(np.sum(N.prod))
-    prodGaz = int(np.sum(G.prod))
-    prodPhs = int(np.sum(P.prod))
-    prodBat = int(np.sum(B.prod))
+    prodEau = int(np.sum(L.décharge + rivprod))
+    prodNuc = int(np.sum(N.décharge))
+    prodGaz = int(np.sum(G.décharge))
+    prodPhs = int(np.sum(S.décharge))
+    prodBat = int(np.sum(B.décharge))
 
     save["prodOnshore"][str(mix["annee"])] = prodOn
     save["prodOffshore"][str(mix["annee"])] = prodOff
@@ -912,7 +712,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
             listePenuriesQuotidien[i // 24] += 1
             listePenuriesHoraire[i % 24] += 1
 
-    consoGaz = (G.stored[0] - G.stored[-1]) * G.etaout
+    consoGaz = (G.stock[0] - G.stock[-1]) * G.etaout
     prodGazFossile = consoGaz - gazBiomasse + electrolyse.sum()
     if prodGazFossile < 0.:
         prodGazFossile = 0.
@@ -976,8 +776,8 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
             nucProlong * 2 +
             nvPions["biomasse"] * 0.12 +
             nvPions["methanation"] * 4.85 +
-            (B.Q * 0.0012) / 0.003 +
-            (P.Q * 0.455) / 0.91 +
+            (B.Pout * 0.0012) / 0.003 +
+            (S.Pout * 0.455) / 0.91 +
             (prodNuc * prixNuc) +
             (prodGazFossile * prixGaz))
 
@@ -1118,10 +918,10 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
               "puissanceEolienneOFF": round(nbPions["eolienneOFF"] * powOffshore, 2),
               "prodPv": save["prodPv"], "puissancePV": round(nbPions["panneauPV"] * powPV, 2),
               "prodEau": save["prodEau"],
-              "prodNucleaire": save["prodNucleaire"], "puissanceNucleaire": round(N.Q, 2),
-              "prodGaz": save["prodGaz"], "puissanceGaz": round(G.Q, 2),
-              "prodPhs": save["prodPhs"], "puissancePhs": round(P.Q, 2),
-              "prodBatterie": save["prodBatterie"], "puissanceBatterie": round(B.Q, 2),
+              "prodNucleaire": save["prodNucleaire"], "puissanceNucleaire": round(N.Pout, 2),
+              "prodGaz": save["prodGaz"], "puissanceGaz": round(G.Pout, 2),
+              "prodPhs": save["prodPhs"], "puissancePhs": round(S.Pout, 2),
+              "prodBatterie": save["prodBatterie"], "puissanceBatterie": round(B.Pout, 2),
               "co2": save["co2"],
               "remplacement": replaceList,
               "nbSurplus": nbS, "nbPenuries": nbP,

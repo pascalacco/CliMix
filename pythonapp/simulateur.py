@@ -27,3 +27,4 @@ if __name__ == "__main__":
     dm.set_chroniques(chroniques)
     dm.set_fichier(fichier='save_tmp', dico=save)
     dm.set_item_fichier(fichier='resultats', item=annee, val=result)
+

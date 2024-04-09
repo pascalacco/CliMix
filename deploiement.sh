@@ -28,19 +28,31 @@ rsynchronise(){
 
 
 redeplois(){
+    echo "__________________________________________________"
     echo "Synchronise $1 et $2"
+    echo "__________________________________________________"
     synchronise $1 $2
 
+    echo "__________________________________________________"
     echo "Mise à jour du venv"
+    echo "__________________________________________________"
     cd "$2" && make maj_python
 
-    echo "Droits de modifs pour $PWD/flaskapp/game_data"
-    mkdir -p flaskapp/game_data
-    chmod -R a+rw flaskapp/game_data/*/*
-
-    echo "compilation de la doc"
-    make doc
     
+    echo "__________________________________________________"
+    echo "Droits de modifs pour $PWD/flaskapp/game_data"
+    echo "__________________________________________________"
+    cd "$2" &&
+  	mkdir -p ./flaskapp/game_data &&
+	  chmod -R a+rw flaskapp/game_data
+
+    echo "__________________________________________________"
+    echo "compilation de la doc"
+    echo "__________________________________________________"
+
+    make doc
+    echo "__________________________________________________"
+
 }
 
 

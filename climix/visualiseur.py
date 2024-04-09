@@ -15,7 +15,7 @@ def init_couleur_et_noms():
             'Gprod', 'Gstored',
             'Lprod', 'Lstored',
             'Nprod', 'Nstored',
-            'Pprod', 'Pstored',
+            'Sprod', 'Sstored',
             'prodResiduelle', '-prodResiduelle',
             's', 'p'
             ]
@@ -36,7 +36,7 @@ def init_couleur_et_noms():
         'Gprod', 'Gstored',
         'Lprod', 'Lstored',
         'Nprod', 'Nstored',
-        'Pprod', 'Pstored',
+        'Sprod', 'Sstored',
         'prodResiduelle', '-prodResiduelle',
         'surplus', "pénuries"
     ]
@@ -63,7 +63,7 @@ class Visualiseur:
     def __init__(self, chroniques, data_mix="./data_mix/"):
         self.data_mix = data_mix
         self.figs = {}
-        chroniques['prod_stock'] = chroniques[["Gprod", "Bprod", "Pprod", "Lprod"]].sum(axis=1)
+        chroniques['prod_stock'] = chroniques[["Gprod", "Bprod", "Sprod", "Lprod"]].sum(axis=1)
         chroniques['-prodResiduelle'] = -chroniques["prodResiduelle"]
         self.chroniques = chroniques
         self.source = bk.models.ColumnDataSource(chroniques)
@@ -141,7 +141,7 @@ class vProduction(Visualiseur):
         n.yaxis.axis_label = 'production (GW)'
         n.legend.click_policy = "mute"
 
-        stock = ["Bprod", 'Pprod']
+        stock = ["Bprod", 'Sprod']
         s = bkp.figure(height=300, width=800, tools="xpan", toolbar_location=None,
                        x_axis_type="datetime", x_axis_location="above",
                        background_fill_color="#efefef", x_range=p.x_range)
