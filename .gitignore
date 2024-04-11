@@ -269,3 +269,4 @@ flaskapp/logs.txt
 
 venv/
 .vscode
+apidoc

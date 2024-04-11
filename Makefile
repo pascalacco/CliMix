@@ -24,7 +24,7 @@ edit :
 	pycharm.sh .
 
 doc :
-	. venv/bin/activate && make -C doc html
+	. venv/bin/activate &&  cd ./doc && ./apidoc_modules.sh && make  html
 
 deploiement_test :
 	. ./deploiement.sh && redeplois . /var/www/climix-test

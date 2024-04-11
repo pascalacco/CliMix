@@ -124,7 +124,7 @@ def StratStockage(prodres, H, Phs, Battery, Gas, Lake, Nuclear):
             Astocker = prodres[k] + abs(nucMin)
 
             for tec in Tecstock:
-                Astocker = Tecstock[tec].charger(k, Astocker)
+                Astocker = Tecstock[tec].recharger(k, Astocker)
 
             Surplus[k] = Astocker
 
@@ -353,7 +353,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     N = te.TechnoNucleaire(nb_units_EPR=nbProdNuc, nb_units_EPR2=nbProdNuc2)
 
     if mix["alea"] == "MEMFDC3":
-        N.Pout *= 45 / 60
+        N.PoutMax *= 45 / 60
 
     # resultats de la strat initiale
     # Renvoie Surplus,Penurie et met à jour Phs,Battery,Methanation,Lake,Therm,Nuc
@@ -776,8 +776,8 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
             nucProlong * 2 +
             nvPions["biomasse"] * 0.12 +
             nvPions["methanation"] * 4.85 +
-            (B.Pout * 0.0012) / 0.003 +
-            (S.Pout * 0.455) / 0.91 +
+            (B.PoutMax * 0.0012) / 0.003 +
+            (S.PoutMax * 0.455) / 0.91 +
             (prodNuc * prixNuc) +
             (prodGazFossile * prixGaz))
 
@@ -918,10 +918,10 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
               "puissanceEolienneOFF": round(nbPions["eolienneOFF"] * powOffshore, 2),
               "prodPv": save["prodPv"], "puissancePV": round(nbPions["panneauPV"] * powPV, 2),
               "prodEau": save["prodEau"],
-              "prodNucleaire": save["prodNucleaire"], "puissanceNucleaire": round(N.Pout, 2),
-              "prodGaz": save["prodGaz"], "puissanceGaz": round(G.Pout, 2),
-              "prodPhs": save["prodPhs"], "puissancePhs": round(S.Pout, 2),
-              "prodBatterie": save["prodBatterie"], "puissanceBatterie": round(B.Pout, 2),
+              "prodNucleaire": save["prodNucleaire"], "puissanceNucleaire": round(N.PoutMax, 2),
+              "prodGaz": save["prodGaz"], "puissanceGaz": round(G.PoutMax, 2),
+              "prodPhs": save["prodPhs"], "puissancePhs": round(S.PoutMax, 2),
+              "prodBatterie": save["prodBatterie"], "puissanceBatterie": round(B.PoutMax, 2),
               "co2": save["co2"],
               "remplacement": replaceList,
               "nbSurplus": nbS, "nbPenuries": nbP,

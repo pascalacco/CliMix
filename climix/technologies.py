@@ -11,17 +11,17 @@ class Techno:
 
     """
     H = 24*365
-    def __init__(self, nom, stock, décharge, etain, etaout, Pout, Pin, capacité, H=H):
-        """ Créateur de la classe
+
+    def __init__(self, nom, stock, etain, etaout, PoutMax, PinMax, capacité, H=H):
+        """ Création de la Technologie de stockage/déstockage/production
         Args:
             nom (str): nom de la techno
-            stock (array) : niveau des stocks a chaque heure
-            décharge (array) : ce qui est produit chaque heure
+            stock (array) : niveau des stocks à chaque heure
             etain (float) : coefficient de rendement a la charge
             etaout (float) : coefficient de rendement a la decharge
-            Pout (float) : capacite installee (flux sortant)
-            Pin (float) : capacite de charge (flux entrant)
-            vol (float) : capacite maximale de stockage
+            PoutMax (float) : puissance maximale de décharge (flux sortant GW)
+            PinMax (float) : puissance maximale de charge (flux entrant GW)
+            capacité (float) : capacite maximale de stockage (GWh)
 
         Returns:
             l'objet de la classe créé (Techno)
@@ -34,92 +34,107 @@ class Techno:
         else:
             self.stock = stock
 
-        if décharge is None :
-            décharge=0
-        if np.isscalar(décharge):
-            self.décharge = np.ones(H) * décharge
-        else:
-            self.décharge = décharge
         self.etain = etain  # . coefficient de rendement à la charge
         self.etaout = etaout  # . coefficient de rendement à la decharge
-        self.Pout = Pout  # . capacite installee (flux sortant)
-        self.Pin = Pin  # . capacite de charge d'une techno de stockage (flux entrant)
+        self.PoutMax = PoutMax  # . capacite installee (flux sortant)
+        self.PinMax = PinMax  # . capacite de charge d'une techno de stockage (flux entrant)
         self.capacité = capacité  # . Capacite maximale de stockage de la techno (Volume max)
         self.H = H
+        self.set_décharge()
+        self.set_recharge()
 
-    def charger(self, k, astocker):
+    def set_décharge(self, décharge=0):
+        if np.isscalar(décharge):
+            self.décharge = np.ones(self.H) * décharge
+        else:
+            self.décharge = décharge
+
+    def set_recharge(self, recharge=0):
+        if np.isscalar(recharge):
+            self.recharge = np.ones(self.H) * recharge
+        else:
+            self.recharge = recharge
+
+    def get_pertes(self):
+        return self.décharge / self.etaout * (1 - self.etaout) + self.recharge * (1-self.etain)
+
+    def Pout(self, k):
+        """Renvoie la puissance maximum de décharge à l'heure k """
+        return min(self.stock[k] * self.etaout, self.PoutMax-self.décharge[k])
+
+    def Pin(self, k):
+        """Renvoie la puissance maximum de recharge à l'heure k """
+        return min((self.capacité-self.stock[k]) / self.etain, self.PinMax-self.recharge[k])
+
+    def recharger(self, k, astocker):
         """Recharge les moyens de stockage quand on a trop d'energie
 
         Args:
-            self : technologie de stockage a recharger (batterie, phs, ...)
             k (int) : heure courante
-            astocker (float) : qte d'energie a stocker
+            astocker (float) : qte d'energie a stocker (GWh/h)
 
         Returns:
-            out()
+            out (flout) : partie de astocker qui n'a pas pu être stockée
         """
-        if astocker == 0:
+        if astocker < 0:
             out = 0
 
         else:
-            temp = min(astocker * self.etain, self.capacité - self.stock[k - 1], self.Pin * self.etain)
-            self.stock[k:] = self.stock[k - 1] + temp
-            out = astocker - temp / self.etain
+            vastoker = min(astocker , self.Pin(k))
+            self.stock[k:] = self.stock[k] + vastoker*self.etain
+            self.recharge[k] = vastoker
+            out = astocker - vastoker
 
         return out
 
 
-    def décharger(self, k, aproduire, prod=True):
+    def décharger(self, k, aproduire):
         """ Decharge les moyens de stockage quand on a besoin d'energie
 
         Args:
-            self : technologie de stockage a utiliser pour la production (batterie, phs, ...)
             k (int) : heure courante
-            aproduire (float) : qte d'energie a fournir
-            endmonthlake (array) : qte d'energie restante dans les lacs jusqu'a la fin du mois
-            prod (boolean) : indique si l'energie dechargee est a prendre en compte pour la production globale (faux pour les echanges internes)
+            aproduire (float) : qte d'energie à récupérer
+
+        Return:
+            out (float) : le reste de ce qui n'a pas été produit
         """
         if aproduire <= 0:
             out = 0
 
         else:
-            temp = min(aproduire / self.etaout, self.stock[k], self.Pout / self.etaout)
+            vaproduire = min(aproduire, self.Pout(k))
 
+            self.stock[k:] = self.stock[k] - vaproduire/self.etaout
+            self.décharge[k] = vaproduire
 
-            if prod:
-                self.stock[k:] = self.stock[k] - temp
-                self.décharge[k] = temp * self.etaout
-
-            out = aproduire - temp * self.etaout
+            out = aproduire - vaproduire
 
         return out
 
 
 class TechnoStep(Techno) :
-    def __init__(self, nom='Step', stock=16, décharge=0,
-                 etain=0.95, etaout=0.9, Pout=9.3, Pin=9.3, capacité=180, H=Techno.H):
-
-        super().__init__(nom=nom, stock=stock, décharge=décharge,
-                         etain=etain, etaout=etaout, Pout=Pout, Pin=Pin,
-                         capacité=capacité, H=H)
+    def __init__(self, nom='Step', stock=16,
+                 etain=0.95, etaout=0.9, PoutMax=9.3, PinMax=9.3, capacité=180, H=Techno.H):
+        super().__init__(nom=nom, stock=stock, etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax, capacité=capacité,
+                         H=H)
 
 
 class TechnoBatteries(Techno):
-    def __init__(self, nom='Batteries', stock=None, décharge=0,
-                 etain=0.95, etaout=0.9, Pout=None, Pin=None,
-                 capacité=180, nb_units=1, H=Techno.H):
+    def __init__(self, nom='Batteries', stock=None,
+                 etain=0.95, etaout=0.9, PoutMax=None, PinMax=None,
+                 capacité=None, nb_units=1, H=Techno.H):
 
-        if Pout is None:
-            Pout = nb_units / 10. * 20.08
-        if Pin is None:
-            Pin = Pout
+        if PoutMax is None:
+            PoutMax = nb_units / 10. * 20.08
+        if PinMax is None:
+            PinMax = PoutMax
         if capacité is None:
             capacité = nb_units/ 10. * 74.14
         if stock is None:
             stock = capacité/2.
 
-        super().__init__(nom=nom, stock=stock, décharge=décharge,
-                         etain=etain, etaout=etaout, Pout=Pout, Pin=Pin,
+        super().__init__(nom=nom, stock=stock,
+                         etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax,
                          capacité=capacité, H=H)
 
 
@@ -131,16 +146,15 @@ class TechnoGaz(Techno):
     # Puissance : 1.08 GWe (EDF)
     # Meme rendement
 
-    def __init__(self, nom='Gaz', stock=init_gaz, décharge=0,
-                 etain=0.59, etaout=0.45, Pout=34.44, Pin=None,
+    def __init__(self, nom='Gaz', stock=init_gaz,
+                 etain=0.59, etaout=0.45, PoutMax=34.44, PinMax=None,
                  capacité=volume_gaz, nb_units=0, H=Techno.H):
 
-        if Pin is None:
-            Pin = nb_units * 1.
+        if PinMax is None:
+            PinMax = nb_units * 1.
 
-        super().__init__(nom=nom, stock=stock, décharge=décharge,
-                         etain=etain, etaout=etaout,
-                         Pout=Pout, Pin=Pin,
+        super().__init__(nom=nom, stock=stock,
+                         etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax,
                          capacité=capacité, H=H)
 
 
@@ -163,16 +177,16 @@ class TechnoLacs(Techno):
          31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31]) * 24
 
 
-    def __init__(self, nom='Lacs', stock=None, décharge=0,
-                 etain=1, etaout=1, Pout=10, Pin=10,
+    def __init__(self, nom='Lacs', stock=None,
+                 etain=1, etaout=1, PoutMax=10, PinMax=10,
                  capacité=2000, H=Techno.H):
 
         self.endmonthlake = np.zeros(H)
         for k in range(12):
             self.endmonthlake[TechnoLacs.horlake[k]:TechnoLacs.horlake[k + 1]] = int(TechnoLacs.horlake[k + 1])
 
-        super().__init__(nom=nom, stock=stock, décharge=décharge,
-                         etain=etain, etaout=etaout, Pout=Pout, Pin=Pin,
+        super().__init__(nom=nom, stock=stock,
+                         etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax,
                          capacité=capacité, H=H)
 
         if stock is None:
@@ -189,7 +203,7 @@ class TechnoLacs(Techno):
             self.stock[TechnoLacs.horlake[k]:TechnoLacs.horlake[k + 1]] = 1000. * lakeprod[k]
 
 
-    def décharger(self, k, aproduire, prod=True):
+    def décharger(self, k, aproduire, executer=True):
         """ Decharge les moyens de stockage quand on a besoin d'energie
 
         Args:
@@ -197,19 +211,19 @@ class TechnoLacs(Techno):
             k (int) : heure courante
             aproduire (float) : qte d'energie a fournir
             endmonthlake (array) : qte d'energie restante dans les lacs jusqu'a la fin du mois
-            prod (boolean) : indique si l'energie dechargee est a prendre en compte pour la production globale (faux pour les echanges internes)
+            executer (boolean) : indique si l'energie dechargee est a prendre en compte pour la production globale (faux pour les echanges internes)
         """
         if aproduire <= 0:
             out = 0
 
         else:
-            temp = min(aproduire / self.etaout, self.stock[k], self.Pout / self.etaout)
 
-            if prod:
-                self.stock[k:int(self.endmonthlake[k])] = self.stock[k] - temp
-                self.décharge[k] = temp * self.etaout
+            vaproduire = min(aproduire, self.Pout(k))
 
-            out = aproduire - temp * self.etaout
+            self.stock[k:int(self.endmonthlake[k])] = self.stock[k] - vaproduire/self.etaout
+            self.décharge[k] = vaproduire
+
+            out = aproduire - vaproduire
 
         return out
 
@@ -279,23 +293,26 @@ def fc_min_max_nuke(k):
 
 class TechnoNucleaire(Techno):
 
-    def __init__(self, nom='Nucléaire', stock=None, décharge=0,
-                 etain=None, etaout=1., Pout=None, Pin=None,
+    def __init__(self, nom='Nucléaire', stock=None,
+                 etain=None, etaout=1., PoutMax=None, PinMax=None,
                  capacité=None, nb_units_EPR=0, nb_units_EPR2=0, H=Techno.H):
 
-        if Pout is None:
-            Pout = 1.08 * nb_units_EPR + 1.67 * nb_units_EPR2
+        if PoutMax is None:
+            PoutMax = 1.08 * nb_units_EPR + 1.67 * nb_units_EPR2
 
-        super().__init__(nom=nom, stock=stock, décharge=décharge,
-                         etain=etain, etaout=etaout,
-                         Pout=Pout, Pin=Pin,
-                         capacité=capacité)
-
+        super().__init__(nom=nom, stock=stock,
+                         etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax,
+                         capacité=capacité, H=H)
+        self.aproduire=0
     def get_p_min_max(self, k):
         fc_min, fc_max = fc_min_max_nuke(k)
-        P_max = fc_max * self.Pout
-        P_min = fc_min * self.Pout
+        P_max = fc_max * self.PoutMax
+        P_min = fc_min * self.PoutMax
         return P_min, P_max
+
+    def Pout(self, k):
+        P_min, P_max = self.get_p_min_max(k)
+        return P_max - self.décharge[k]
 
     def pilote_prod(self, k, aproduire):
         """ Lance la production des centrales nucleaires
@@ -305,23 +322,21 @@ class TechnoNucleaire(Techno):
             k (int) : heure courante
             aproduire (float) : qte d'energie a fournir
         """
-        if aproduire <= 0:
-            out = 0
+        # Si la demande est trop faible ou nulle, on produit quand meme à hauteur de 20%
+        P_min, P_max = self.get_p_min_max(k)
+        P_max = P_max - self.décharge[k]
+        P_min = P_min - self.décharge[k]
 
+        if aproduire > P_max:
+            temp = P_max
+        elif aproduire > P_min:
+            temp = aproduire
         else:
-            # Si la demande est trop faible ou nulle, on produit quand meme à hauteur de 20%
-            P_min, P_max = self.get_p_min_max(k)
+            temp = P_min
 
-            if aproduire > P_max:
-                temp = P_max
-            elif aproduire > P_min:
-                temp = aproduire
-            else:
-                temp = P_min
+        self.décharge[k] += temp
 
-            self.décharge[k] = temp
-
-            out = aproduire - self.décharge[k]
+        out = aproduire - temp
 
         return out
 
@@ -338,15 +353,148 @@ def thermProd(tec, k, aproduire):
         out = 0
 
     else:
-        temp = min(aproduire / tec.etaout, tec.Pout / tec.etaout)
+        temp = min(aproduire / tec.etaout, tec.PoutMax / tec.etaout)
         tec.décharge[k] = temp * tec.etaout
         out = aproduire - tec.décharge[k]
 
     return out
 
-if __name__ == "__main__":
+
+def test_technoLacs():
+    import matplotlib.pyplot as plt
+    L = TechnoLacs()
+    plt.title("Test des lacs")
+    plt.subplot(311)
+    plt.grid()
+    plt.plot(L.stock, 'k--')
+    plt.ylabel('stock avant et après')
+    reste = np.zeros(Techno.H)
+    aproduire = reste.copy()
+    for k in range(Techno.H):
+        if 2000 < k < 3600:
+            val=15
+            aproduire[k] +=val
+            reste[k] +=L.décharger(k=k, aproduire=val, executer=True)
+
+        if 6000 < k < 6400:
+            val = 1
+            aproduire[k] +=val
+            reste[k] +=L.décharger(k=k, aproduire=val, executer=True)
+
+        if 6200 < k < 6800:
+            val = 1
+            aproduire[k] +=val
+            reste[k] +=L.décharger(k=k, aproduire=val, executer=True)
+
+        if 4000 < k < 5000:
+            val = 10
+            aproduire[k] += val
+            reste[k] += L.décharger(k=k, aproduire=val, executer=False)
+
+        if 8000 < k < 8500:
+            val = -5
+            aproduire[k] += val
+            reste[k] += L.décharger(k=k, aproduire=val, executer=True)
+        else:
+            aproduire[k] +=0
+            reste[k] +=L.décharger(k=k, aproduire=0, executer=True)
+
+    plt.plot(L.stock, 'r')
+    plt.subplot(312)
+    plt.plot(aproduire, 'b--')
+    plt.plot(reste, 'r')
+    plt.legend(['aproduire', 'reste'])
+    plt.grid()
+    plt.subplot(313)
+    plt.plot(L.décharge, 'g')
+    plt.plot(aproduire-reste, 'b.')
+    plt.legend(['décharge(prod)', 'aprod - reste'])
+    plt.show()
+
+def test_generique(T=None):
+    import matplotlib.pyplot as plt
+    N= 50
+
+    if T is None:
+        T= Techno(nom="generique", stock=50, etain=0.75, etaout=0.25, PoutMax=1, PinMax=10, capacité=100, H=50)
+
+    astocker = np.zeros(N)
+    reste = np.zeros(N)
+    Pin = np.zeros(N)
+    Pout = np.zeros(N)
+
+    for k in range(N):
+        val = 0
+        if 10 < k <= 20:
+            val = (T.capacité-T.stock[0])/10/T.etain *2
+        if 30 < k <= 40:
+            val = - T.capacité /10*T.etaout *2
+
+        astocker[k] = val
+        if val>0:
+            reste[k] += T.recharger(k,val)
+        else:
+            reste[k] -= T.décharger(k, -val)
+
+        Pin[k] += T.Pin(k)
+        Pout[k] += T.Pout(k)
+
+    plt.subplot(311)
+    plt.plot(T.stock, 'k--')
+    plt.grid()
+    plt.subplot(312)
+    plt.plot(astocker, 'k--')
+    plt.plot(-T.décharge,'b')
+    plt.plot(T.recharge, 'r')
+    plt.plot(reste, 'g--')
+
+    plt.subplot(313)
+    plt.plot(astocker, 'k--')
+    plt.plot(reste, 'g--')
+    plt.show()
+
+def test_technoNucleaire():
     import matplotlib.pyplot as plt
 
-    fc_nuke = [fc_min_max_nuke(k) for k in range(1, 365 * 24)]
+    N = TechnoNucleaire(nb_units_EPR=1, nb_units_EPR2=0)
+    fc_nuke = [N.get_p_min_max(k) for k in range(1, 365 * 24)]
+    aproduire = np.zeros(N.H)
+    reste = np.zeros(N.H)
+    Pout = np.zeros(N.H)
+
+    for k in range(N.H):
+        aproduire[k]=0.2
+        if 500 < k <= 2000:
+            aproduire[k] = aproduire[k-1] + 1/1000.
+        if 2000 < k <= 3500:
+            aproduire[k] = aproduire[k - 1] - 1 / 1000.
+
+        reste[k] = N.pilote_prod(k, aproduire[k])
+        if 5000 < k <= 8000:
+            reste[k] = N.pilote_prod(k, 0.4+reste[k])
+        if 6000 < k <= 8000:
+            reste[k] = N.pilote_prod(k, 0.2+reste[k])
+        if 7000 < k <= 8000:
+            reste[k] = N.pilote_prod(k, 0.4-reste[k])
+
+        Pout[k] = N.Pout(k)
+
+    plt.subplot(211)
     plt.plot(fc_nuke)
+    plt.plot(N.décharge,'b-+')
+    plt.grid()
+    plt.subplot(212)
+    plt.plot(aproduire, 'k')
+    plt.plot(reste, 'g')
+    plt.plot(Pout,'r')
+    plt.grid()
     plt.show()
+
+
+if __name__ == "__main__":
+    #test_technoLacs()
+    test_technoNucleaire()
+    #test_generique()
+    #test_generique(TechnoStep(H=50))
+    #test_generique(TechnoBatteries(nb_units=1, H=50))
+    #test_generique(TechnoGaz(nb_units=10, H=50))
