@@ -2,7 +2,7 @@ import os
 from flaskapp.archiveur import DataManager
 from climix.geographe.pays import FR_metro
 from flaskapp import maitre_de_jeu as mj
-
+from climix import visualiseur as vi
 if __name__ == "__main__":
     chemin = os.path.dirname(os.path.realpath(__file__))
     dataPath = chemin+"/../flaskapp/"
@@ -15,6 +15,17 @@ if __name__ == "__main__":
     data["carte"] = FR_metro.nom
     data["stock"] = 1
     data["annee"] = 2030
+    data["stock"] = 10
+    data["occ"]["methanation"] = 2
+    data["pac"]["methanation"] = 2
+    data["naq"]["methanation"] = 2
+    data["occ"]["eolienneOFF"] = 2
+    data["pac"]["eolienneOFF"] = 2
+    data["naq"]["eolienneOFF"] = 2
+    data["occ"]["panneauPV"] = 4
+    data["pac"]["panneauPV"] = 4
+    data["naq"]["panneauPV"] = 4
+
     input = mj.inputs_from_save_and_data(save, data)
 
     annee = str(data["annee"])
@@ -28,3 +39,6 @@ if __name__ == "__main__":
     dm.set_fichier(fichier='save_tmp', dico=save)
     dm.set_item_fichier(fichier='resultats', item=annee, val=result)
 
+    chroniques = dm.get_chroniques()
+    self = vi.vProduction(chroniques)
+    self.show(self.fig_prod())

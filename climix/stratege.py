@@ -13,92 +13,7 @@ dataPath = os.path.dirname(os.path.realpath(__file__))+"/"
 H = (24 * 365)
 
 
-def certitudeglobal(y1, y2, y3, stockmax):
-    """ 1ere methode de calcul des seuils de stock
-
-    Args:
-        y1 (array) : heures avec surplus
-        y2 (array) : heures avec penuries
-        y3 (array) : heures sans surplus ni penurie 
-        stockmax (float) : capacite max des batteries + phs 
-    """
-
-    certitude_interval = np.zeros(3)
-
-    ##distribution ecretage : min, max, moyenne et ecart-type
-    if y1[y1 != -1].size > 0:
-        emoy = np.mean(y1[y1 != -1])  ##moyenne de l'echantillon //
-        eetype = np.std(y1[y1 != -1])  ##ecart-type de l'echantillon //
-        certitude_interval[1] = emoy - 2.33 * eetype / np.sqrt(
-            len(y1[y1 != -1]))  ##99% sur ecretage (valeur sup de l'IC)
-    else:
-        # Si jamais de surplus
-        certitude_interval[1] = stockmax - 10
-
-    ##distribution penurie : min, max, moyenne, ecart-type
-    if y2[y2 != -1].size > 0:
-        pmoy = np.mean(y2[y2 != -1])
-        petype = np.std(y2[y2 != -1])
-        certitude_interval[0] = pmoy + 1.76 * petype / np.sqrt(
-            len(y2[y2 != -1]))  ##96% sur penurie (valeur inf de l'IC)
-    else:
-        # Si jamais de penurie
-        certitude_interval[0] = 10
-
-    certitude_interval[2] = (certitude_interval[0] + certitude_interval[1]) / 2  ##valeur moyenne entre 98% et 99%
-
-    return certitude_interval
-
-
-def seuil(a, b, c, crit, mode):
-    """ 2e methode de calcul des seuils de stock
-
-    Args:
-        a (array) : heures avec surplus
-        b (array) : heures avec penuries
-        c (array) : heures sans surplus ni penurie 
-        crit (float) : critere de separation des penuries (ex: si 0.2, on garde 20% des penuries d'un cote, 80% de l'autre)
-        mode (str) : vaut 'u' ou 'd' selon qu'on veuille se placer au dessus ou en dessous du seuil 
-    """
-
-    y1 = np.copy(a)
-    y2 = np.copy(b)
-    y3 = np.copy(c)
-
-    for i in range(len(y1)):
-        y3[i] = -1 if (y1[i] == y3[i] or y2[i] == y3[i]) else y3[i]
-
-    bestRatio = -1
-    bestStock = -1
-
-    for s in range(270):
-        nbPen = 0
-        nbSeuil = 0
-
-        for i in range(len(y1)):
-            if mode == "u":
-                if y1[i] >= s or y3[i] >= s:
-                    nbSeuil += 1
-                elif y2[i] >= s:
-                    nbSeuil += 1
-                    nbPen += 1
-            else:
-                if 0 <= y1[i] <= s or 0 <= y3[i] <= s:
-                    nbSeuil += 1
-                elif 0 <= y2[i] <= s:
-                    nbSeuil += 1
-                    nbPen += 1
-
-        if nbSeuil != 0:
-            ratio = nbPen / nbSeuil
-            if abs(ratio - crit) < abs(bestRatio - crit):
-                bestRatio = ratio
-                bestStock = s
-
-    return bestStock
-
-
-def StratStockage(prodres, H, Phs, Battery, Gas, Lake, Nuclear):
+def StratStockagev1(prodres, H, Step, Battery, Gas, Lake, Nuclear):
     """ Premiere strat de stockage naive
 
     Args:
@@ -111,10 +26,10 @@ def StratStockage(prodres, H, Phs, Battery, Gas, Lake, Nuclear):
     ##Ajout paramètre Penurie
     Manque = np.zeros(H)
     # Definition d'un ordre sur les differentes technologies de stockage et destockage
-    Tecstock = {"Phs": Phs, "Battery": Battery, "Gas": Gas}
-    Tecstock2 = {"Gas": Gas, "Phs": Phs, "Battery": Battery}
+    Tecstock = {"Step": Step, "Battery": Battery, "Gas": Gas}
+    Tecstock2 = {"Gas": Gas, "Step": Step, "Battery": Battery}
 
-    Tecdestock = {"Battery": Battery, "Phs": Phs, "Gas": Gas, "Lake": Lake}
+    Tecdestock = {"Battery": Battery, "Step": Step, "Gas": Gas, "Lake": Lake}
 
     for k in range(1, H):
         if prodres[k] > 0:
@@ -124,17 +39,17 @@ def StratStockage(prodres, H, Phs, Battery, Gas, Lake, Nuclear):
             Astocker = prodres[k] + abs(nucMin)
 
             for tec in Tecstock:
-                Astocker = Tecstock[tec].recharger(k, Astocker)
+                Astocker -= Tecstock[tec].recharger(k, Astocker)
 
             Surplus[k] = Astocker
 
         else:
             Aproduire = -prodres[k]
 
-            Aproduire = Nuclear.pilote_prod(k, Aproduire)
+            Aproduire -= Nuclear.pilote_prod(k, Aproduire)
 
             for tec in Tecdestock:
-                Aproduire = Tecdestock[tec].décharger(k, Aproduire)
+                Aproduire -= Tecdestock[tec].décharger(k, Aproduire)
 
             ##liste penurie --> pour savoir si il y a penurie dans la production d'electricite 
             Manque[k] = Aproduire
@@ -230,7 +145,7 @@ def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2):
         else:
             Aproduire = -prodres[k]
 
-            Aproduire = Nuclear.pilote_prod(k, Aproduire)
+            Aproduire -= Nuclear.pilote_prod(k, Aproduire)
 
             for tec in strat_destock:
                 Aproduire = strat_destock[tec].décharger(k, Aproduire)
@@ -240,14 +155,174 @@ def StratStockagev2(prodres, H, Phs, Battery, Gas, Lake, Nuclear, I0, I1, I2):
 
     return Surplus, Manque
 
+class PredicteurGlissant():
+    def __init__(self, méthode, horizon=24, cyclique=H):
+        self.horizon = horizon
+        self.méthode = méthode
+        self.trainard = 0
+        self.somme=0
+        self.set_somme_init(start=0, stop=self.horizon)
+        self.cyclique=cyclique
+        self.k=0
 
-def extraire_chroniques(s, p, prodresiduelle, H, P, B, G, L, N):
-    chroniques = {"s": s, "p": p, "prodResiduelle": prodresiduelle}
-    techs = {P, B, G, L, N}
-    for tech in techs:
+    def set_somme_init(self, start, stop):
+        self.somme = 0
+        for k in range(start,stop-1):
+            self.somme += self.méthode(k)
+
+    def __next__(self):
+        self.somme -= self.trainard
+        self.trainard = self.méthode(self.k)
+        self.somme += self.méthode((self.k+self.horizon-1)%self.cyclique)
+        self.k = (self.k + 1)%self.cyclique
+        return self.somme
+
+def recharge_plusieur_techs ( k, liste, astocker):
+    astocker_init = astocker
+    for tec in liste:
+        astocker -= tec.recharger(k=k, astocker=astocker)
+    return astocker_init - astocker
+
+def decharge_plusieur_techs ( k, liste, aproduire):
+    aproduire_init = aproduire
+    for tec in liste:
+        aproduire -= tec.décharger(k=k, aproduire=aproduire)
+    return aproduire_init - aproduire
+
+
+def StratStockage(prodres, Step, Battery, Gas, Lake, Nuclear):
+    """
+
+    """
+    pred_nuke24_min = PredicteurGlissant(Nuclear.p_min_effective)
+    pred_muke24_max = PredicteurGlissant(Nuclear.p_max_effective)
+    pred_prodres24 = PredicteurGlissant(lambda k: prodres[k])
+
+    cap_SB = Step.capacité + Battery.capacité
+
+    tecstock = {"Battery": Battery, "Step": Step}
+
+    tecdestock = {"Lake": Lake, "Step": Step, "Battery": Battery}
+
+    Surplus = np.zeros(len(prodres))
+    Manque = np.zeros(len(prodres))
+
+    for k in range(H):
+        nuke24min = pred_nuke24_min.__next__()
+        nuke24max = pred_muke24_max.__next__()
+        prodres24 = pred_prodres24.__next__()
+
+        if prodres24 + nuke24max < 0:
+            état = "pénurie"
+            consigne_SB = 0.7 * cap_SB
+        elif prodres24 + nuke24min > 0:
+            état = "abondance"
+            consigne_SB = 0.3 * cap_SB
+        else:
+            état = "flexible"
+            consigne_SB = 0.5 * cap_SB
+
+        prodres_k = prodres[k]
+
+        stock_SB = Step.stock[k] + Battery.stock[k]
+        a_decharger_SB = stock_SB - consigne_SB
+
+        if état == "pénurie":
+            # Nuke au max
+            prodres_k += Nuclear.pilote_prod(k, Nuclear.Pout(k))
+            if prodres_k > 0:
+                #reliquat on recharge
+                prodres_k -= recharge_plusieur_techs(k, liste=[Battery, Step, Gas], astocker=prodres_k)
+                #reliquat on risuqe d'écrêter : on annule le trop
+                if prodres_k > 0:
+                    prodres_k -= Nuclear.pilot_annule_prod(k, prodres_k)
+                Surplus[k]= prodres_k
+
+            else:
+                aproduire_k = -prodres_k
+                if stock_SB > 0.3 * cap_SB:
+                    aproduire_k -= decharge_plusieur_techs(k, liste=[Step, Battery, Lake, Gas], aproduire=aproduire_k)
+                else:
+                    aproduire_k -= decharge_plusieur_techs(k, liste=[Lake, Gas, Step, Battery], aproduire=aproduire_k)
+                Manque[k] = aproduire_k
+
+        elif état == "abondance":
+            # nuke au min
+            prodres_k += Nuclear.pilote_prod(k, 0)
+            # gaz à fond
+            prodres_k -= Gas.recharger(k, Gas.Pin(k))
+
+            if a_decharger_SB < 0:
+                # les batteries veulent remonter à 30% tant mieux !
+                prodres_k -= recharge_plusieur_techs(k, liste=[Battery, Step], astocker= -a_decharger_SB)
+            else:
+                # on prend le risque d'écrêter
+                prodres_k += decharge_plusieur_techs(k, liste=[Battery, Step], aproduire=a_decharger_SB)
+
+            if prodres_k > 0:
+                #on écrêtarait
+                prodres_k -= recharge_plusieur_techs(k, liste=[Battery, Step], astocker=prodres_k)
+                Surplus[k] = prodres_k
+            else:
+                aproduire = -prodres_k
+                # un peu de nuke pour recharger le gas et batt
+                aproduire -= Nuclear.pilote_prod(k, aproduire)
+                # on risque la pénurie finalement : on annule la production de H2
+                aproduire -= Gas.annuler_recharger(k, aanuler= aproduire)
+                # on vide les batterie sous 30% puis lac puis Gas fossile
+                aproduire -= decharge_plusieur_techs(k, liste=[Battery, Step, Lake, Gas], aproduire=aproduire)
+                Manque[k] = aproduire
+
+        else:
+            # Normal
+
+
+            #regul batteries
+            if a_decharger_SB < 0:
+                # les batteries veulent remonter à 50%
+                prodres_k -= recharge_plusieur_techs(k, liste=[Battery, Step],
+                                                     astocker= -a_decharger_SB)
+
+            else:
+                # on prend le risque d'écrêter
+                prodres_k += decharge_plusieur_techs(k, liste=[Battery, Step],
+                                                     aproduire= a_decharger_SB)
+            # gaz à fond
+            prodres_k -= Gas.recharger(k, Nuclear.Pout(k) + prodres_k)
+
+            prodres_k += Nuclear.pilote_prod(k, -prodres_k)
+
+            if prodres_k > 0:
+                # on écrêterait
+                prodres_k -=  recharge_plusieur_techs(k, liste=[Battery, Step],
+                                                      astocker=prodres_k)
+                Surplus[k] = prodres_k
+            else:
+                # risque de pénurie
+                prodres_k += decharge_plusieur_techs(k, liste=[Lake, Step, Battery, Gas],
+                                                     aproduire= -prodres_k)
+                Manque[k] = -prodres_k
+        pass
+
+
+
+
+
+
+    return Surplus, Manque
+
+
+def extraire_chroniques(s, p, prodres, S, B, G, L, N):
+    chroniques = {"s": -s, "p": p, "prodResiduelle": prodres}
+
+    for tech in (S, B, G):
         chroniques[tech.nom[0] + "prod"] = tech.décharge
-        if tech != N:
-            chroniques[tech.nom[0] + "stored"] = tech.stock
+        chroniques[tech.nom[0] + "cons"] = -tech.recharge
+        chroniques[tech.nom[0] + "stored"] = tech.stock
+
+    chroniques[L.nom[0] + "prod"] = L.décharge
+    chroniques[N.nom[0] + "prod"] = N.décharge
+
     return chroniques
 
 
@@ -343,7 +418,6 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
                   "prodOnshore": prodOnshore,
                   "prodPV": prodPV,
                   "rivprod": rivprod,
-                  "lakeprod": L.stock
                   }
 
 
@@ -357,88 +431,28 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
 
     # resultats de la strat initiale
     # Renvoie Surplus,Penurie et met à jour Phs,Battery,Methanation,Lake,Therm,Nuc
-    s, p = StratStockage(prodresiduelle, H, S, B, G, L, N)
-
-    #############################
-    ## NUAGES DE POINTS POUR OPTIMISER LE STOCKAGE
-
-    stockage_PB = np.zeros(
-        365)  ##liste qui va servir à enregister les stockages Phs + Battery à l'heure H pour tous les jours
-
-    stockmax = B.capacité + S.capacité  ##stockage maximum total = max total stockage Phs + max total stockage Battery
-
-    ##listes pour ecretage : x1 enregistre les jours où le lendemain il y a ecretage
-    ##y1 enregistre la valeur du stock Phs + Battery où le lendemain il y a ecretage
-    x1 = np.ones(365) * (-1)
-    y1 = np.ones(365) * (-1)
-
-    ##pareil que precèdemment mais pour lendemains avec penurie
-    x2 = np.ones(365) * (-1)
-    y2 = np.ones(365) * (-1)
-
-    ##pareil que precèdemment mais pour lendemains avec demande satisfaite et sans perte
-    x3 = np.ones(365) * (-1)
-    y3 = np.ones(365) * (-1)
-
-    ##on enlevera les -1 des listes x1, x2, x3, y1, y2, y3 pour ne recuperer que les points essentiels
-
-    StockPB = S.stock + B.stock  ##valeur des deux stocks
-
-    ###############################################################################
-    ##Certitude interval pour toutes les heures
-    certitude_interval_inf = np.zeros(24)
-    certitude_interval_sup = np.zeros(24)
-    certitude_interval_med = np.zeros(24)
-
-    seuils_top = np.zeros(24)
-    seuils_mid = np.zeros(24)
-    seuils_bot = np.zeros(24)
-
-    for h1 in range(24):
-        for jour in range(365):  ##on regarde tous les jours de l'annee
-
-            stockage_PB[jour] = StockPB[jour * 24 + h1]  # Au jour jour, valeur du stock Phs + Battery
-
-            ##on regarde dans les 24h qui suivent si il y a ecretage, penurie ou aucun des deux
-            for h2 in range(24):
-                t = (jour * 24 + h1 + h2) % H
-
-                if s[t] > 0 and StockPB[t] >= stockmax:  ##cas ecretage
-                    x1[jour] = jour + 1  ##on note le jour precèdant jour avec ecretage
-                    y1[jour] = stockage_PB[jour]  ##on note le stock du jour precèdant jour avec ecretage
-
-                elif p[t] > 0:  ##cas penurie
-                    x2[jour] = jour + 1  ##memes explications mais pour penurie
-                    y2[jour] = stockage_PB[jour]
-
-                else:  ##cas ni ecretage, ni penurie
-                    x3[jour] = jour + 1  ##memes explications mais avec ni ecretage, ni penurie
-                    y3[jour] = stockage_PB[jour]
-
-                if x1[jour] == x2[jour]:  ##si ecretage et penurie le meme jour, on considère que c'est une penurie
-                    x1[jour] = -1
-                    y1[jour] = -1
-
-        int_glob = certitudeglobal(y1, y2, y3, stockmax)
-        certitude_interval_inf[h1] = int_glob[0]
-        certitude_interval_sup[h1] = int_glob[1]
-        certitude_interval_med[h1] = int_glob[2]
-
-        seuils_top[h1] = seuil(y1, y2, y3, 0.02, "u")
-        seuils_bot[h1] = seuil(y1, y2, y3, 0.9, "d")
-        seuils_mid[h1] = (seuils_top[h1] + seuils_bot[h1]) / 2
+    #s, p = StratStockage(prodresiduelle, H, S, B, G, L, N)
 
     # Renvoie Surplus,Penurie, et met à jour les technos
+    #certitude_interval_inf, certitude_interval_med, certitude_interval_sup = nuages_points(B, S, p, s)
+    iinf = np.ones(24)*10.
+    imed = np.ones(24) * 93.
+    isup = np.ones(24) * 177.
 
     # Decommenter pour methode 1 (intervalles de confiance)
-    s, p = StratStockagev2(prodresiduelle, H, S, B, G, L, N,
-                           certitude_interval_inf, certitude_interval_med, certitude_interval_sup)
+    #s, p = StratStockagev2(prodresiduelle, H, S, B, G, L, N,
+    #                       iinf, imed, isup)
 
     # Decommenter pour methode 2 (recherche iterative du meilleur seuil)
     # s,p=StratStockagev2(prodresiduelle, H, P, B, M, L, T, N,
     #                    seuils_bot, seuils_mid, seuils_top, endmonthlake)
 
-    chroniques.update(extraire_chroniques(s, p, prodresiduelle, H, S, B, G, L, N))
+    s, p = StratStockage(prodres=prodresiduelle, Step=S, Battery=B,
+                         Gas=G, Lake=L, Nuclear=N)
+
+    chroniques.update(extraire_chroniques(s=s, p=p, prodres=prodresiduelle,
+                                          S=S, B=B, G=G, L=L, N=N )
+                      )
     ####Demande des choix de la fiche Usage à l'utilisateur
     # choix_utilisateur = input("Entrez les valeurs separees par des espaces : ")
 
@@ -944,3 +958,164 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
               }
 
     return result, save, chroniques
+
+
+
+
+def certitudeglobal(y1, y2, y3, stockmax):
+    """ 1ere methode de calcul des seuils de stock
+
+    Args:
+        y1 (array) : heures avec surplus
+        y2 (array) : heures avec penuries
+        y3 (array) : heures sans surplus ni penurie
+        stockmax (float) : capacite max des batteries + phs
+    """
+
+    certitude_interval = np.zeros(3)
+
+    ##distribution ecretage : min, max, moyenne et ecart-type
+    if y1[y1 != -1].size > 0:
+        emoy = np.mean(y1[y1 != -1])  ##moyenne de l'echantillon //
+        eetype = np.std(y1[y1 != -1])  ##ecart-type de l'echantillon //
+        certitude_interval[1] = emoy - 2.33 * eetype / np.sqrt(
+            len(y1[y1 != -1]))  ##99% sur ecretage (valeur sup de l'IC)
+    else:
+        # Si jamais de surplus
+        certitude_interval[1] = stockmax - 10
+
+    ##distribution penurie : min, max, moyenne, ecart-type
+    if y2[y2 != -1].size > 0:
+        pmoy = np.mean(y2[y2 != -1])
+        petype = np.std(y2[y2 != -1])
+        certitude_interval[0] = pmoy + 1.76 * petype / np.sqrt(
+            len(y2[y2 != -1]))  ##96% sur penurie (valeur inf de l'IC)
+    else:
+        # Si jamais de penurie
+        certitude_interval[0] = 10
+
+    certitude_interval[2] = (certitude_interval[0] + certitude_interval[1]) / 2  ##valeur moyenne entre 98% et 99%
+
+    return certitude_interval
+
+
+def seuil(a, b, c, crit, mode):
+    """ 2e methode de calcul des seuils de stock
+
+    Args:
+        a (array) : heures avec surplus
+        b (array) : heures avec penuries
+        c (array) : heures sans surplus ni penurie
+        crit (float) : critere de separation des penuries (ex: si 0.2, on garde 20% des penuries d'un cote, 80% de l'autre)
+        mode (str) : vaut 'u' ou 'd' selon qu'on veuille se placer au dessus ou en dessous du seuil
+    """
+
+    y1 = np.copy(a)
+    y2 = np.copy(b)
+    y3 = np.copy(c)
+
+    for i in range(len(y1)):
+        y3[i] = -1 if (y1[i] == y3[i] or y2[i] == y3[i]) else y3[i]
+
+    bestRatio = -1
+    bestStock = -1
+
+    for s in range(270):
+        nbPen = 0
+        nbSeuil = 0
+
+        for i in range(len(y1)):
+            if mode == "u":
+                if y1[i] >= s or y3[i] >= s:
+                    nbSeuil += 1
+                elif y2[i] >= s:
+                    nbSeuil += 1
+                    nbPen += 1
+            else:
+                if 0 <= y1[i] <= s or 0 <= y3[i] <= s:
+                    nbSeuil += 1
+                elif 0 <= y2[i] <= s:
+                    nbSeuil += 1
+                    nbPen += 1
+
+        if nbSeuil != 0:
+            ratio = nbPen / nbSeuil
+            if abs(ratio - crit) < abs(bestRatio - crit):
+                bestRatio = ratio
+                bestStock = s
+
+    return bestStock
+
+
+
+def nuages_points(B, S, p, s) :
+    #############################
+    ## NUAGES DE POINTS POUR OPTIMISER LE STOCKAGE
+
+    stockage_PB = np.zeros(
+        365)  ##liste qui va servir à enregister les stockages Phs + Battery à l'heure H pour tous les jours
+
+    stockmax = B.capacité + S.capacité  ##stockage maximum total = max total stockage Phs + max total stockage Battery
+
+    ##listes pour ecretage : x1 enregistre les jours où le lendemain il y a ecretage
+    ##y1 enregistre la valeur du stock Phs + Battery où le lendemain il y a ecretage
+    x1 = np.ones(365) * (-1)
+    y1 = np.ones(365) * (-1)
+
+    ##pareil que precèdemment mais pour lendemains avec penurie
+    x2 = np.ones(365) * (-1)
+    y2 = np.ones(365) * (-1)
+
+    ##pareil que precèdemment mais pour lendemains avec demande satisfaite et sans perte
+    x3 = np.ones(365) * (-1)
+    y3 = np.ones(365) * (-1)
+
+    ##on enlevera les -1 des listes x1, x2, x3, y1, y2, y3 pour ne recuperer que les points essentiels
+
+    StockPB = S.stock + B.stock  ##valeur des deux stocks
+
+    ###############################################################################
+    ##Certitude interval pour toutes les heures
+    certitude_interval_inf = np.zeros(24)
+    certitude_interval_sup = np.zeros(24)
+    certitude_interval_med = np.zeros(24)
+
+    seuils_top = np.zeros(24)
+    seuils_mid = np.zeros(24)
+    seuils_bot = np.zeros(24)
+
+    for h1 in range(24):
+        for jour in range(365):  ##on regarde tous les jours de l'annee
+
+            stockage_PB[jour] = StockPB[jour * 24 + h1]  # Au jour jour, valeur du stock Phs + Battery
+
+            ##on regarde dans les 24h qui suivent si il y a ecretage, penurie ou aucun des deux
+            for h2 in range(24):
+                t = (jour * 24 + h1 + h2) % H
+
+                if s[t] > 0 and StockPB[t] >= stockmax:  ##cas ecretage
+                    x1[jour] = jour + 1  ##on note le jour precèdant jour avec ecretage
+                    y1[jour] = stockage_PB[jour]  ##on note le stock du jour precèdant jour avec ecretage
+
+                elif p[t] > 0:  ##cas penurie
+                    x2[jour] = jour + 1  ##memes explications mais pour penurie
+                    y2[jour] = stockage_PB[jour]
+
+                else:  ##cas ni ecretage, ni penurie
+                    x3[jour] = jour + 1  ##memes explications mais avec ni ecretage, ni penurie
+                    y3[jour] = stockage_PB[jour]
+
+                if x1[jour] == x2[jour]:  ##si ecretage et penurie le meme jour, on considère que c'est une penurie
+                    x1[jour] = -1
+                    y1[jour] = -1
+
+        int_glob = certitudeglobal(y1, y2, y3, stockmax)
+        certitude_interval_inf[h1] = int_glob[0]
+        certitude_interval_sup[h1] = int_glob[1]
+        certitude_interval_med[h1] = int_glob[2]
+
+        seuils_top[h1] = seuil(y1, y2, y3, 0.02, "u")
+        seuils_bot[h1] = seuil(y1, y2, y3, 0.9, "d")
+        seuils_mid[h1] = (seuils_top[h1] + seuils_bot[h1]) / 2
+
+    return certitude_interval_inf, certitude_interval_med, certitude_interval_sup

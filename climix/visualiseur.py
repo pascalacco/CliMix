@@ -11,32 +11,32 @@ import pandas as pd
 def init_couleur_et_noms():
     init_cols = ['demande', 'electrolyse',
             'prodOffshore', 'prodOnshore', 'prodPV', 'rivprod', 'lakeprod',
-            'Bprod', 'Bstored',
-            'Gprod', 'Gstored',
+            'Bprod', 'Bstored', 'Bcons',
+            'Gprod', 'Gstored', 'Gcons',
             'Lprod', 'Lstored',
             'Nprod', 'Nstored',
-            'Sprod', 'Sstored',
+            'Sprod', 'Sstored', 'Scons',
             'prodResiduelle', '-prodResiduelle',
             's', 'p'
             ]
     init_couls = ["black", "grey",
                 "seagreen", "yellowgreen", "yellow", "aquamarine", "blue",
-                "darkolivegreen", "darkolivegreen",
-                "purple", "purple",
+                "orange", "orange", "green",
+                "purple", "purple", "grey",
                 "darkblue", "darkblue",
                 "coral", "coral",
-                "lightblue", "lightblue",
+                "lightblue", "lightblue", "lightblue",
                 "darkslategray", "darkslategray",
-                "green", "red"
+                "blue", "red"
                 ]
     init_noms = [
         'demande', 'electrolyse',
         'prodOffshore', 'prodOnshore', 'prodPV', 'rivprod', 'lakeprod',
-        'Bprod', 'Bstored',
-        'Gprod', 'Gstored',
+        'Batt-', 'Bstored', 'Batt+',
+        'Gaz2power', 'Gaz stock', 'Power2Gaz',
         'Lprod', 'Lstored',
         'Nprod', 'Nstored',
-        'Sprod', 'Sstored',
+        'Step-', 'Stock Step', 'Step+',
         'prodResiduelle', '-prodResiduelle',
         'surplus', "pénuries"
     ]
@@ -63,8 +63,12 @@ class Visualiseur:
     def __init__(self, chroniques, data_mix="./data_mix/"):
         self.data_mix = data_mix
         self.figs = {}
-        chroniques['prod_stock'] = chroniques[["Gprod", "Bprod", "Sprod", "Lprod"]].sum(axis=1)
-        chroniques['-prodResiduelle'] = -chroniques["prodResiduelle"]
+        chroniques['demande+P2G'] = chroniques["demande"] + chroniques["Gcons"]
+        chroniques['prod_non_pilot'] = chroniques[['prodOffshore', 'prodOnshore', 'prodPV', 'rivprod']].sum(axis=1)
+        chroniques['prod_pilot'] = chroniques[["Nprod", "Lprod", "Gprod"]].sum(axis=1)
+        chroniques['demandeRésiduelle'] = -chroniques["prodResiduelle"] + chroniques["Gcons"]
+        chroniques['demandeStock'] = chroniques['demandeRésiduelle'] - chroniques["prod_pilot"]
+
         self.chroniques = chroniques
         self.source = bk.models.ColumnDataSource(chroniques)
 
@@ -107,7 +111,8 @@ class Visualiseur:
         select.add_tools(range_tool)
         return p, select
 
-
+    def show(self, fig):
+        bkp.show(fig)
 class vScenario(Visualiseur):
 
     def set_fig_1(self):
@@ -126,27 +131,29 @@ class vProduction(Visualiseur):
 
         p, select = self.range_fig()
         non_pilot = ['rivprod',  'prodOffshore', 'prodOnshore', 'prodPV']
-        p = self.cumul_plot(cols=non_pilot, fig=p)
+        pilot = ["Nprod", 'Lprod', "Gprod", "Bprod", "Sprod"]
+        p = self.cumul_plot(cols=["Gcons", "Nprod", 'rivprod', 'prodOffshore', 'Lprod', "Gprod", 'prodOnshore', 'prodPV'], fig=p)
+        p.line(x='date', y='demande+P2G', source=self.source, legend_label='demande + P2G')
         p.line(x='date', y='demande', source=self.source, legend_label=noms['demande'])
         p.yaxis.axis_label = 'production (GW)'
         p.legend.click_policy = "mute"
 
-        pilot = ["Nprod", "Gprod", 'Lprod']
+
         n = bkp.figure(height=300, width=800, tools="xpan", toolbar_location=None,
                        x_axis_type="datetime", x_axis_location="above",
                        background_fill_color="#efefef", x_range=p.x_range)
 
-        n.line('date', '-prodResiduelle', source=self.source, legend_label="demande résiduelle")
         n = self.cumul_plot(cols=pilot, fig=n)
+        n.line('date', 'demandeRésiduelle', source=self.source, legend_label="demande + P2G- non pilotable")
         n.yaxis.axis_label = 'production (GW)'
         n.legend.click_policy = "mute"
 
-        stock = ["Bprod", 'Sprod']
+        stock = [ "Bcons", "Bprod", "Scons", "Sprod",  "Gprod", "s",  "p",]
         s = bkp.figure(height=300, width=800, tools="xpan", toolbar_location=None,
                        x_axis_type="datetime", x_axis_location="above",
                        background_fill_color="#efefef", x_range=p.x_range)
-        n.line('date', '-prodResiduelle', source=self.source, legend_label="demande résiduelle")
         s = self.cumul_plot(cols=stock, fig=s)
+        s.line('date', 'demandeStock', source=self.source, legend_label="demande restante G+B+S")
         s.yaxis.axis_label = 'production (GW)'
         s.legend.click_policy = "mute"
 
@@ -162,11 +169,11 @@ class vProduction(Visualiseur):
         cols = ["s", "p"]
 
         p = self.cumul_plot(cols, p)
-        p.line(x='date', y='-prodResiduelle', source=self.source, legend_label='production résiduelle')
+        p.line(x='date', y='demandeRésiduelle', source=self.source, legend_label='production résiduelle')
         p.yaxis.axis_label = 'surplus penuries (GW)'
         p.legend.click_policy = "mute"
 
-        select.line('date', '-prodResiduelle', source=self.source)
+        select.line('date', 'demandeRésiduelle', source=self.source)
         fig = column(p, select)
         return fig
 

@@ -270,3 +270,4 @@ flaskapp/logs.txt
 venv/
 .vscode
 apidoc
+simulateur.html
