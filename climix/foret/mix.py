@@ -17,13 +17,13 @@ if __name__ == "__main__":
     Fr = Mix("FR")
     metro = Mix("metro")
     metro.from_json(chemin+"mix_init.json")
-    metro.to_json(chemin+"FR_metro_init.json")
-    metro.from_json(chemin+"FR_metro_init.json")
-    metro.to_json(chemin+"FR_metro_init.json")
+    #metro.to_json(chemin+"FR_metro_init.json")
+    #metro.from_json(chemin+"FR_metro_init.json")
+    #metro.to_json(chemin+"FR_metro_init.json")
     Fr &= metro
     Eu &= Fr
     print(Eu)
-    Eu.to_json(chemin+"eu_init.json")
+    #Eu.to_json(chemin+"eu_init.json")
     print(dict(Eu))
     print(Eu@["EU", "FR", "metro", "hdf"])
     loc = "FR@metro@hdf@biomasse"

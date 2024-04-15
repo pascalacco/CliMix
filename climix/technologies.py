@@ -140,8 +140,9 @@ class Techno:
 
 
 class TechnoStep(Techno) :
+    capacité = 180
     def __init__(self, nom='Step', stock=16,
-                 etain=0.95, etaout=0.9, PoutMax=9.3, PinMax=9.3, capacité=180, H=Techno.H):
+                 etain=0.95, etaout=0.9, PoutMax=9.3, PinMax=9.3, capacité=capacité, H=Techno.H):
         super().__init__(nom=nom, stock=stock, etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax, capacité=capacité,
                          H=H)
 
@@ -151,6 +152,7 @@ class TechnoBatteries(Techno):
                  etain=0.95, etaout=0.9, PoutMax=None, PinMax=None,
                  capacité=None, nb_units=1, H=Techno.H):
 
+        self.nb_units = nb_units
         if PoutMax is None:
             PoutMax = nb_units / 10. * 20.08
         if PinMax is None:
@@ -176,6 +178,7 @@ class TechnoGaz(Techno):
     def __init__(self, nom='Gaz', stock=init_gaz,
                  etain=0.59, etaout=0.45, PoutMax=34.44, PinMax=None,
                  capacité = volume_gaz, nb_units=0, H=Techno.H):
+        self.nb_units = nb_units
 
         if PinMax is None:
             PinMax = nb_units * 1.
@@ -186,6 +189,78 @@ class TechnoGaz(Techno):
 
 
 class TechnoLacs(Techno):
+    # Puissance centrales territoire : 18.54 GWe repartis sur 24 centrales (EDF)
+    # Rendement meca (inutile ici) : ~35% generalement (Wiki)
+    duree_mois = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])*24
+
+
+    def __init__(self, nom='Lacs', stock=None,
+                 etain=1, etaout=1, PoutMax=10, PinMax=10,
+                 capacité=TechnoStep.capacité, H=Techno.H):
+
+
+        super().__init__(nom=nom, stock=stock,
+                         etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax,
+                         capacité=capacité, H=H)
+
+        if stock is None:
+            self.set_stock_et_cons_from_csv()
+
+    def Pout(self, k):
+        """Renvoie la puissance maximum de décharge à l'heure k """
+        return min(self.stock[k] * self.etaout, self.PoutMax-self.décharge[k])
+
+    def set_stock_et_cons_from_csv(self, fichier=chemin_donnees + "/lake_inflows.csv"):
+        lake = pd.read_csv(fichier, header=None)
+        lake.columns = ["month", "prod2"]
+        lakeprod = np.array(lake.prod2)
+
+        # Calcul de ce qui est stocke dans les lacs pour chaque mois
+        self.stock = np.ones(self.H)*self.capacité
+        k = 0
+        for m in range(12):
+            ksuiv = k + TechnoLacs.duree_mois[m]
+            self.recharge[k:ksuiv] = lakeprod[m]
+            k = ksuiv
+
+    def recharger(self, k):
+        max_charge = self.capacité - self.stock[k]
+        recharge = min(max_charge, self.recharge[k])
+        self.stock[k:] += recharge
+        self.recharge[k] -= recharge
+        return self.recharge[k]
+
+    def produire_minimum(self, k):
+        self.stock[k:] += self.recharge[k]
+        produit = self.décharger(k, self.recharge[k])
+        self.recharge[k] -= produit
+        return produit
+
+    def décharger(self, k, aproduire):
+        """ Decharge les moyens de stockage quand on a besoin d'energie
+
+        Args:
+            self : technologie de stockage a utiliser pour la production (batterie, phs, ...)
+            k (int) : heure courante
+            aproduire (float) : qte d'energie a fournir
+            endmonthlake (array) : qte d'energie restante dans les lacs jusqu'a la fin du mois
+            executer (boolean) : indique si l'energie dechargee est a prendre en compte pour la production globale (faux pour les echanges internes)
+        """
+        if aproduire <= 0:
+            out = 0
+
+        else:
+
+            vaproduire = min(aproduire, self.Pout(k))
+
+            self.stock[k:] = self.stock[k] - vaproduire/self.etaout
+            self.décharge[k] += vaproduire
+
+            out = vaproduire
+
+        return out
+
+class OldTechnoLacs(Techno):
     # Puissance centrales territoire : 18.54 GWe repartis sur 24 centrales (EDF)
     # Rendement meca (inutile ici) : ~35% generalement (Wiki)
 
@@ -254,7 +329,6 @@ class TechnoLacs(Techno):
 
         return out
 
-
 def fc_min_max_nuke(k, Pmax=1):
     """ Renvoie la puissance dispo actuellement pour le nucleaire, par rapport a la puissance max
 
@@ -321,10 +395,16 @@ def fc_min_max_nuke(k, Pmax=1):
 class TechnoNucleaire(Techno):
 
     def __init__(self, nom='Nucléaire', PoutMax=None, décharge_init=None,
-                 nb_units_EPR=0, nb_units_EPR2=0, H=Techno.H):
+                 nb_units_EPR=0, nb_units_EPR2=0, H=Techno.H, ramp_up=0.25, ramp_down=0.25):
+
+        self.nb_units_EPR = nb_units_EPR
+        self.nb_units_EPR2 = nb_units_EPR2
 
         if PoutMax is None:
             PoutMax = 1.08 * nb_units_EPR + 1.67 * nb_units_EPR2
+
+        self.ramp_up = ramp_up * PoutMax
+        self.ramp_down = ramp_down * PoutMax
 
         super().__init__(nom=nom, stock=None,
                          etain=None, etaout=1, PoutMax=PoutMax, PinMax=None,
@@ -351,10 +431,18 @@ class TechnoNucleaire(Techno):
         return self.fc_nuke[k][1]
 
     def Pout(self, k):
-        return self.p_max_effective(k) - self.décharge[k]
+        if k > 0:
+            return min(self.p_max_effective(k) - self.décharge[k],
+                       self.décharge[k-1]+self.ramp_up - self.décharge[k])
+        else:
+            return self.p_max_effective(k) - self.décharge[k]
 
     def Pout_min(self, k):
-        return self.p_min_effective(k) - self.décharge[k]
+        if k > 0:
+            return max(self.p_min_effective(k) - self.décharge[k],
+                       self.décharge[k-1] - self.ramp_down - self.décharge[k])
+        else:
+            return self.p_min_effective(k) - self.décharge[k]
 
     def pilote_prod(self, k, aproduire):
         """ Lance la production des centrales nucleaires
@@ -365,25 +453,26 @@ class TechnoNucleaire(Techno):
             aproduire (float) : qte d'energie a fournir
         """
         # Si la demande est trop faible ou nulle, on produit quand meme à hauteur de 20%
-        P_min, P_max = self.get_pout_effectives(k)
-        P_max = P_max - self.décharge[k]
-        P_min = P_min - self.décharge[k]
 
-        if aproduire > P_max:
-            temp = P_max
-        elif aproduire > P_min:
+        le_max = self.Pout(k)
+        le_min = self.Pout_min(k)
+
+        if aproduire > le_max:
+            temp = le_max
+        elif aproduire > le_min:
             temp = aproduire
         else:
-            temp = P_min
+            temp = le_min
 
         self.décharge[k] += temp
 
         return temp
 
     def pilot_annule_prod(self, k, aannuler):
-        vaannuler = min(aannuler, self.décharge[k]-self.p_min_effective(k))
+        vaannuler = min(aannuler, - self.Pout_min(k))
         self.décharge[k] -= vaannuler
         return vaannuler
+
 
 def thermProd(tec, k, aproduire):
     """ Lance la production des centrales thermiques
@@ -408,13 +497,15 @@ def test_technoLacs():
     import matplotlib.pyplot as plt
     L = TechnoLacs()
     plt.title("Test des lacs")
-    plt.subplot(311)
+    plt.subplot(313)
     plt.grid()
-    plt.plot(L.stock, 'k--')
+    plt.plot(L.recharge, 'k--')
     plt.ylabel('stock avant et après')
     reste = np.zeros(Techno.H)
     aproduire = reste.copy()
     for k in range(Techno.H):
+        L.recharger(k)
+        L.produire_minimum(k)
         if 2000 < k < 3600:
             val=15
             aproduire[k] +=val
@@ -440,9 +531,11 @@ def test_technoLacs():
             aproduire[k] += val
             reste[k] += val - L.décharger(k=k, aproduire=val)
         else:
-            aproduire[k] +=0
+            val = 0
+            aproduire[k] += val
             reste[k] += val - L.décharger(k=k, aproduire=0)
 
+    plt.subplot(311)
     plt.plot(L.stock, 'r')
     plt.subplot(312)
     plt.plot(aproduire, 'b--')
@@ -546,9 +639,9 @@ def test_technoNucleaire():
 
 
 if __name__ == "__main__":
-    #test_technoLacs()
+    test_technoLacs()
     #test_technoNucleaire()
-    test_generique()
+    #test_generique()
     #test_generique(TechnoStep(H=50))
     #test_generique(TechnoBatteries(nb_units=1, H=50))
     #test_generique(TechnoGaz(nb_units=10, H=50))

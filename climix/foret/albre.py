@@ -98,6 +98,7 @@ class Albre(dict):
             json.dump(dico, f, **self.JSON_OPTS)
 
     def __matmul__(self, noms):
+        """ @ permet d'accéder à un élément fils ou noeud"""
         if not isinstance(noms, list):
             noms = noms.split("@")
         nom = noms[0]
@@ -114,6 +115,7 @@ class Albre(dict):
         return arbre
 
     def __iand__(self, b):
+        " &= permet de joindre un arbre à un autre"
         name = b.nom
         if self.est_feuille:
             self[self._TYPE] = Albre.NOEUD
@@ -124,6 +126,7 @@ class Albre(dict):
         return self
 
     def __isub__(self, b):
+        """ -= calcule la différence entre les calculables d'un arbre"""
         arbre = self @ b.nom
         for un_nom, un_arbre in arbre.iter_arbres():
             if un_arbre.est_feuille:
@@ -132,6 +135,7 @@ class Albre(dict):
                         un_arbre -= (b@un_nom)[key]
 
     def __str__(self):
+        """ dessin couché de l'arbre """
         if self.est_feuille:
             str = Albre.FEUILLE + " : " + self.nom + "\n"
         else:
@@ -153,6 +157,7 @@ class Albre(dict):
         return str
 
     def __repr__(self):
+        """ juste type et nom"""
         return self[self._TYPE] + " " + self.nom
 
 

@@ -19,12 +19,15 @@ if __name__ == "__main__":
     data["occ"]["methanation"] = 2
     data["pac"]["methanation"] = 2
     data["naq"]["methanation"] = 2
-    data["occ"]["eolienneOFF"] = 2
-    data["pac"]["eolienneOFF"] = 2
-    data["naq"]["eolienneOFF"] = 2
-    data["occ"]["panneauPV"] = 4
-    data["pac"]["panneauPV"] = 4
-    data["naq"]["panneauPV"] = 4
+    data["occ"]["eolienneOFF"] = 1
+    data["pac"]["eolienneOFF"] = 1
+    data["naq"]["eolienneOFF"] = 1
+    data["occ"]["panneauPV"] = 1
+    data["pac"]["panneauPV"] = 1
+    data["naq"]["panneauPV"] = 1
+    data["occ"]["eolienneON"] = 1
+    data["pac"]["eolienneON"] = 1
+    data["naq"]["eolienneON"] = 1
 
     input = mj.inputs_from_save_and_data(save, data)
 
@@ -42,3 +45,4 @@ if __name__ == "__main__":
     chroniques = dm.get_chroniques()
     self = vi.vProduction(chroniques)
     self.show(self.fig_prod())
+    #self.show(self.fig_stock())

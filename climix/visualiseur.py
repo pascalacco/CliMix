@@ -17,28 +17,31 @@ def init_couleur_et_noms():
             'Nprod', 'Nstored',
             'Sprod', 'Sstored', 'Scons',
             'prodResiduelle', '-prodResiduelle',
-            's', 'p'
+            's', 'p',
+            'résiduelNonPilotable'
             ]
     init_couls = ["black", "grey",
                 "seagreen", "yellowgreen", "yellow", "aquamarine", "blue",
-                "orange", "orange", "green",
-                "purple", "purple", "grey",
+                "orange", "orange", "orange",
+                "purple", "violet", "grey",
                 "darkblue", "darkblue",
                 "coral", "coral",
                 "lightblue", "lightblue", "lightblue",
                 "darkslategray", "darkslategray",
-                "blue", "red"
+                "blue", "red",
+                "grey"
                 ]
     init_noms = [
-        'demande', 'electrolyse',
+        'demande (DM)', 'electrolyse',
         'prodOffshore', 'prodOnshore', 'prodPV', 'rivprod', 'lakeprod',
-        'Batt-', 'Bstored', 'Batt+',
+        'Batt', 'Bstored', 'Batt',
         'Gaz2power', 'Gaz stock', 'Power2Gaz',
         'Lprod', 'Lstored',
         'Nprod', 'Nstored',
-        'Step-', 'Stock Step', 'Step+',
+        'Step', 'Stock Step', 'Step',
         'prodResiduelle', '-prodResiduelle',
-        'surplus', "pénuries"
+        'surplus', "pénuries",
+        'DM - non pilotable(NP)'
     ]
 
     couleurs = {}
@@ -63,16 +66,16 @@ class Visualiseur:
     def __init__(self, chroniques, data_mix="./data_mix/"):
         self.data_mix = data_mix
         self.figs = {}
-        chroniques['demande+P2G'] = chroniques["demande"] + chroniques["Gcons"]
-        chroniques['prod_non_pilot'] = chroniques[['prodOffshore', 'prodOnshore', 'prodPV', 'rivprod']].sum(axis=1)
-        chroniques['prod_pilot'] = chroniques[["Nprod", "Lprod", "Gprod"]].sum(axis=1)
-        chroniques['demandeRésiduelle'] = -chroniques["prodResiduelle"] + chroniques["Gcons"]
-        chroniques['demandeStock'] = chroniques['demandeRésiduelle'] - chroniques["prod_pilot"]
 
-        self.chroniques = chroniques
-        self.source = bk.models.ColumnDataSource(chroniques)
+        self.chroniques = chroniques.apply(lambda col : col.repeat(2))
+        dates = np.empty_like(self.chroniques["date"].values)
+        dates[:-1] = self.chroniques["date"].values[1:]
+        dates[-1] = self.chroniques["date"].values[-1]
+        self.chroniques["date"] = dates
+        self.chroniques = self.chroniques.reset_index()
+        self.source = bk.models.ColumnDataSource(self.chroniques)
 
-        self.dates = np.array(chroniques['date'], dtype=np.datetime64)
+        self.dates = np.array(self.chroniques['date'], dtype=np.datetime64)
 
     def get_dates_et_source(self):
         return self.dates, self.source
@@ -87,19 +90,26 @@ class Visualiseur:
         script, divs = components(self.figs)
         return {"script": script, "divs": divs}
 
-    def cumul_plot(self, cols, fig=bkp.figure(x_axis_type="datetime")):
-        fig.varea_stack(stackers=cols, x="date", color=couleurs[cols].to_list(),
+    def stack_plot(self, cols, fig=bkp.figure(x_axis_type="datetime"), méthode=None, pas_de_legende=False):
+        if méthode is None:
+            méthode = fig.varea_stack
+
+        if pas_de_legende:
+            méthode(stackers=cols, x="date", color=couleurs[cols].to_list(), source=self.source)
+
+        else:
+            méthode(stackers=cols, x="date", color=couleurs[cols].to_list(),
                         legend_label=noms[cols].to_list(), source=self.source)
-        fig.legend.click_policy = "mute"
+
         return fig
 
     def range_fig(self, deb=24 * 31, fin=24 * 31 + 24 * 7):
         p = bkp.figure(height=300, width=800, tools="xpan", toolbar_location=None,
-                       x_axis_type="datetime", x_axis_location="above",
+                       x_axis_type="datetime", x_axis_location="below", sizing_mode="scale_width",
                        background_fill_color="#efefef", x_range=(self.dates[deb], self.dates[fin]))
 
         select = bkp.figure(title="Déplacez le milieu ou un bord du rectangle",
-                            height=130, width=800, y_range=p.y_range,
+                            height=130, width=800, y_range=p.y_range, sizing_mode="scale_width",
                             x_axis_type="datetime", y_axis_type=None,
                             tools="", toolbar_location=None, background_fill_color="#efefef")
 
@@ -113,6 +123,8 @@ class Visualiseur:
 
     def show(self, fig):
         bkp.show(fig)
+
+
 class vScenario(Visualiseur):
 
     def set_fig_1(self):
@@ -120,45 +132,68 @@ class vScenario(Visualiseur):
         df = pd.read_csv(self.data_mix + fich)
 
     def set_figs(self):
-        fig = self.cumul_plot(cols=['demande', 'electrolyse'])
+        fig = self.stack_plot(cols=['demande', 'electrolyse'])
         self.set_fig(fig, "Scenario")
 
 
 class vProduction(Visualiseur):
 
+
     def fig_prod(self):
-        from bokeh.palettes import tol
 
-        p, select = self.range_fig()
-        non_pilot = ['rivprod',  'prodOffshore', 'prodOnshore', 'prodPV']
-        pilot = ["Nprod", 'Lprod', "Gprod", "Bprod", "Sprod"]
-        p = self.cumul_plot(cols=["Gcons", "Nprod", 'rivprod', 'prodOffshore', 'Lprod', "Gprod", 'prodOnshore', 'prodPV'], fig=p)
-        p.line(x='date', y='demande+P2G', source=self.source, legend_label='demande + P2G')
-        p.line(x='date', y='demande', source=self.source, legend_label=noms['demande'])
-        p.yaxis.axis_label = 'production (GW)'
-        p.legend.click_policy = "mute"
+        prods = ['rivprod',  'prodOffshore', "Nprod", "Lprod", 'prodOnshore', 'prodPV']
+        self.chroniques['prods'] = self.chroniques[prods].sum(axis=1)
+        self.chroniques['résiduel'] = self.chroniques["demande"] - self.chroniques["prods"]
 
+        self.source = bk.models.ColumnDataSource(self.chroniques)
 
-        n = bkp.figure(height=300, width=800, tools="xpan", toolbar_location=None,
-                       x_axis_type="datetime", x_axis_location="above",
-                       background_fill_color="#efefef", x_range=p.x_range)
+        s, select = self.range_fig()
 
-        n = self.cumul_plot(cols=pilot, fig=n)
-        n.line('date', 'demandeRésiduelle', source=self.source, legend_label="demande + P2G- non pilotable")
-        n.yaxis.axis_label = 'production (GW)'
-        n.legend.click_policy = "mute"
-
-        stock = [ "Bcons", "Bprod", "Scons", "Sprod",  "Gprod", "s",  "p",]
-        s = bkp.figure(height=300, width=800, tools="xpan", toolbar_location=None,
-                       x_axis_type="datetime", x_axis_location="above",
-                       background_fill_color="#efefef", x_range=p.x_range)
-        s = self.cumul_plot(cols=stock, fig=s)
-        s.line('date', 'demandeStock', source=self.source, legend_label="demande restante G+B+S")
-        s.yaxis.axis_label = 'production (GW)'
+        s.add_layout(bk.models.Legend(), 'right')
         s.legend.click_policy = "mute"
 
-        select.line('date', 'demande', source=self.source)
-        fig = column(p, n, s, select)
+        prod_stock = ["Bprod", "Sprod",  "Gprod", "p"]
+        cons_stock = ["Bcons", "Scons",  "Gcons", "s"]
+        s = self.stack_plot(cols=prod_stock, fig=s)
+        s = self.stack_plot(cols=cons_stock, fig=s)
+        s.line('date', 'résiduel', source=self.source, line_width=2, color="black",
+               legend_label="demande restante")
+        s.yaxis.axis_label = 'stock/déstock élec. + gaz. (GW)'
+        s.legend.click_policy = "mute"
+
+
+        p = bkp.figure(height=300, width=800, tools=["box_zoom"], toolbar_location=None,
+                       x_axis_type="datetime", x_axis_location="below", sizing_mode="scale_width",
+                       background_fill_color="#efefef", x_range=s.x_range)
+        p.add_layout(bk.models.Legend(), 'right')
+        p.legend.click_policy = "mute"
+        p = self.stack_plot(cols=prods, fig=p)
+        p.line(x='date', y='demande', source=self.source, line_width=2, color="black", legend_label=noms['demande'])
+        p.yaxis.axis_label = 'productions hors stoc/destock et gaz (GW)'
+        p.legend.click_policy = "mute"
+        hover = bk.models.HoverTool(tooltips=[("Value", "@demande")])
+        p.add_tools(hover)
+        #select.line('date', 'demande', source=self.source)
+        select = self.stack_plot(cols=prod_stock, fig=select, pas_de_legende=True)
+        select = self.stack_plot(cols=cons_stock, fig=select, pas_de_legende=True)
+        fig = column(select, p, s, sizing_mode="scale_width")
+        return fig
+
+    def fig_stock(self):
+
+        s, select = self.range_fig()
+
+        s.add_layout(bk.models.Legend(), 'right')
+        s.legend.click_policy = "mute"
+
+        stock = ["Lstored", "Bstored", "Sstored"]
+        self.stack_plot(stock, fig=s)
+        s.yaxis.axis_label = 'stock  (GWh)'
+        s.legend.click_policy = "mute"
+
+        #select.line('date', 'demande', source=self.source)
+        select = self.stack_plot(cols=stock, fig=select, pas_de_legende=True)
+        fig = column(select, s)
         return fig
 
     def fig_penuries(self):
@@ -168,7 +203,7 @@ class vProduction(Visualiseur):
 
         cols = ["s", "p"]
 
-        p = self.cumul_plot(cols, p)
+        p = self.stack_plot(cols, p)
         p.line(x='date', y='demandeRésiduelle', source=self.source, legend_label='production résiduelle')
         p.yaxis.axis_label = 'surplus penuries (GW)'
         p.legend.click_policy = "mute"
@@ -177,10 +212,13 @@ class vProduction(Visualiseur):
         fig = column(p, select)
         return fig
 
+        def fig_facteur_de_charge(self):
+            pass
+
     def set_figs(self):
         fig = self.fig_prod()
         self.set_fig(fig, "production")
-        self.set_fig(self.fig_penuries())
+        self.set_fig(self.fig_stock(), "stocks")
 
 
 vuesClasses = {"resultats": Visualiseur,
