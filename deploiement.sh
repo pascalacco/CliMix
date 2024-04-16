@@ -1,5 +1,3 @@
-
-
 copy(){
     rm -rf "$2"/game_back
     mv -f "$2"/flaskapp/game_data "$2"/game_back
@@ -13,6 +11,8 @@ copy(){
     cp -rf "$1"/*.txt "$2"/
     cp -rf "$1"/Makefile "$2"/
     cp -rf "$1"/setup.py "$2"/
+    cp -rf "$1"/doc "$2"/
+    
 }
 
 
@@ -23,35 +23,42 @@ synchronise()
 }
 
 rsynchronise(){
-    rsync -av --delete --exclude={'.git','flaskapp/game_data/*/*','venv','doc/build'} --include={'flaskapp/game_data/*.json'} "$1/" $(realpath -s "$2")
+    rsync -anv --delete --exclude={'.git','flaskapp/game_data/*/*','venv','doc/build'} --include={'flaskapp/game_data/*.json'} "$1/" "$2/"
 }
 
 
+
 redeplois(){
+    SRC=$(realpath -s "$1")
+    DST=$(realpath -s "$2")
+    
     echo "__________________________________________________"
-    echo "Synchronise $1 et $2"
+    echo "Synchronise $SRC et $DST"
     echo "__________________________________________________"
-    synchronise "$1" "$2"
+    rsynchronise "$SRC" "$DST"
 
     echo "__________________________________________________"
     echo "Mise à jour du venv"
     echo "__________________________________________________"
-    cd "$2" && make maj_python
+    cd "$DST" && make maj_python
 
     
     echo "__________________________________________________"
     echo "Droits de modifs pour $PWD/flaskapp/game_data"
     echo "__________________________________________________"
-    cd "$2" &&
-  	mkdir -p ./flaskapp/game_data &&
-	  chmod -R a+rw flaskapp/game_data
+    cd "$DST" && mkdir -p ./flaskapp/game_data &&
+	chmod -R a+rw flaskapp/game_data
 
     echo "__________________________________________________"
     echo "compilation de la doc"
     echo "__________________________________________________"
 
-    make doc
+    cd "$DST" && make doc
     echo "__________________________________________________"
+
+    pwd
+    cd "$SRC"
+    pwd
 
 }
 

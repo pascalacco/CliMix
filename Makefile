@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 .ONESHELL:
 
 venv :
@@ -7,29 +8,31 @@ venv :
 maj_python : venv/touche venv/climix_touche
 
 venv/touche : requirements.txt notebooks_requirements.txt
-	. venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt
-	. venv/bin/activate && pip install -r notebooks_requirements.txt
+	source venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt
+	source venv/bin/activate && pip install -r notebooks_requirements.txt
 	touch venv/touche
 
 venv/climix_touche : setup.py $(wildcard  climix/*.py) $(wildcard climix/*/*.py) $(wildcard flaskapp/*.py) $(wildcard pythonapp/*.py) 
 
-	. venv/bin/activate && pip install -e .
+	source venv/bin/activate && pip install -e .
 	touch venv/climix_touche
 
 exec_locale : 
-	. venv/bin/activate && python flaskapp/app.py
+	source venv/bin/activate && python flaskapp/app.py
 
 edit :
 	source venv/bin/activate
 	pycharm.sh .
 
 doc :
-	. venv/bin/activate &&  cd ./doc && ./apidoc_modules.sh && make  html
+	source venv/bin/activate &&  cd ./doc && ./apidoc_modules.sh && make  html
 
 deploiement_test :
-	. ./deploiement.sh && redeplois . /var/www/climix-test
+	source ./deploiement.sh && redeplois . /var/www/climix-test
 
 deploiement_stable :
-	. ./deploiement.sh && redeplois . /var/www/climix
+	source ./deploiement.sh && redeplois . /var/www/climix
+
+
 
 .PHONY : venv deploiement_test deploiement_stable  exec_locale doc
