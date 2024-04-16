@@ -23,7 +23,7 @@ synchronise()
 }
 
 rsynchronise(){
-    rsync -anv --delete --exclude={'.git','flaskapp/game_data/*/*','venv','doc/build'} --include={'flaskapp/game_data/*.json'} "$1/" "$2/"
+    rsync -av --delete --exclude={'.git','flaskapp/game_data/*/*','venv','doc/build'} --include={'flaskapp/game_data/*.json'} "$1/" "$2/"
 }
 
 
