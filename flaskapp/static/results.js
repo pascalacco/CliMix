@@ -81,6 +81,27 @@ $(function () {
     }
 
     function conso() {
+        let table = [['Année', 'EON', 'EOFF', 'Batterie', 'Nucléaire',
+                'PV', 'Hydraulique', 'Phs', 'Gaz Fossile', 'Gaz autres', {role: 'annotation'}]];
+
+
+        for(let year in resultsHistory){
+            let line=[];
+            line.push(year);
+            line.push(resultsHistory[year].prodOnshore);
+            line.push(resultsHistory[year].prodOffshore);
+            line.push(resultsHistory[year].prodBatterie);
+            line.push(resultsHistory[year].prodNucleaire);
+            line.push(resultsHistory[year].prodPv);
+            line.push(resultsHistory[year].prodEau);
+            line.push(resultsHistory[year].prodPhs);
+            line.push(resultsHistory[year].prodGazFossile);
+            line.push(resultsHistory[year].prodGaz-resultsHistory[year].prodGazFossile);
+            line.push("");
+            table.push(line)
+        };
+        let resultamoi = google.visualization.arrayToDataTable(table);
+
         let result8 = google.visualization.arrayToDataTable([
             ['Année', 'EON', 'EOFF', 'Batterie', 'Nucléaire',
                 'PV', 'Hydraulique', 'Phs', 'Gaz Fossile', 'Gaz autres', {role: 'annotation'}],
@@ -117,7 +138,7 @@ $(function () {
 
 
         let chart = new google.visualization.ColumnChart(document.getElementById('Combine_div'));
-        chart.draw(result8, options);
+        chart.draw(resultamoi, options);
     }
 
     function Prod() {
@@ -334,9 +355,9 @@ $(function () {
         google.charts.setOnLoadCallback(PenSurBar1);
         google.charts.setOnLoadCallback(PenSurBar2);
         google.charts.setOnLoadCallback(Resultats);
-        google.charts.setOnLoadCallback(Score);
+        //google.charts.setOnLoadCallback(Score);
         google.charts.setOnLoadCallback(conso);
-        google.charts.setOnLoadCallback(Sol);
+        //google.charts.setOnLoadCallback(Sol);
 
         let map = document.querySelector('#map')
 

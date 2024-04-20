@@ -423,218 +423,33 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
 
     factNuc = 0 if (mix['nb']['EPR2'] + mix['nb']['centraleNuc'] == 0) else prodNuc / (mix['nb']['EPR2'] + mix['nb']['centraleNuc'])
 
+    population = {'ara':0.12, 'bfc':0.04, 'bre':0.05, 'cor':0.005,
+                  'cvl':0.04, 'est':0.08, 'hdf':0.09, 'idf':0.19,
+                  'naq':0.09, 'nor':0.05, 'occ': 0.09, 'pac':0.08,
+                  'pll':0.06}
+
     """
-
-    ##Occitanie
-    popOCC = 0.09  ##pourcentage population
-    prodOCC = (np.array(fdc_off.occ) * mix["occ"]["eolienneOFF"] * powOffshore +
-               np.array(fdc_on.occ) * mix["occ"]["eolienneON"] * powOnshore +
-               np.array(fdc_pv.occ) * mix["occ"]["panneauPV"] * powPV +
-               (mix["occ"]["EPR2"] - nvPionsReg["occ"]["EPR2"] + mix["occ"]["centraleNuc"]) * factNuc +
-               nbThermReg["occ"] * prodGaz / nbTherm)
-
-    ##Nouvelle-Aquitaine
-    popNA = 0.09
-    prodNA = (np.array(fdc_off.naq) * mix["naq"]["eolienneOFF"] * powOffshore +
-              np.array(fdc_on.naq) * mix["naq"]["eolienneON"] * powOnshore +
-              np.array(fdc_pv.naq) * mix["naq"]["panneauPV"] * powPV +
-              (mix["naq"]["EPR2"] - nvPionsReg["naq"]["EPR2"] + mix["naq"]["centraleNuc"]) * factNuc +
-              nbThermReg["naq"] * prodGaz / nbTherm)
-
-    ##Bretagne
-    popBRE = 0.05
-    prodBRE = (np.array(fdc_off.bre) * mix["bre"]["eolienneOFF"] * powOffshore +
-               np.array(fdc_on.bre) * mix["bre"]["eolienneON"] * powOnshore +
-               np.array(fdc_pv.bre) * mix["bre"]["panneauPV"] * powPV +
-               (mix["bre"]["EPR2"] - nvPionsReg["bre"]["EPR2"] + mix["bre"]["centraleNuc"]) * factNuc +
-               nbThermReg["bre"] * prodGaz / nbTherm)
-
-    ##Haut-de-France
-    popHDF = 0.09
-    prodHDF = (np.array(fdc_off.hdf) * mix["hdf"]["eolienneOFF"] * powOffshore +
-               np.array(fdc_on.hdf) * mix["hdf"]["eolienneON"] * powOnshore +
-               np.array(fdc_pv.hdf) * mix["hdf"]["panneauPV"] * powPV +
-               (mix["hdf"]["EPR2"] - nvPionsReg["hdf"]["EPR2"] + mix["hdf"]["centraleNuc"]) * factNuc +
-               nbThermReg["hdf"] * prodGaz / nbTherm)
-
-    ##Pays de la Loire
-    popPDL = 0.06
-    prodPDL = (np.array(fdc_off.pll) * mix["pll"]["eolienneOFF"] * powOffshore +
-               np.array(fdc_on.pll) * mix["pll"]["eolienneON"] * powOnshore +
-               np.array(fdc_pv.pll) * mix["pll"]["panneauPV"] * powPV +
-               (mix["pll"]["EPR2"] - nvPionsReg["pll"]["EPR2"] + mix["pll"]["centraleNuc"]) * factNuc +
-               nbThermReg["pll"] * prodGaz / nbTherm)
-
-    ##Auvergne-Rhône-Alpes
-    popARA = 0.12
-    prodARA = (np.array(fdc_on.ara) * mix["ara"]["eolienneON"] * powOnshore +
-               np.array(fdc_pv.ara) * mix["ara"]["panneauPV"] * powPV +
-               (mix["ara"]["EPR2"] - nvPionsReg["ara"]["EPR2"] + mix["ara"]["centraleNuc"]) * factNuc +
-               nbThermReg["ara"] * prodGaz / nbTherm)
-
-    ##Grand Est
-    popGE = 0.08
-    prodGE = (np.array(fdc_on.est) * mix["est"]["eolienneON"] * powOnshore +
-              np.array(fdc_pv.est) * mix["est"]["panneauPV"] * powPV +
-              (mix["est"]["EPR2"] - nvPionsReg["est"]["EPR2"] + mix["est"]["centraleNuc"]) * factNuc +
-              nbThermReg["est"] * prodGaz / nbTherm)
-
-    ##Normandie
-    popNOR = 0.05
-    prodNOR = (np.array(fdc_off.nor) * mix["nor"]["eolienneOFF"] * powOffshore +
-               np.array(fdc_on.nor) * mix["nor"]["eolienneON"] * powOnshore +
-               np.array(fdc_pv.nor) * mix["nor"]["panneauPV"] * powPV +
-               (mix["nor"]["EPR2"] - nvPionsReg["nor"]["EPR2"] + mix["nor"]["centraleNuc"]) * factNuc +
-               nbThermReg["nor"] * prodGaz / nbTherm)
-
-    ##Bourgogne-Franche-Comte
-    popBFC = 0.04
-    prodBFC = (np.array(fdc_on.bfc) * mix["bfc"]["eolienneON"] * powOnshore +
-               np.array(fdc_pv.bfc) * mix["bfc"]["panneauPV"] * powPV +
-               (mix["bfc"]["EPR2"] - nvPionsReg["bfc"]["EPR2"] + mix["bfc"]["centraleNuc"]) * factNuc +
-               nbThermReg["bfc"] * prodGaz / nbTherm)
-
-    ##Centre Val de Loire
-    popCVL = 0.04
-    prodCVL = (np.array(fdc_on.cvl) * mix["cvl"]["eolienneON"] * powOnshore +
-               np.array(fdc_pv.cvl) * mix["cvl"]["panneauPV"] * powPV +
-               (mix["cvl"]["EPR2"] - nvPionsReg["cvl"]["EPR2"] + mix["cvl"]["centraleNuc"]) * factNuc +
-               nbThermReg["cvl"] * prodGaz / nbTherm)
-
-    ##PACA
-    popPAC = 0.08
-    prodPAC = (np.array(fdc_off.pac) * mix["pac"]["eolienneOFF"] * powOffshore +
-               np.array(fdc_on.pac) * mix["pac"]["eolienneON"] * powOnshore +
-               np.array(fdc_pv.pac) * mix["pac"]["panneauPV"] * powPV +
-               (mix["pac"]["EPR2"] - nvPionsReg["pac"]["EPR2"] + mix["pac"]["centraleNuc"]) * factNuc +
-               nbThermReg["pac"] * prodGaz / nbTherm)
-
-    ##Ile-de-France
-    popIDF = 0.19
-    prodIDF = (np.array(fdc_on.idf) * mix["idf"]["eolienneON"] * powOnshore +
-               np.array(fdc_pv.idf) * mix["idf"]["panneauPV"] * powPV +
-               (mix["idf"]["EPR2"] - nvPionsReg["idf"]["EPR2"] + mix["idf"]["centraleNuc"]) * factNuc +
-               nbThermReg["idf"] * prodGaz / nbTherm)
-
-    ##Corse
-    popCOR = 0.005
-    prodCOR = (np.array(fdc_off.cor) * mix["cor"]["eolienneOFF"] * powOffshore +
-               np.array(fdc_on.cor) * mix["cor"]["eolienneON"] * powOnshore +
-               np.array(fdc_pv.cor) * mix["cor"]["panneauPV"] * powPV +
-               (mix["cor"]["EPR2"] - nvPionsReg["cor"]["EPR2"] + mix["cor"]["centraleNuc"]) * factNuc +
-               nbThermReg["cor"] * prodGaz / nbTherm)
-
-    ##production totale sur le territoire
-    prod = prodOCC + prodNA + prodBRE + prodHDF + prodPDL + prodARA + prodGE + prodNOR + prodBFC + prodCVL + prodPAC + prodIDF + prodCOR
-
-    ##calcul des ratios (prod de la region/pros totale --> heure par heure)
-    ratioOCC = np.zeros(H)
-    ratioNA = np.zeros(H)
-    ratioBRE = np.zeros(H)
-    ratioHDF = np.zeros(H)
-    ratioPDL = np.zeros(H)
-    ratioARA = np.zeros(H)
-    ratioGE = np.zeros(H)
-    ratioNOR = np.zeros(H)
-    ratioBFC = np.zeros(H)
-    ratioCVL = np.zeros(H)
-    ratioPAC = np.zeros(H)
-    ratioIDF = np.zeros(H)
-    ratioCOR = np.zeros(H)
-
-    for i in range(H):
-        ratioOCC[i] = prodOCC[i] / prod[i] if prod[i] != 0 else 0
-        ratioNA[i] = prodNA[i] / prod[i] if prod[i] != 0 else 0
-        ratioBRE[i] = prodBRE[i] / prod[i] if prod[i] != 0 else 0
-        ratioHDF[i] = prodHDF[i] / prod[i] if prod[i] != 0 else 0
-        ratioPDL[i] = prodPDL[i] / prod[i] if prod[i] != 0 else 0
-        ratioARA[i] = prodARA[i] / prod[i] if prod[i] != 0 else 0
-        ratioGE[i] = prodGE[i] / prod[i] if prod[i] != 0 else 0
-        ratioNOR[i] = prodNOR[i] / prod[i] if prod[i] != 0 else 0
-        ratioBFC[i] = prodBFC[i] / prod[i] if prod[i] != 0 else 0
-        ratioCVL[i] = prodCVL[i] / prod[i] if prod[i] != 0 else 0
-        ratioPAC[i] = prodPAC[i] / prod[i] if prod[i] != 0 else 0
-        ratioIDF[i] = prodIDF[i] / prod[i] if prod[i] != 0 else 0
-        ratioCOR[i] = prodCOR[i] / prod[i] if prod[i] != 0 else 0
-
-        # print(ratioOCC)
-    ##difference des rations prod et ratios pop regions par regions
-
-    diffOCC = np.zeros(H)
-    diffNA = np.zeros(H)
-    diffBRE = np.zeros(H)
-    diffHDF = np.zeros(H)
-    diffPDL = np.zeros(H)
-    diffARA = np.zeros(H)
-    diffGE = np.zeros(H)
-    diffNOR = np.zeros(H)
-    diffBFC = np.zeros(H)
-    diffCVL = np.zeros(H)
-    diffPAC = np.zeros(H)
-    diffIDF = np.zeros(H)
-    diffCOR = np.zeros(H)
-
-    diffOCC = ratioOCC - popOCC * np.ones(H)
-    diffNA = ratioNA - popNA * np.ones(H)
-    diffBRE = ratioBRE - popBRE * np.ones(H)
-    diffHDF = ratioHDF - popHDF * np.ones(H)
-    diffPDL = ratioPDL - popPDL * np.ones(H)
-    diffARA = ratioARA - popARA * np.ones(H)
-    diffGE = ratioGE - popGE * np.ones(H)
-    diffNOR = ratioNOR - popNOR * np.ones(H)
-    diffBFC = ratioBFC - popBFC * np.ones(H)
-    diffCVL = ratioCVL - popCVL * np.ones(H)
-    diffPAC = ratioPAC - popPAC * np.ones(H)
-    diffIDF = ratioIDF - popIDF * np.ones(H)
-    diffCOR = ratioCOR - popCOR * np.ones(H)
-
-    ##moyenne sur les heures de l'annee des differences
-    moyOCC = np.sum(diffOCC) / 8760 * 100
-    moyNA = np.sum(diffNA) / 8760 * 100
-    moyBRE = np.sum(diffBRE) / 8760 * 100
-    moyHDF = np.sum(diffHDF) / 8760 * 100
-    moyPDL = np.sum(diffPDL) / 8760 * 100
-    moyARA = np.sum(diffARA) / 8760 * 100
-    moyGE = np.sum(diffGE) / 8760 * 100
-    moyNOR = np.sum(diffNOR) / 8760 * 100
-    moyBFC = np.sum(diffBFC) / 8760 * 100
-    moyCVL = np.sum(diffCVL) / 8760 * 100
-    moyPAC = np.sum(diffPAC) / 8760 * 100
-    moyIDF = np.sum(diffIDF) / 8760 * 100
-    moyCOR = np.sum(diffCOR) / 8760 * 100
-
-    moyAbsOCC = np.sum(np.abs(diffOCC)) / 8760 * 100
-    moyAbsNA = np.sum(np.abs(diffNA)) / 8760 * 100
-    moyAbsBRE = np.sum(np.abs(diffBRE)) / 8760 * 100
-    moyAbsHDF = np.sum(np.abs(diffHDF)) / 8760 * 100
-    moyAbsPDL = np.sum(np.abs(diffPDL)) / 8760 * 100
-    moyAbsARA = np.sum(np.abs(diffARA)) / 8760 * 100
-    moyAbsGE = np.sum(np.abs(diffGE)) / 8760 * 100
-    moyAbsNOR = np.sum(np.abs(diffNOR)) / 8760 * 100
-    moyAbsBFC = np.sum(np.abs(diffBFC)) / 8760 * 100
-    moyAbsCVL = np.sum(np.abs(diffCVL)) / 8760 * 100
-    moyAbsPAC = np.sum(np.abs(diffPAC)) / 8760 * 100
-    moyAbsIDF = np.sum(np.abs(diffIDF)) / 8760 * 100
-    moyAbsCOR = np.sum(np.abs(diffCOR)) / 8760 * 100
-    
-      transfert=                      {"occ": int(round(moyOCC)),
-                            "naq": int(round(moyNA)),
-                            "bre": int(round(moyBRE)),
-                            "hdf": int(round(moyHDF)),
-                            "pll": int(round(moyPDL)),
-                            "ara": int(round(moyARA)),
-                            "est": int(round(moyGE)),
-                            "nor": int(round(moyNOR)),
-                            "bfc": int(round(moyBFC)),
-                            "cvl": int(round(moyCVL)),
-                            "pac": int(round(moyPAC)),
-                            "idf": int(round(moyIDF)),
-                            "cor": int(round(moyCOR))
-                            }
-                            
-                            
+    np.array(fdc_off.occ) * mix["occ"]["eolienneOFF"] * powOffshore +
+    np.array(fdc_on.occ) * mix["occ"]["eolienneON"] * powOnshore +
+    np.array(fdc_pv.occ) * mix["occ"]["panneauPV"] * powPV +
+    (mix["occ"]["EPR2"] - nvPionsReg["occ"]["EPR2"] + mix["occ"]["centraleNuc"]) * factNuc +
+    nbThermReg["occ"] * prodGaz / nbTherm)
     """
+    ratio={}
+    prod = {}
+    diff={}
     transfert={}
+    for reg in population:
+        prod[reg] = (prod_renouvelables['regions'][reg]["eolienneOFF"].sum()+
+                     prod_renouvelables['regions'][reg]["eolienneON"].sum() +
+                     prod_renouvelables['regions'][reg]["panneauPV"].sum())
+        prod[reg] += (mix['nb'][reg]["EPR2"] + mix['nb'][reg]["centraleNuc"]) * factNuc
+        prod[reg] += nbThermReg[reg] * prodGaz / nbTherm
+        ratio[reg] = prod[reg] / prodTotale
+        diff[reg] = ratio[reg] - population[reg]
+        transfert[reg] = int(diff[reg] * 100.)
+
+
     result = {"carte": mix["carte"],
               "annee": mix["annee"],
               "alea": mix["alea"],
