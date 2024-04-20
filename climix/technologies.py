@@ -43,6 +43,7 @@ class Techno:
         self.set_décharge()
         self.set_recharge()
 
+
     def set_décharge(self, décharge=0):
         if np.isscalar(décharge):
             self.décharge = np.ones(self.H) * décharge
@@ -174,9 +175,10 @@ class TechnoGaz(Techno):
     # T = Techno('Centrale thermique', None, np.zeros(H), None, 1, 0.7725*nbTherm, None, None)
     # Puissance : 1.08 GWe (EDF)
     # Meme rendement
-
+    etain=0.59
+    etaout=0.45
     def __init__(self, nom='Gaz', stock=init_gaz,
-                 etain=0.59, etaout=0.45, PoutMax=34.44, PinMax=None,
+                 etain=etain, etaout=etaout, PoutMax=34.44, PinMax=None,
                  capacité = volume_gaz, nb_units=0, H=Techno.H):
         self.nb_units = nb_units
 

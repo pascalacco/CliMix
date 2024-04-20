@@ -123,14 +123,14 @@ $(function () {
     function Prod() {
         let result2 = google.visualization.arrayToDataTable([
             ['Technologie', 'Production'],
-            ['EON', resultsData.prodOnshore[resultsData.annee]],            // RGB value
-            ['EOFF', resultsData.prodOffshore[resultsData.annee]],            // English color name
-            ['Batterie', resultsData.prodBatterie[resultsData.annee]],
-            ['Hydraulique', resultsData.prodEau[resultsData.annee]],
-            ['Gaz', resultsData.prodGaz[resultsData.annee]],
-            ['Nucléaire', resultsData.prodNucleaire[resultsData.annee]],
-            ['PV', resultsData.prodPv[resultsData.annee]],
-            ['Phs', resultsData.prodPhs[resultsData.annee]],
+            ['EON', resultsData.prodOnshore],            // RGB value
+            ['EOFF', resultsData.prodOffshore],            // English color name
+            ['Batterie', resultsData.prodBatterie],
+            ['Hydraulique', resultsData.prodEau],
+            ['Gaz', resultsData.prodGaz],
+            ['Nucléaire', resultsData.prodNucleaire],
+            ['PV', resultsData.prodPv],
+            ['Phs', resultsData.prodPhs],
             // CSS-style declaration
         ]);
 
@@ -145,8 +145,9 @@ $(function () {
 
     function EmCO2() {
         let co2Array = [];
-        for (let i = 0; i < 5; i++) {
-            co2Array.push((resultsData.co2[i] === undefined) ? 0 : resultsData.co2[i]);
+        let i = 0
+        for (let year in resultsHistory){
+            co2Array.push((resultsHistory[year].co2 === undefined) ? undefined : resultsHistory[year].co2);
         }
 
         let result3 = google.visualization.arrayToDataTable([
@@ -280,8 +281,8 @@ $(function () {
                 f: resultsData.GazElectrolyse + ' GWh/an'
             }],
                 ['Gaz fossile brulé (équivalent électrique)', {
-                v: resultsData.prodGazFossile[resultsData.annee],
-                f: resultsData.prodGazFossile[resultsData.annee] + ' GWh/an'
+                v: resultsData.prodGazFossile,
+                f: resultsData.prodGazFossile + ' GWh/an'
             }]
         ]);
 
