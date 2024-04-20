@@ -196,7 +196,7 @@ def extraire_chroniques(s, p, prodres, S, B, G, L, N):
     return chroniques
 
 
-def calculer_prod_non_pilot(save,  mix, nbPions):
+def calculer_prod_non_pilot(mix, nb):
 
     fdc_on = pd.read_csv(dataPath + "mix_data/fdc_on.csv")
     fdc_off = pd.read_csv(dataPath + "mix_data/fdc_off.csv")
@@ -213,19 +213,20 @@ def calculer_prod_non_pilot(save,  mix, nbPions):
 
     # On fait la somme des prods par region pour chaque techno (FacteurDeCharge * NbPions * PuissanceParPion)
 
-    for reg in save["capacite"]:
-        prodOnshore += np.array(fdc_on[reg]) * mix[reg]["eolienneON"] * powOnshore
-        prodPV += np.array(fdc_pv[reg]) * mix[reg]["panneauPV"] * powPV
+    for reg in mix["capacites"]:
+        prodOnshore += np.array(fdc_on[reg]) * nb[reg]["eolienneON"] * powOnshore
+        prodPV += np.array(fdc_pv[reg]) * nb[reg]["panneauPV"] * powPV
         if reg != "bfc" and reg != "ara" and reg != "cvl" and reg != "idf" and reg != "est":
-            prodOffshore += np.array(fdc_off[reg]) * mix[reg]["eolienneOFF"] * powOffshore
+            prodOffshore += np.array(fdc_off[reg]) * nb[reg]["eolienneOFF"] * powOffshore
 
     # carte alea MEMFDC (lance 1)
     if mix["alea"] == "MEMFDC1" or mix["alea"] == "MEMFDC2" or mix["alea"] == "MEMFDC3":
-        prodOnshore -= (np.array(fdc_on["cvl"]) * mix["cvl"]["eolienneON"] * powOnshore) * 0.1
+        prodOnshore -= (np.array(fdc_on["cvl"]) * nb["cvl"]["eolienneON"] * powOnshore) * 0.1
 
     # note de Hugo, je ne sais pas à quoi sert cette ligne, l'effet de la carte aléa correspondant est déjà écrit à un autre endroit.
     # Alea +15% prod PV
-    prodPV += save["innovPV"] * prodPV
+    if "innovPV" in mix:
+        prodPV += mix["innovPV"] * prodPV
 
     # Definition des productions electriques des rivières et lacs
     coefriv = 13.
@@ -284,7 +285,7 @@ def result_prod_region(mix, save, nbPions, nvPionsReg, chroniques, L, N, G, S, B
     # carte alea MEMFDC (lance 2 / 3)
     # un an de moins de biomasse en nouvelle aquitaine (impact sur cette année)
     if mix["alea"] == "MEMFDC2":
-        gazBiomasse -= mix["naq"]["biomasse"] * 2. * 0.1 * 0.71 * H
+        gazBiomasse -= nb["naq"]["biomasse"] * 2. * 0.1 * 0.71 * H
 
     s=chroniques["s"]
     p=chroniques["p"]
@@ -325,7 +326,7 @@ def result_prod_region(mix, save, nbPions, nvPionsReg, chroniques, L, N, G, S, B
         EmissionCO2 += save["varEmissions"]
 
     save["co2"].append(EmissionCO2)
-    demande = np.sum(chroniques["demande"])  # variable demande
+    demane_annuelle = np.sum(chroniques["demande"])  # variable demande
 
 
     # calcul des productions par region
@@ -556,7 +557,7 @@ def result_prod_region(mix, save, nbPions, nvPionsReg, chroniques, L, N, G, S, B
               "consoGaz": save["consoGaz"],
               "GazElectrolyse": save["GazElectrolyse"],
               "prodGazFossile": save["prodGazFossile"],
-              "demande": int(demande), "production": prodTotale,
+              "demande": int(demane_annuelle), "production": prodTotale,
               "prodOnshore": save["prodOnshore"], "puissanceEolienneON": round(nbPions["eolienneON"] * powOnshore, 2),
               "prodOffshore": save["prodOffshore"],
               "puissanceEolienneOFF": round(nbPions["eolienneOFF"] * powOffshore, 2),
@@ -610,7 +611,7 @@ def result_couts(mix, save, nbPions, nvPions, nvPionsReg, B, S, N):
     onshoreRemplac = 0
     offshoreRemplac = 0
 
-    for reg in save["capacite"]:
+    for reg in save["capacites"]:
         listNuc = save[reg]["centraleNuc"]
         listOn = save[reg]["eolienneON"]
         listOff = save[reg]["eolienneOFF"]
@@ -722,31 +723,6 @@ def result_ressources(mix, save, nbPions, nvPions, ):
     dechet += nbPions["centraleNuc"] + nbPions["EPR2"]
     save["scores"]["Dechet"] = dechet
 
-    capmax_info = save["capacite"]
-    # carte alea MECS (lance 1 / 2)
-    if mix["alea"] == "MECS1" or mix["alea"] == "MECS2" or mix["alea"] == "MECS3":
-        for k in capmax_info:
-            capmax_info[k]["eolienneON"] = int(capmax_info[k]["eolienneON"] * 0.4)
-
-    if mix["alea"] == "MECS2" or mix["alea"] == "MECS3":
-        capmax_info["occ"]["eolienneON"] *= 2
-        capmax_info["occ"]["panneauPV"] *= 2
-
-    # carte alea MEGDT (lance 2)
-    if mix["alea"] == "MEGDT2" or mix["alea"] == "MEGDT3":
-        capmax_info["naq"]["eolienneOFF"] += 1
-        capmax_info["pac"]["eolienneOFF"] += 1
-
-    save["capacite"] = capmax_info
-
-    for k in capmax_info:
-        if (nbPions["eolienneON"] > capmax_info[k]["eolienneON"]
-                or nbPions["eolienneOFF"] > capmax_info[k]["eolienneOFF"]
-                or nbPions["panneauPV"] > capmax_info[k]["panneauPV"] - 11 * nbPions["eolienneON"]
-                or nbPions["biomasse"] > capmax_info[k]["biomasse"] - 33 * nbPions["eolienneON"] - 3 * nbPions[
-                    "panneauPV"]):
-            pass
-            # AVERTISSEMENT
 
     result = {"sol": round((Sol / 551695) * 100, 4),
               "scoreUranium": Uranium, "scoreHydro": Hydro, "scoreBois": Bois, "scoreDechets": dechet,
@@ -776,7 +752,7 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     # scenario += np.ones(H) * (save["varConso"]/H)
 
     if mix["alea"] == "MEVUAPV2" or mix["alea"] == "MEVUAPV3":
-        save["innovPV"] = 0.15
+        mix["innovPV"] = 0.15
 
     # carte alea MEMDA (lance 3)
     if mix["alea"] == "MEMDA3":
@@ -797,12 +773,14 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
 
     S = te.TechnoStep()
     B = te.TechnoBatteries(nb_units=mix["stock"])
-    G = te.TechnoGaz(nb_units=nbPions["methanation"])
+    G = te.TechnoGaz(nb_units=mix["methanation"])
     L = te.TechnoLacs()
 
     # reacteurs nucleaires effectifs qu'après 1 tour
-    nbProdNuc = nbPions["centraleNuc"]
-    nbProdNuc2 = (nbPions["EPR2"] - nvPions["EPR2"])
+    nbProdNuc = mix["centraleNuc"]
+    #nbProdNuc2 = (nbPions["EPR2"] - nvPions["EPR2"])
+    nbProdNuc2 = mix["EPR2"]
+
     N = te.TechnoNucleaire(nb_units_EPR=nbProdNuc, nb_units_EPR2=nbProdNuc2)
 
     if mix["alea"] == "MEMFDC3":
@@ -814,32 +792,84 @@ def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
     chroniques.update(extraire_chroniques(s=s, p=p, prodres=prodresiduelle,
                                           S=S, B=B, G=G, L=L, N=N))
 
-    result = result_prod_region(mix=mix, save=save, nbPions=nbPions, nvPionsReg=nvPionsReg,
-                                 chroniques=chroniques, L=L, N=N, G=G, S=S, B=B)
-    result.update(result_couts(mix, save, nbPions, nvPions, nvPionsReg, B, S, N))
+    result= {}
+    #result = result_prod_region(mix=mix, save=save, nbPions=nbPions, nvPionsReg=nvPionsReg,
+    #                             chroniques=chroniques, L=L, N=N, G=G, S=S, B=B)
+    #result.update(result_couts(mix, save, nbPions, nvPions, nvPionsReg, B, S, N))
 
-    result.update(result_ressources(mix, save, nbPions, nvPions))
+    #result.update(result_ressources(mix, save, nbPions, nvPions))
 
-    replaceList = []
-    nbReplace = 0
-    for reg in save["capacite"]:
-        for p in save[reg]:
-            nbReplace = 0
-
-            if p == "centraleNuc":
-                for y in save[reg][p]:
-                    if y == save["annee"] - 40:
-                        nbReplace += 1
-
-            elif p == "eolienneON" or p == "eolienneOFF":
-                for y in save[reg][p]:
-                    if y == save["annee"] - 15:
-                        nbReplace += 1
-
-            if nbReplace > 0:
-                replaceList.append([nbReplace, p, reg])
-
-    result.update({"remplacement": replaceList})
 
     return result, save, chroniques
 
+
+def simuler(demande, electrolyse, mix, nb):
+    """ Optimisation de strategie de stockage et de destockage du Mix energetique
+
+    Args:
+        demande (array) : scenario de consommation heure par heure
+        mix (dict) : donnees du plateau
+        save (dict) : donnees du tour precedent
+        nbPions (dict) : nombre de pions total pour chaque techno
+        nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
+        nvPionsReg (dict) : nombre de pions total pour chaque techno
+        electrolyse (float) : demande en electrolyse du scenar (kWh)
+    Returns:
+        result (dict) : dictionnaire contenant les résultats d'une seule année (result sans s à la fin)
+    """
+
+    # carte alea MEVUAPV  (lance de 1 / 2)
+    # if mix["alea"] == "MEVUAPV1" or mix["alea"] == "MEVUAPV2" or mix["alea"] == "MEVUAPV3":
+    #     save["varConso"] = 9e4
+    # scenario += np.ones(H) * (save["varConso"]/H)
+
+    if mix["alea"] == "MEVUAPV2" or mix["alea"] == "MEVUAPV3":
+        mix["innovPV"] = 0.15
+
+    # carte alea MEMDA (lance 3)
+    if mix["alea"] == "MEMDA3":
+        demande = 0.95 * demande
+
+    chroniques = {"demande": demande,
+                  "electrolyse": electrolyse}
+
+    chroniques.update(calculer_prod_non_pilot(mix, nb))
+
+    # Calcul de la production residuelle
+    # prodresiduelle = prod2006_offshore + prod2006_onshore + prod2006_pv + rivprod - scenario
+    prodresiduelle = chroniques["prodOffshore"] + chroniques["prodOnshore"] + chroniques["prodPV"] + chroniques[
+        "rivprod"] - demande
+
+    # Definition des differentes technologies
+
+    # Techno params : name, stored, prod, etain, etaout, Q, S, vol
+
+    S = te.TechnoStep()
+    B = te.TechnoBatteries(nb_units=mix["stock"])
+    G = te.TechnoGaz(nb_units=nb["methanation"])
+    L = te.TechnoLacs()
+
+    # reacteurs nucleaires effectifs qu'après 1 tour
+    nbProdNuc = nb["centraleNuc"]
+    # nbProdNuc2 = (nbPions["EPR2"] - nvPions["EPR2"])
+    nbProdNuc2 = nb["EPR2"]
+
+    N = te.TechnoNucleaire(nb_units_EPR=nbProdNuc, nb_units_EPR2=nbProdNuc2)
+
+    if mix["alea"] == "MEMFDC3":
+        N.PoutMax *= 45 / 60
+
+    s, p = strat_stockage(prodres=prodresiduelle, Step=S, Battery=B,
+                          Gas=G, Lake=L, Nuclear=N)
+
+    chroniques.update(extraire_chroniques(s=s, p=p, prodres=prodresiduelle,
+                                          S=S, B=B, G=G, L=L, N=N))
+
+    result = {}
+    # result = result_prod_region(mix=mix, save=save, nbPions=nbPions, nvPionsReg=nvPionsReg,
+    #                             chroniques=chroniques, L=L, N=N, G=G, S=S, B=B)
+    # result.update(result_couts(mix, save, nbPions, nvPions, nvPionsReg, B, S, N))
+
+    # result.update(result_ressources(mix, save, nbPions, nvPions))
+
+    return result, chroniques

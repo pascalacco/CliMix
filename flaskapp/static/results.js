@@ -406,7 +406,6 @@ $(function () {
         location.href = "/manual";
     });
 
-
     // DEBUT EXECUTION PAGE
 
     $.ajax({

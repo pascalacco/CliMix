@@ -44,5 +44,5 @@ if __name__ == "__main__":
 
     chroniques = dm.get_chroniques()
     self = vi.vProduction(chroniques)
-    self.show(self.fig_prod())
-    #self.show(self.fig_stock())
+    #self.show(self.fig_prod())
+    self.show(self.fig_stock())

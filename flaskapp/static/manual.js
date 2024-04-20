@@ -3,9 +3,6 @@ $(function () {
 
     let exitConfirm = false; // METTRE A TRUE LORS DU DEPLOIEMENT
 
-    onbeforeunload = function () {
-        if (exitConfirOupsm) return "Etes-vous sûr(e) de vouloir quitter cette page ? Vos modifications seront perdues."
-    }
 
 
     let mixData = null;
@@ -28,7 +25,7 @@ $(function () {
             divStr += `<div class="region" id="${reg[0]}"> <h3 class="row mt-1  ps-3 bg-primary rounded bg-opacity-50 ">${reg[1]}</h3>`;
             for (const pion of pions) {
                 divStr += `<div class="row align-items-top">
-                        <div class="col-auto mt-1">${pion[1]}</div>
+                        <div class="col-auto mt-1" id="${reg[0]}_${pion[0]}_nom">${pion[1]}</div>
                         <div class="col-auto mt-1">
                             <input value="0" min="0" max="10" type="number" id="${reg[0]}_${pion[0]}" class="form-control-sm"/>
                         </div>
@@ -36,6 +33,7 @@ $(function () {
                             <button class="btn btn-basic col-1" type="button" id="${reg[0]}_${pion[0]}_minus">➖</button>
                             <button class="btn btn-basic col-1" type="button" id="${reg[0]}_${pion[0]}_plus">➕</button>
                         </div>
+                        
                     </div>`;
 
             }
@@ -114,8 +112,8 @@ $(function () {
                 for (const p of pions) {
                     const str = $(`#${reg[0]}_${p[0]}`).val();
                     const nb = parseFloat(str);
-                    if (str == "" || nb < 0 || nb > 100 || !(Number.isInteger(nb))) {
-                        alert("Veuillez entrer des nombres entiers entre 0 et 100 seulement.");
+                    if (str == "" || nb < -100 || nb > 100 || !(Number.isInteger(nb))) {
+                        alert("Veuillez entrer des nombres entiers entre -100 et 100 seulement.");
                         err = 1;
                     }
                     data[reg[0]][p[0]] = nb;
@@ -142,11 +140,8 @@ $(function () {
             annee = Number(mixData.annee);
             $("#annee").val(annee.toString());
             $("#stock").val(mixData.stock.toString());
-            if (mixData.alea == "") {
-                $("#alea").val(aleas[Math.floor(Math.random() * aleas.length)]);
-            } else {
-                $("#alea").val(mixData.alea);
-            }
+            $("#alea").val(mixData.alea);
+
         }
         let replace = null;
         if (annee == "2030") {
@@ -166,7 +161,8 @@ $(function () {
 
         for (const reg of maps[mixData.carte]) {
             for (const pion of pions) {
-                $(`#${reg[0]}_${pion[0]}`).val(mixData[reg[0]][pion[0]]);
+                $(`#${reg[0]}_${pion[0]}`).val(mixData[reg[0]][pion[0]].length);
+                $(`#${reg[0]}_${pion[0]}_nom`).html($(`#${reg[0]}_${pion[0]}_nom`).text() + "["+mixData[reg[0]][pion[0]].toString()+"]");
 
             }
         }

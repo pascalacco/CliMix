@@ -5,7 +5,7 @@ import datetime
 import traceback
 import os
 
-dataPath = os.path.dirname(os.path.realpath(__file__))+'/'
+dataPath = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 from bokeh.resources import INLINE
 
@@ -15,7 +15,6 @@ from climix import visualiseur
 
 # Set up Flask:
 app = Flask(__name__)
-
 
 # Bypass CORS at the front end:
 cors = CORS(app)
@@ -39,17 +38,17 @@ def set_group():
 
         dm = DataManager(equipe=equipe, partie=partie)
         if action == "new":
-            dm.init_partie()
-
+            maitre_de_jeu.initialise_partie(dm)
         if dm.est_ok():
             resp = make_response(jsonify(["log_in_success"]))
             resp.set_cookie(key="groupe", value=equipe, samesite="Lax")
             resp.set_cookie(key="equipe", value=partie, samesite="Lax")
         else:
             if action != "new":
-                resp = make_response(["err", "Partie " + equipe +"/" + partie + " n'existe pas. <br>Cliquez sur le bouton 'nouvelle partie' pour la créer "])
+                resp = make_response(["err",
+                                      "Partie " + equipe + "/" + partie + " n'existe pas. <br>Cliquez sur le bouton 'nouvelle partie' pour la créer "])
             else:
-                resp = make_response(jsonify(["log_in_error pour " +equipe + "/" + partie]))
+                resp = make_response(jsonify(["log_in_error pour " + equipe + "/" + partie]))
     except:
         with open(dataPath + 'logs.txt', 'a') as logs:
             logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
@@ -81,6 +80,27 @@ def manual_html():
     return resp
 
 
+@app.route('/saisie/<equipe>/<partie>/<annee>')
+def saisie_html(equipe, partie, annee):
+    try:
+        dm = DataManager(equipe=equipe, partie=partie)
+        mix = maitre_de_jeu.recup_mix(dm, annee)
+        resp = make_response(
+            render_template("saisie.html", equipe=equipe, partie=partie, annee=annee,
+                            unites=mix["unites"], nb=mix["nb"], capacites=mix["capacites"], actions=mix["actions"],
+                            reg_convert=maitre_de_jeu.reg_convert, pion_convert=maitre_de_jeu.pion_convert,
+                            )
+        )
+
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+
+        resp = ["err", traceback.format_exc()]
+
+    return resp
+
+
 @app.route('/get_mix')
 @cross_origin(support_credentials=True)
 def get_mix():
@@ -88,6 +108,7 @@ def get_mix():
         equipe = request.cookies.get("groupe")
         partie = request.cookies.get("equipe")
         dm = DataManager(equipe=equipe, partie=partie)
+        return get_mix_partie(equipe=equipe, partie=partie, dm=dm)
 
         mix = dm.get_fichier("mix")
 
@@ -97,6 +118,57 @@ def get_mix():
             logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
 
         return ["err", traceback.format_exc()]
+
+
+@app.route('/get_mix/<equipe>/<partie>')
+def get_mix_partie(equipe, partie, dm):
+    save = dm.get_fichier(fichier="save")
+    annee = save['annee'].__str__()
+    return get_mix_annee(equipe=equipe, partie=partie, annee=annee, dm=dm)
+
+
+@app.route('/get_mix/<equipe>/<partie>/<annee>')
+def get_mix_annee(equipe, partie, annee, dm=None):
+    """
+        Récupère le bon mix avec le datamanger dm.
+        Si l'année est la suivante créée un nouveau mix)
+    :param equipe:
+    :param partie:
+    :param annee:
+    :param dm: DataManager
+    """
+    try:
+        if dm is None:
+            dm = DataManager(equipe=equipe, partie=partie)
+
+        mix = maitre_de_jeu.recup_mix(dm=dm, annee=annee)
+        return jsonify(mix)
+
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+
+        return ["err", traceback.format_exc()]
+
+
+@app.route('/calculer/<equipe>/<partie>/<annee>', methods=["POST"])
+def calculer(equipe, partie, annee):
+    try:
+        dm = DataManager(equipe=equipe, partie=partie)
+        actions = request.get_json()
+        resp = maitre_de_jeu.calculer(dm=dm, annee=annee, actions=actions, scenario=partie)
+
+    except maitre_de_jeu.errJeu as ex:
+
+        resp = ["errJeu", ex.__str__()]
+
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+        resp = ["err", traceback.format_exc()]
+    resp = jsonify(resp)
+
+    return resp
 
 
 # Create the production API POST endpoint:
@@ -110,6 +182,10 @@ def prodCompute():
 
         data = request.get_json()
         save = dm.get_fichier("save")
+
+        if "alea" not in save or save["alea"] != data["alea"]:
+            save["capacite"] = maitre_de_jeu.nouv_capacite_alea(mix=save, alea=data["alea"])
+            dm.set_item_fichier(fichier="save", item="capacite", val=save["capacite"])
 
         maitre_de_jeu.assert_capacitees(save, data)
 
@@ -127,11 +203,34 @@ def prodCompute():
         dm.set_item_fichier(fichier='resultats', item=annee, val=result)
 
         resp = ["success"]
-
-        dm.set_fichier(fichier='mix', dico=data)
+        data["capacite"] = save["capacite"]
+        dm.set_item_fichier(fichier='mixes', item=annee, val=data)
 
     except maitre_de_jeu.errJeu as ex:
         resp = ["errJeu", ex.__str__()]
+
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+        resp = ["err", traceback.format_exc()]
+    resp = jsonify(resp)
+
+    return resp
+
+@app.route("/commit/<equipe>/<partie>/<annee>")
+def commit(equipe, partie, annee):
+    try:
+        dm = DataManager(equipe=equipe, partie=partie)
+        annee_suivante = (int(annee) + 5).__str__()
+        new = dm.get_fichier("new")
+        new["actif"] = False
+
+        dm.set_item_fichier(fichier='mixes', item=annee, val=new)
+
+        if annee_suivante == 2055:
+            return redirect("/")
+        else:
+            return redirect("/saisie/"+equipe+"/"+partie+"/"+annee_suivante)
 
     except:
         with open(dataPath + 'logs.txt', 'a') as logs:
@@ -145,13 +244,14 @@ def prodCompute():
 @app.route("/commit")
 @cross_origin(supports_credentials=True)
 def commitResults():
-    try :
+    try:
         equipe = request.cookies.get("groupe")
         partie = request.cookies.get("equipe")
         dm = DataManager(equipe=equipe, partie=partie)
-
         newSave = dm.cp_fichier(src='save_tmp', dst='save')
-        mix = dm.set_item_fichier(fichier='mix', item='actif', val=False)
+        annee_terminee = (newSave["annee"] - 5).__str__()
+
+        mix = dm.set_item_enfouis_dans_fichier(fichier='mixes', items=[annee_terminee, 'actif'], val=False)
 
         if newSave["annee"] == 2055:
             return redirect("/")
@@ -166,6 +266,7 @@ def commitResults():
 
     return resp
 
+
 @app.route('/vues/<vue>')
 @app.route('/vues/')
 @app.route('/vues')
@@ -174,6 +275,19 @@ def vues(vue="resultats"):
     try:
         equipe = request.cookies.get("groupe")
         partie = request.cookies.get("equipe")
+        return vues_html(equipe=equipe, partie=partie, vue=vue)
+
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+        resp = ["err", traceback.format_exc()]
+    return resp
+
+
+@app.route('/vues/<equipe>/<partie>/<annee>')
+@app.route('/vues/<equipe>/<partie>/<annee>/<vue>')
+def vues_html(equipe, partie, annee, vue="resultats"):
+    try:
         dm = DataManager(equipe=equipe, partie=partie)
 
         if (equipe is None) or (partie is None):
@@ -187,8 +301,7 @@ def vues(vue="resultats"):
             resources = INLINE.render()
             script = composants["script"]
             divs = composants["divs"]
-            jinja_params = {"group": equipe,
-                            "team": partie,
+            jinja_params = {"equipe": equipe, "partie": partie, "annee": annee,
                             "vue": vue,
                             "bokeh_ressources": INLINE.render(),
                             "bokeh_script": script,
@@ -202,7 +315,7 @@ def vues(vue="resultats"):
             except:
                 resp = make_response(
                     render_template("vue_generique.html", **jinja_params)
-                    )
+                )
 
     except:
         with open(dataPath + 'logs.txt', 'a') as logs:

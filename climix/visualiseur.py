@@ -103,13 +103,13 @@ class Visualiseur:
 
         return fig
 
-    def range_fig(self, deb=24 * 31, fin=24 * 31 + 24 * 7):
-        p = bkp.figure(height=300, width=800, tools="xpan", toolbar_location=None,
+    def range_fig(self, deb=24 * 31, fin=24 * 31 + 24 * 14):
+        p = bkp.figure(height=150, width=800, tools="xpan", toolbar_location=None,
                        x_axis_type="datetime", x_axis_location="below", sizing_mode="scale_width",
                        background_fill_color="#efefef", x_range=(self.dates[deb], self.dates[fin]))
 
         select = bkp.figure(title="Déplacez le milieu ou un bord du rectangle",
-                            height=130, width=800, y_range=p.y_range, sizing_mode="scale_width",
+                            height=80, width=800, y_range=p.y_range, sizing_mode="scale_width",
                             x_axis_type="datetime", y_axis_type=None,
                             tools="", toolbar_location=None, background_fill_color="#efefef")
 
@@ -147,7 +147,20 @@ class vProduction(Visualiseur):
 
         self.source = bk.models.ColumnDataSource(self.chroniques)
 
-        s, select = self.range_fig()
+        p, select = self.range_fig()
+
+        p.add_layout(bk.models.Legend(), 'right')
+        p.legend.click_policy = "mute"
+        p = self.stack_plot(cols=prods, fig=p)
+        p.line(x='date', y='demande', source=self.source, line_width=2, color="black", legend_label=noms['demande'])
+        p.yaxis.axis_label = 'productions hors stoc/destock et gaz (GW)'
+        p.legend.click_policy = "mute"
+        hover = bk.models.HoverTool(tooltips=[("Value", "@demande")])
+        p.add_tools(hover)
+
+        s = bkp.figure(height=150, width=800, tools=["box_zoom"], toolbar_location=None,
+                       x_axis_type="datetime", x_axis_location="below", sizing_mode="scale_width",
+                       background_fill_color="#efefef", x_range=p.x_range)
 
         s.add_layout(bk.models.Legend(), 'right')
         s.legend.click_policy = "mute"
@@ -161,40 +174,35 @@ class vProduction(Visualiseur):
         s.yaxis.axis_label = 'stock/déstock élec. + gaz. (GW)'
         s.legend.click_policy = "mute"
 
-
-        p = bkp.figure(height=300, width=800, tools=["box_zoom"], toolbar_location=None,
+        stock = bkp.figure(height=150, width=800, tools=["box_zoom"], toolbar_location=None,
                        x_axis_type="datetime", x_axis_location="below", sizing_mode="scale_width",
-                       background_fill_color="#efefef", x_range=s.x_range)
-        p.add_layout(bk.models.Legend(), 'right')
-        p.legend.click_policy = "mute"
-        p = self.stack_plot(cols=prods, fig=p)
-        p.line(x='date', y='demande', source=self.source, line_width=2, color="black", legend_label=noms['demande'])
-        p.yaxis.axis_label = 'productions hors stoc/destock et gaz (GW)'
-        p.legend.click_policy = "mute"
-        hover = bk.models.HoverTool(tooltips=[("Value", "@demande")])
-        p.add_tools(hover)
-        #select.line('date', 'demande', source=self.source)
-        select = self.stack_plot(cols=prod_stock, fig=select, pas_de_legende=True)
-        select = self.stack_plot(cols=cons_stock, fig=select, pas_de_legende=True)
-        fig = column(select, p, s, sizing_mode="scale_width")
+                       background_fill_color="#efefef", x_range=p.x_range)
+        stock = self.fig_stock(s=stock)
+        select = self.stack_plot(cols=prods, fig=select, pas_de_legende=True)
+        fig = column(select, p, s, stock, sizing_mode="scale_width")
         return fig
 
-    def fig_stock(self):
+    def fig_stock(self, s = None):
 
-        s, select = self.range_fig()
+        stock = ["Lstored", "Sstored", "Bstored", ]
+
+        if s is None:
+            s, select = self.range_fig()
+            select = self.stack_plot(cols=stock, fig=select, pas_de_legende=True)
+        else:
+            select=None
 
         s.add_layout(bk.models.Legend(), 'right')
         s.legend.click_policy = "mute"
 
-        stock = ["Lstored", "Bstored", "Sstored"]
-        self.stack_plot(stock, fig=s)
-        s.yaxis.axis_label = 'stock  (GWh)'
+        s = self.stack_plot(cols=stock, fig=s)
+        s.yaxis.axis_label = 'stocks (GWh)'
         s.legend.click_policy = "mute"
 
-        #select.line('date', 'demande', source=self.source)
-        select = self.stack_plot(cols=stock, fig=select, pas_de_legende=True)
-        fig = column(select, s)
-        return fig
+        if select is not None:
+            return column(select, s, sizing_mode="scale_width")
+        else:
+            return s
 
     def fig_penuries(self):
         from bokeh.palettes import tol
@@ -216,9 +224,7 @@ class vProduction(Visualiseur):
             pass
 
     def set_figs(self):
-        fig = self.fig_prod()
-        self.set_fig(fig, "production")
-        self.set_fig(self.fig_stock(), "stocks")
+        self.set_fig(self.fig_prod(), "Pilotage de la production")
 
 
 vuesClasses = {"resultats": Visualiseur,

@@ -3,6 +3,7 @@
 
 
 {% block head %}
+    {{ super() }}
 
     {{ bokeh_ressources|safe }}
 
@@ -17,15 +18,19 @@
 
 
 {% block content %}
+    {{ super() }}
     <h1>{% block title %} {{ vue }} * {% endblock %}</h1>
-    <col class="embed-wrapper">
         {% for nom, div in bokeh_divs.items() %}
-             {{ nom }}
-
-            {{ div|safe }}
+            <row>
+                <col class="embed-wrapper">
+                    <h3> {{ nom }} </h3>
+                        {{ div|safe }}
+                </col>
+            </row>
 
         {% endfor %}
-    </col>
+
     {{ bokeh_script|safe  }}
+
 
 {% endblock %}

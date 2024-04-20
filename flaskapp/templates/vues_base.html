@@ -1,95 +1,60 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="utf-8">
-    <meta name="author" content="Pascal Acco">
-    <meta name="description" content="Page view">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>{% block title %} {% endblock %}</title>
-
-    <link rel="icon" type="image/x-icon" href="static/img/favicon.ico">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-          crossorigin="anonymous">
+{% extends 'bandeau_base.html' %}
 
 
-    {% block head %} {% endblock %}
+{% block title %} Visualisation {% endblock %}
 
-</head>
-<body>
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg  bg-light navbar-light">
-    <div class="container">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="/">
-                <img id="Climix-logo"
-                     src="/static/logo.png"
-                     alt="Climix Logo"
-                     draggable="false"
-                     height="60"
-                />
-            </a>
-            <a class="navbar-brand" href="#">
-                Résultats
-            </a>
-        </div>
-        <button
-                class="navbar-toggler"
-                type="button"
-                data-mdb-toggle="collapse"
-                data-mdb-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-        >
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item">
-                    <a>Groupe : <span class="badge bg-secondary">{{group}}</span></a>
-                </li>
-                <li class="nav-item">
-                    <a>Scénario : <span class="badge bg-secondary">{{team}}</span></a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+
+
+{% block content %}
+{{ super() }}
 
 <div class="row">
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a class="nav-link {% if vue == 'resultats' %} active {% endif %}" href="/vues/resultats">Résultats</a>
+            <a class="nav-link {% if vue == 'resultats' %} active {% endif %}"
+            onclick="spin('resultats')" id="resultats">Résultats</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if vue == 'production' %} active {% endif %}" aria-current="page"
-               href="/vues/production">Production</a>
+            <button type="button" class="nav-link {% if vue == 'production' %} active {% endif %}" aria-current="page"
+              onclick="spin('production')" id="production">Production</button>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if vue == 'scenario' %} active {% endif %}" aria-current="page"
-               href="/vues/scenario">Scenario</a>
+               onclick="spin('scenario')" id="scenario" >Scenario</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/results">Résultats (old)</a>
         </li>
+        <div class="text-center mt-3 mb-5">
+            <button class="btn btn-success" onclick="window.location.href = '/saisie/{{equipe}}/{{partie}}/{{annee}}';" type="button">< Retourner au mix pour le modifier</button>
+            {% set annee_int = annee | int%}
+            {% set next_annee = (annee_int +5) | safe%}
+            <button class="btn btn-success" onclick="window.location.href = '/commit/{{equipe}}/{{partie}}/{{annee}}';" type="button">Valider ce mix et passer au tour suivant >
+            </button>
+        </div>
     </ul>
+
 </div>
 
-{% block content %} {% endblock %}
 
- <div class="text-center mt-3 mb-5">
-            <button class="btn btn-success" onclick="window.location.href = '/manual';" type="button">< Retourner au mix pour le modifier</button>
-            <button class="btn btn-success" onclick="window.location.href = '/commit';" type="button">Valider ce mix et passer au tour suivant >
-            </button>
- </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
 
-{% block endscripts %} {% endblock %}
-</body>
-</html>
+{% endblock %}
+
+
+
+
+{% block endscripts %}
+
+{{ super() }}
+
+
+
+<script type="text/javascript" src="/static/vues.js"></script>
+
+ {% endblock %}

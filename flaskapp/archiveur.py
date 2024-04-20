@@ -109,8 +109,8 @@ class DataManager:
 
     """
     chemin = os.path.dirname(os.path.realpath(__file__))
-    fichiers = ["save", "mix", "resultats", "inputs", "logs"]
-    fichiers_init = ["save", "mix", "resultats", "inputs", "logs"]
+    fichiers = ["save", "mix", "mixes", "resultats", "inputs", "logs"]
+    fichiers_init = ["save", "mix", "mixes", "resultats", "inputs", "logs"]
     json_opts = {"indent": 4, "sort_keys": False}
     init_path = chemin+ "/game_data/"
 
@@ -187,8 +187,22 @@ class DataManager:
         return dico
 
     def set_item_fichier(self, fichier, item, val, ext=".json"):
+
         dico = self.get_fichier(fichier)
+
         dico[item] = val
+
+        self.set_fichier(fichier, dico)
+        return dico
+
+    def set_item_enfouis_dans_fichier(self, fichier, items, val, ext=".json"):
+
+        dico = self.get_fichier(fichier)
+        dicit=dico
+        for un_item in items[:-1]:
+            dicit = dicit[un_item]
+        dicit[items[-1]]= val
+
         self.set_fichier(fichier, dico)
         return dico
 
