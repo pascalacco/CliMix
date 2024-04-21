@@ -35,23 +35,21 @@ $(function () {
 
 
         let result1 = google.visualization.arrayToDataTable([['Technologie', 'Pourcentage', 'Unité'],
-            ['EON', resultsData.puissanceEolienneON / TotalP, 'GW'],
-            ['EOFF', resultsData.puissanceEolienneOFF / TotalP, 'GW'],
-            ['Batterie', resultsData.puissanceBatterie / TotalP, 'GW'],
-            ['Nucléaire', resultsData.puissanceNucleaire / TotalP, 'GW'],
-            ['PV', resultsData.puissancePV / TotalP, 'GW'],
-            ['Phs', resultsData.puissancePhs / TotalP, 'GW'],
-            ['Gaz', resultsData.puissanceGaz / TotalP, 'GW']
+            ['ONshore', resultsData.puissanceEolienneON , 'GW'],
+            ['OFFshore', resultsData.puissanceEolienneOFF , 'GW'],
+            ['Batterie', resultsData.puissanceBatterie, 'GW'],
+            ['Nucléaire', resultsData.puissanceNucleaire , 'GW'],
+            ['PV', resultsData.puissancePV, 'GW'],
+            ['Step', resultsData.puissancePhs, 'GW'],
+            ['Gaz2power', resultsData.puissanceGaz, 'GW']
         ]);
 
         let options = {
-            title: 'Puissance installée'
+            title: 'Puissance installée' + " : " + Math.round(TotalP) + " GW"
         };
 
 
-        // Concaténez la valeur à la chaîne 'Puissance Installée' et affichez-la dans l'élément <div>
-        let powStr = options.title + " : " + Math.round(TotalP) + " GW";
-        $("#output").text(powStr);
+
 
 
         // Instantiate and draw the chart.
@@ -81,12 +79,12 @@ $(function () {
     }
 
     function conso() {
-        let table = [['Année', 'EON', 'EOFF', 'Batterie', 'Nucléaire',
-                'PV', 'Hydraulique', 'Phs', 'Gaz Fossile', 'Gaz autres', {role: 'annotation'}]];
+        let table = [['Année', 'ONshore', 'OFFshore', 'Batterie', 'Nucléaire',
+            'PV', 'Riv+Lacs', 'Step', 'Gaz2power', {role: 'annotation'}]];
 
 
-        for(let year in resultsHistory){
-            let line=[];
+        for (let year in resultsHistory) {
+            let line = [];
             line.push(year);
             line.push(resultsHistory[year].prodOnshore);
             line.push(resultsHistory[year].prodOffshore);
@@ -95,43 +93,20 @@ $(function () {
             line.push(resultsHistory[year].prodPv);
             line.push(resultsHistory[year].prodEau);
             line.push(resultsHistory[year].prodPhs);
-            line.push(resultsHistory[year].prodGazFossile);
-            line.push(resultsHistory[year].prodGaz-resultsHistory[year].prodGazFossile);
+            line.push(resultsHistory[year].prodGaz);
             line.push("");
             table.push(line)
-        };
+        }
+        ;
         let resultamoi = google.visualization.arrayToDataTable(table);
 
-        let result8 = google.visualization.arrayToDataTable([
-            ['Année', 'EON', 'EOFF', 'Batterie', 'Nucléaire',
-                'PV', 'Hydraulique', 'Phs', 'Gaz Fossile', 'Gaz autres', {role: 'annotation'}],
 
-            ['2030', resultsData.prodOnshore["2030"], resultsData.prodOffshore["2030"], resultsData.prodBatterie["2030"],
-                resultsData.prodNucleaire["2030"], resultsData.prodPv["2030"], resultsData.prodEau["2030"],
-                resultsData.prodPhs["2030"], resultsData.prodGazFossile["2030"], (resultsData.prodGaz["2030"] - resultsData.prodGazFossile["2030"]), ''],
-
-            ['2035', resultsData.prodOnshore["2035"], resultsData.prodOffshore["2035"], resultsData.prodBatterie["2035"],
-                resultsData.prodNucleaire["2035"], resultsData.prodPv["2035"], resultsData.prodEau["2035"],
-                resultsData.prodPhs["2035"], resultsData.prodGazFossile["2035"], (resultsData.prodGaz["2035"] - resultsData.prodGazFossile["2035"]), ''],
-
-            ['2040', resultsData.prodOnshore["2040"], resultsData.prodOffshore["2040"], resultsData.prodBatterie["2040"],
-                resultsData.prodNucleaire["2040"], resultsData.prodPv["2040"], resultsData.prodEau["2040"],
-                resultsData.prodPhs["2040"], resultsData.prodGazFossile["2040"], (resultsData.prodGaz["2040"] - resultsData.prodGazFossile["2040"]), ''],
-
-            ['2045', resultsData.prodOnshore["2045"], resultsData.prodOffshore["2045"], resultsData.prodBatterie["2045"],
-                resultsData.prodNucleaire["2045"], resultsData.prodPv["2045"], resultsData.prodEau["2045"],
-                resultsData.prodPhs["2045"], resultsData.prodGazFossile["2045"], (resultsData.prodGaz["2045"] - resultsData.prodGazFossile["2045"]), ''],
-
-            ['2050', resultsData.prodOnshore["2050"], resultsData.prodOffshore["2050"], resultsData.prodBatterie["2050"],
-                resultsData.prodNucleaire["2050"], resultsData.prodPv["2050"], resultsData.prodEau["2050"],
-                resultsData.prodPhs["2050"], resultsData.prodGazFossile["2050"], (resultsData.prodGaz["2050"] - resultsData.prodGazFossile["2050"]), ''],
-        ]);
 
         let options = {
             width: 600,
-            title: 'Production par technologie (en GWh)',
+            title: 'Production électrique par technologie (en GWh)',
             height: 400,
-            legend: {position: 'top', maxLines: 3},
+            legend: {position: 'right'},
             bar: {groupWidth: '75%'},
             isStacked: true,
         };
@@ -144,19 +119,19 @@ $(function () {
     function Prod() {
         let result2 = google.visualization.arrayToDataTable([
             ['Technologie', 'Production'],
-            ['EON', resultsData.prodOnshore],            // RGB value
-            ['EOFF', resultsData.prodOffshore],            // English color name
+            ['ONshore', resultsData.prodOnshore],            // RGB value
+            ['OFFshore', resultsData.prodOffshore],            // English color name
             ['Batterie', resultsData.prodBatterie],
-            ['Hydraulique', resultsData.prodEau],
-            ['Gaz', resultsData.prodGaz],
+            ['Riv. + Lacs', resultsData.prodEau],
+            ['Gaz 2 Power', resultsData.prodGaz],
             ['Nucléaire', resultsData.prodNucleaire],
             ['PV', resultsData.prodPv],
-            ['Phs', resultsData.prodPhs],
+            ['Step', resultsData.prodPhs],
             // CSS-style declaration
         ]);
 
         let options = {
-            title: 'Production (en GWh)',
+            title: 'Production électrique (en GWh)',
             legend: 'none'
         };
 
@@ -167,8 +142,8 @@ $(function () {
     function EmCO2() {
         let co2Array = [];
         let i = 0
-        for (let year in resultsHistory){
-            co2Array.push((resultsHistory[year].co2 === undefined) ? undefined : resultsHistory[year].co2);
+        for (let year in resultsHistory) {
+            co2Array.push(resultsHistory[year].co2);
         }
 
         let result3 = google.visualization.arrayToDataTable([
@@ -196,7 +171,7 @@ $(function () {
 
     function PenSurBar1() {
         let result4 = new google.visualization.arrayToDataTable([
-            ['Heures', 'nombre de pénuries', 'nombre de surplus'],
+            ['Heures', 'Pénuries', 'Surplus'],
             [{v: [0, 0, 0], f: '0 am'}, resultsData.penuriesHoraire[0], resultsData.surplusHoraire[0]],
             [{v: [1, 0, 0], f: '1 am'}, resultsData.penuriesHoraire[1], resultsData.surplusHoraire[1]],
             [{v: [2, 0, 0], f: '2 am'}, resultsData.penuriesHoraire[2], resultsData.surplusHoraire[2]],
@@ -247,8 +222,8 @@ $(function () {
     function PenSurBar2() {
         let result5 = new google.visualization.arrayToDataTable([]);
         result5.addColumn('number', "Jours de l'année");
-        result5.addColumn('number', 'nombre de pénuries');
-        result5.addColumn('number', 'nombre de surplus');
+        result5.addColumn('number', 'Pénuries');
+        result5.addColumn('number', 'Surplus');
 
         for (let i = 0; i < 365; i++) {
             result5.addRow([i + 1, resultsData.penuriesQuotidien[i], resultsData.surplusQuotidien[i]]);
@@ -281,6 +256,8 @@ $(function () {
         result6.addRows([
             ['Dépense', {v: resultsData.cout, f: resultsData.cout + ' Md€'}],
             ['Budget disponible', {v: resultsData.budget, f: resultsData.budget + ' Md€'}],
+            ['_____________Bilan électrique______________', {v: 0, f: ''}],
+
             ['Demande électrique', {v: resultsData.demande, f: resultsData.demande + ' GWh/an'}],
             ['Production électrique', {v: resultsData.production, f: resultsData.production + ' GWh/an'}],
             ['Production - Demande électrique', {
@@ -289,19 +266,28 @@ $(function () {
             }],
             ["Nb d'heures de Pénuries", {v: resultsData.nbPenuries}],
             ["Nb d'heures de Surplus", {v: resultsData.nbSurplus}],
-            ['Conso Gaz (stock debut - stock fin)', {
-                v: resultsData.consoGaz,
-                f: resultsData.consoGaz + ' GWh/an'
+            ['_____________Bilan gaz______________', {v: 0, f: ''}],
+            ['Demande Gaz (electrolyse H2) pour industrie (équivalent électrique)', {
+                v: resultsData.electrolyse,
+                f: resultsData.electrolyse + ' GWh/an'
             }],
-            ['Biogaz produit (équivalent électrique)', {
-                v: resultsData.biogaz,
-                f: resultsData.biogaz + ' GWh/an'
+            ['Demande Gaz pour électricité G2P (équivalent électrique)', {
+                v: resultsData.demandeG2P,
+                f: resultsData.demandeG2P + ' GWh/an'
             }],
-            ['Gaz généré par electrolyse (équivalent électrique)', {
+            ['Production Gaz par electrolyse P2G (équivalent électrique)', {
                 v: resultsData.GazElectrolyse,
                 f: resultsData.GazElectrolyse + ' GWh/an'
             }],
-                ['Gaz fossile brulé (équivalent électrique)', {
+            ['Variation stock P2G, G2P (stock debut - stock fin)', {
+                v: resultsData.consoGaz,
+                f: resultsData.consoGaz + ' GWh/an'
+            }],
+            ['Production Gaz par Bio/déchets (équivalent électrique)', {
+                v: resultsData.biogaz,
+                f: resultsData.biogaz + ' GWh/an'
+            }],
+            ['Gaz fossile brulé (équivalent électrique)', {
                 v: resultsData.prodGazFossile,
                 f: resultsData.prodGazFossile + ' GWh/an'
             }]
@@ -429,31 +415,20 @@ $(function () {
     });
 
     // DEBUT EXECUTION PAGE
-
     $.ajax({
-        url: "/get_mix",
+        url: "/get_results",
         type: "GET",
         dataType: "json",
         success: function (data, textStatus, jqXHR) {
-            mixData = data;
-            $.ajax({
-                url: "/get_results",
-                type: "GET",
-                dataType: "json",
-                success: function (data, textStatus, jqXHR) {
-                    resultsHistory = data;
-                    resultsData = data[mixData.annee.toString()];
-                    fillPage();
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    displayError("http", errorThrown);
-                }
-            });
+            resultsHistory = data;
+            resultsData = data[annee];
+            fillPage();
         },
         error: function (jqXHR, textStatus, errorThrown) {
             displayError("http", errorThrown);
         }
     });
+
     $("#results").fadeIn();
 
 

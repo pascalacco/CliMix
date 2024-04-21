@@ -15,24 +15,28 @@
         <!--button class="btn col-1 btn-lg fs-1" id="nextYear" type="button">⊳</--button-->
     </div>
 
-    <div id="output"></div>
 
 
-    <div id="Chart_div" style="border: 1px solid #ccc"></div>
-    <div id="Bar_div" style="border: 1px solid #ccc"></div>
-    <div id="line_div" style="border: 1px solid #ccc"></div>
 
-    <div id="chartcolumn_div" style="border: 1px solid #ccc"></div>
-    <div id="chartcolumn2_div" style="border: 1px solid #ccc"></div>
-    <div id="table_div" style="border: 1px solid #ccc"></div>
+    <div class="col-auto" id="table_div" style="border: 1px solid #ccc"></div>
+    <div class="col-auto" id="line_div" style="border: 1px solid #ccc"></div>
+    <div class="col-auto">
+        <div class="row">
+            <div class="col-auto" id="Combine_div" style="border: 1px solid #ccc"></div>
+            <div class="col-auto" id="Chart_div" style="border: 1px solid #ccc"></div>
+        </div>
+    </div>
+    <div class="col-auto" id="Bar_div" style="border: 1px solid #ccc"></div>
 
-    <div id="Score_div" style="border: 1px solid #ccc"></div>
-    <div id="Combine_div" style="border: 1px solid #ccc"></div>
-    <div id="Sol_div" style="border: 1px solid #ccc"></div>
+    <div class="col-auto" id="chartcolumn_div" style="border: 1px solid #ccc"></div>
+    <div class="col-auto" id="chartcolumn2_div" style="border: 1px solid #ccc"></div>
+
+    <div class="col-auto" id="Score_div" style="border: 1px solid #ccc"></div>
+    <div class="col-auto" id="Sol_div" style="border: 1px solid #ccc"></div>
 
 
     <div class="map row" id="map">
-        <div class="map__image col-6">
+        <div class="map__image col-auto">
             <h2>Carte de France - Equilibre du réseau</h2>
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:amcharts="http://amcharts.com/ammap"
                  xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 612 583">
@@ -94,7 +98,7 @@
         </div>
 
 
-        <div id="legende" class="col-4">
+        <div id="legende" class="col-auto">
             <h2>Legende</h2>
             <p>(l'idéal est d'être proche de 0 ;) )</p>
             <!--contenu de la légende en javascript-->

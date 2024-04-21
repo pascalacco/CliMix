@@ -105,7 +105,7 @@ class Techno:
 
             vastoker = min(astocker , self.Pin(k))
             self.stock[k:] = self.stock[k] + vastoker * self.etain
-            self.recharge[k] = vastoker
+            self.recharge[k] += vastoker
             out = vastoker + relargue
 
         return out
@@ -133,7 +133,7 @@ class Techno:
             vaproduire = min(aproduire, self.Pout(k))
 
             self.stock[k:] = self.stock[k] - vaproduire/self.etaout
-            self.décharge[k] = vaproduire
+            self.décharge[k] += vaproduire
 
             out = vaproduire + relargue
 

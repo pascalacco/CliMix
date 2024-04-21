@@ -353,14 +353,6 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
 
     prodTotale = prodOn + prodOff + prodPv+ prodEau + prodNuc + prodGaz + prodPhs + prodBat
 
-    gazBiomasse = mix['nb']["biomasse"] * 2 * 0.1 * 0.71 * stratege.H
-    #  gaz =        nbPions      * nbCentraleParPion * puissance * fdc * nbHeures
-
-    # note Hugo : il semble que cet effet soit mal implémenté : à tester
-    # carte alea MEMFDC (lance 2 / 3)
-    # un an de moins de biomasse en nouvelle aquitaine (impact sur cette année)
-    if mix["alea"] == "MEMFDC2":
-        gazBiomasse -= mix['nb']["naq"]["biomasse"] * 2. * 0.1 * 0.71 *  stratege.H
 
     s=chroniques["s"]
     p=chroniques["p"]
@@ -384,13 +376,25 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
             listePenuriesQuotidien[i // 24] += 1
             listePenuriesHoraire[i % 24] += 1
 
-    consoGaz = (chroniques['Gstored'][0] - chroniques['Gstored'][-1]) * technologies.TechnoGaz.etaout
-    prodGazFossile = consoGaz - gazBiomasse - annuel["electrolyse"]
-    if prodGazFossile < 0.:
-        prodGazFossile = 0.
+    consoGazGlobale = (chroniques['Gstored'][0] - chroniques['Gstored'][-1])
+    consGazG2P= annuel['Gprod']/technologies.TechnoGaz.etaout # gaz brulé pour le G2P
+    prodGazP2G = -annuel['Gcons'] * technologies.TechnoGaz.etaout  # gaz produit par le P2G
+    prodGazBiomasse = mix['nb']["biomasse"] * 2 * 0.1 * 0.71 * stratege.H #gaz produit en bio masse
+
+    #  gaz =        nbPions      * nbCentraleParPion * puissance * fdc * nbHeures
+
+    # note Hugo : il semble que cet effet soit mal implémenté : à tester
+    # carte alea MEMFDC (lance 2 / 3)
+    # un an de moins de biomasse en nouvelle aquitaine (impact sur cette année)
+    if mix["alea"] == "MEMFDC2":
+        prodGazBiomasse -= mix['nb']["naq"]["biomasse"] * 2. * 0.1 * 0.71 * stratege.H
+
+    consGazFossile = annuel["electrolyse"] + consGazG2P - prodGazP2G   - prodGazBiomasse
+    if consGazFossile < 0.:
+        consGazFossile = 0.
 
 
-    EmissionCO2 = prodOn * 10 + prodOff * 9 + prodPv * 55 + prodEau * 10 + prodNuc * 6 + prodGazFossile * 443  # variable EmissionCO2
+    EmissionCO2 = prodOn * 10 + prodOff * 9 + prodPv * 55 + prodEau * 10 + prodNuc * 6 + consGazFossile * 443  # variable EmissionCO2
 
 
     demane_annuelle = annuel["demande"]  # variable demande
@@ -453,10 +457,12 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
     result = {"carte": mix["carte"],
               "annee": mix["annee"],
               "alea": mix["alea"],
-              "biogaz": round(gazBiomasse),
-              "consoGaz": round(consoGaz),
-              "GazElectrolyse": round(annuel["Gprod"]),
-              "prodGazFossile": round(prodGazFossile),
+              "biogaz": round(prodGazBiomasse),
+              "consoGaz": round(consoGazGlobale),
+              "electrolyse": round(annuel["electrolyse"]),
+              "GazElectrolyse": round(prodGazP2G),
+              "demandeG2P": round(consGazG2P),
+              "prodGazFossile": round(consGazFossile),
               "demande": int(demane_annuelle), "production": prodTotale,
               "prodOnshore": prodOn, "puissanceEolienneON": round(mix['nb']["eolienneON"] * powOnshore, 2),
               "prodOffshore":prodOff,
@@ -464,7 +470,7 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
               "prodPv": prodPv, "puissancePV": round(mix['nb']["panneauPV"] * powPV, 2),
               "prodEau": prodEau,
               "prodNucleaire": prodNuc, "puissanceNucleaire": round(puissances['N'], 2),
-              "prodGaz": prodGaz, "puissanceGaz": round(puissances['G'], 2),
+              "prodGaz": consGazG2P, "puissanceGaz": round(puissances['G'], 2),
               "prodPhs": prodPhs, "puissancePhs": round(puissances['S'], 2),
               "prodBatterie": prodBat, "puissanceBatterie": round(puissances['B'], 2),
               "co2": EmissionCO2,
