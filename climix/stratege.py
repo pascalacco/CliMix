@@ -442,9 +442,10 @@ def simuler(demande, electrolyse, mix, nb):
     nbProdNuc2 = nb["EPR2"]
 
     N = te.TechnoNucleaire(nb_units_EPR=nbProdNuc, nb_units_EPR2=nbProdNuc2)
-
     if mix["alea"] == "MEMFDC3":
-        N.PoutMax *= 45 / 60
+        N.PoutMax *= 45. / 60.
+        N.fc_nuke *= 45. / 60.
+
 
     s, p = strat_stockage(prodres=prodresiduelle, Step=S, Battery=B,
                           Gas=G, Lake=L, Nuclear=N)

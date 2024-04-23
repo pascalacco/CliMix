@@ -140,26 +140,40 @@ class Techno:
         return out
 
 
-class TechnoStep(Techno) :
+class TechnoStep(Techno):
+    etain = 0.95
+    etaout = 0.9
+    PoutMax = 9.3
+    PinMax = 9.3
     capacité = 180
+
     def __init__(self, nom='Step', stock=16,
-                 etain=0.95, etaout=0.9, PoutMax=9.3, PinMax=9.3, capacité=capacité, H=Techno.H):
+                 etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax, capacité=capacité, H=Techno.H):
         super().__init__(nom=nom, stock=stock, etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax, capacité=capacité,
                          H=H)
 
 
 class TechnoBatteries(Techno):
+    """
+    Calculé pour une capacité totale de 10 unités
+    """
+    etain = 0.95
+    etaout = 0.9
+    PoutMaxParUnite = 20.08/10.
+    PinMaxParUnite = PoutMaxParUnite
+    capaciteParUnite = 74.14/10.
+
     def __init__(self, nom='Batteries', stock=None,
                  etain=0.95, etaout=0.9, PoutMax=None, PinMax=None,
                  capacité=None, nb_units=1, H=Techno.H):
 
         self.nb_units = nb_units
         if PoutMax is None:
-            PoutMax = nb_units / 10. * 20.08
+            PoutMax = nb_units * TechnoBatteries.PoutMaxParUnite
         if PinMax is None:
-            PinMax = PoutMax
+            PinMax = nb_units * TechnoBatteries.PinMaxParUnite
         if capacité is None:
-            capacité = nb_units/ 10. * 74.14
+            capacité = nb_units * TechnoBatteries.capaciteParUnite
         if stock is None:
             stock = capacité/2.
 
@@ -169,21 +183,23 @@ class TechnoBatteries(Techno):
 
 
 class TechnoGaz(Techno):
-    volume_gaz = 10000000.
-    init_gaz = volume_gaz / 2.
+    capacité = 10000000.
+    init_gaz = capacité / 2.
     # Methanation : 1 pion = 10 unites de 100 MW = 1 GW
     # T = Techno('Centrale thermique', None, np.zeros(H), None, 1, 0.7725*nbTherm, None, None)
     # Puissance : 1.08 GWe (EDF)
     # Meme rendement
-    etain=0.59
-    etaout=0.45
+    etain = 0.59
+    etaout = 0.45
+    PoutMax = 34.44
+    PinMaxParUnite = 1.
     def __init__(self, nom='Gaz', stock=init_gaz,
-                 etain=etain, etaout=etaout, PoutMax=34.44, PinMax=None,
-                 capacité = volume_gaz, nb_units=0, H=Techno.H):
+                 etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=None,
+                 capacité=capacité, nb_units=0, H=Techno.H):
         self.nb_units = nb_units
 
         if PinMax is None:
-            PinMax = nb_units * 1.
+            PinMax = nb_units * TechnoGaz.PinMaxParUnite
 
         super().__init__(nom=nom, stock=stock,
                          etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax,
@@ -194,11 +210,15 @@ class TechnoLacs(Techno):
     # Puissance centrales territoire : 18.54 GWe repartis sur 24 centrales (EDF)
     # Rendement meca (inutile ici) : ~35% generalement (Wiki)
     duree_mois = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])*24
-
+    etain = 1
+    etaout = 1
+    PoutMax = 10
+    PinMax = 10
+    capacité = TechnoStep.capacité
 
     def __init__(self, nom='Lacs', stock=None,
-                 etain=1, etaout=1, PoutMax=10, PinMax=10,
-                 capacité=TechnoStep.capacité, H=Techno.H):
+                 etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax,
+                 capacité=capacité, H=Techno.H):
 
 
         super().__init__(nom=nom, stock=stock,
@@ -395,18 +415,24 @@ def fc_min_max_nuke(k, Pmax=1):
     return sMin*Pmax, sMax*Pmax
 
 class TechnoNucleaire(Techno):
+    PoutMaxParUniteEPR2 = 1.67
+    PoutMaxParUniteEPR = 1.08
+
+    ramp_up = 0.25           # % de PoutMax /heure
+    ramp_down = ramp_up
 
     def __init__(self, nom='Nucléaire', PoutMax=None, décharge_init=None,
-                 nb_units_EPR=0, nb_units_EPR2=0, H=Techno.H, ramp_up=0.25, ramp_down=0.25):
+                 nb_units_EPR=0, nb_units_EPR2=0, H=Techno.H, ramp_up=ramp_up, ramp_down=ramp_down):
 
         self.nb_units_EPR = nb_units_EPR
         self.nb_units_EPR2 = nb_units_EPR2
 
         if PoutMax is None:
-            PoutMax = 1.08 * nb_units_EPR + 1.67 * nb_units_EPR2
+            PoutMax = (TechnoNucleaire.PoutMaxParUniteEPR * nb_units_EPR +
+                       TechnoNucleaire.PoutMaxParUniteEPR2 * nb_units_EPR2)
 
-        self.ramp_up = ramp_up * PoutMax
-        self.ramp_down = ramp_down * PoutMax
+        self.ramp_up = ramp_up * PoutMax            #GW/h
+        self.ramp_down = ramp_down * PoutMax        #GW/h
 
         super().__init__(nom=nom, stock=None,
                          etain=None, etaout=1, PoutMax=PoutMax, PinMax=None,

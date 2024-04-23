@@ -37,7 +37,7 @@ pion_convert = {
     "panneauPV": "Panneaux PV",
     "centraleNuc": "Ancien nuc.",
     "EPR2": "EPR 2",
-    "methanation": "Méthanation",
+    "methanation": "Power 2 Gaz",
     "biomasse": "Biomasse"
 }
 
@@ -56,7 +56,7 @@ def nouveau_mix(annee, mix, alea=random.choice(aleas)):
     nmix["actif"] = True
     nmix["alea"] = alea
     nmix["capacites"] = nouv_capacite_alea(nmix, nmix['alea'])
-    nmix["nb"] = calculer_nb(mix)
+    nmix["nb"] = calculer_nb(mix, annee)
     nmix["actions"] = get_actions(nmix)
     return nmix
 
@@ -164,6 +164,7 @@ def appliquer(actions, mix):
         raise errJeu(f"On ne peut pas réduire le stock de batteries de {actions['stock']['actuel']} à {actions['stock']['nouv']} ! C'est gâcher")
 
     unites = {}
+
     for reg, region in actions["regions"].items():
         unites[reg] = {}
 
@@ -186,15 +187,28 @@ def appliquer(actions, mix):
                     unites[reg][p].pop(an)
 
                 if act["action"] == "+":
-                    if an in new["unites"][reg][p]:
-                        unites[reg][p][an] += act['valeur']
+                    if p == "EPR2":
+                        l_annee = (int(an)+5).__str__()
+                        act["EPR2_en_construction"] = act['valeur']
 
                     else:
-                        unites[reg][p][an] = act['valeur']
+                        l_annee = an
+                    if l_annee in new["unites"][reg][p]:
+                        unites[reg][p][l_annee] += act['valeur']
+
+                    else:
+                        unites[reg][p][l_annee] = act['valeur']
+
                     act['nb_nouvelles'] = act['valeur']
 
+                if act["action"] == "=":
+                    if 'nb_nouvelles' in act:
+                        act.pop('nb_nouvelles')
+                    if "EPR2_en_construction" in act:
+                        act.pop('EPR2_en_construction')
+
     new['unites'] = unites
-    new["nb"] = calculer_nb(new)
+    new["nb"] = calculer_nb(new, mix['annee'])
     new["actions"] = actions
     return new
 
@@ -218,10 +232,12 @@ def sommer_dict(dico):
     return new
 
 
-def calculer_nb(mix):
-    nb = appliquer_a_dict(dico=mix["unites"], fonc=lambda pion: sum(pion.values()))
+def calculer_nb(mix, annee):
+    nb = appliquer_a_dict(dico=mix["unites"],
+                          fonc=lambda pion: sum([val if int(an) <= int(annee) else 0 for an, val in pion.items()]))
     nb = sommer_dict(nb)
     return nb
+
 
 def calculer(dm, annee, actions, scenario):
     try:
@@ -263,7 +279,7 @@ def calculer(dm, annee, actions, scenario):
 def calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances ):
     result = {}
     annuel = {item: sum(val) for item, val in chroniques.items()}
-    renouv = appliquer_a_dict(actions['regions'], lambda dic: sum([act['nb_renouveles'] for an,act in dic.items() if 'nb_renouveles' in act]))
+    renouv = appliquer_a_dict(actions['regions'], lambda dic: sum([act['nb_renouveles'] for an, act in dic.items() if 'nb_renouveles' in act]))
     nouv = appliquer_a_dict(actions['regions'], lambda dic: sum([act['nb_nouvelles'] for an, act in dic.items() if 'nb_nouvelles' in act]))
     renouv = sommer_dict(renouv)
     nouv = sommer_dict(nouv)
@@ -427,10 +443,10 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
 
     factNuc = 0 if (mix['nb']['EPR2'] + mix['nb']['centraleNuc'] == 0) else prodNuc / (mix['nb']['EPR2'] + mix['nb']['centraleNuc'])
 
-    population = {'ara':0.12, 'bfc':0.04, 'bre':0.05, 'cor':0.005,
-                  'cvl':0.04, 'est':0.08, 'hdf':0.09, 'idf':0.19,
-                  'naq':0.09, 'nor':0.05, 'occ': 0.09, 'pac':0.08,
-                  'pll':0.06}
+    population = {'ara': 0.12, 'bfc': 0.04, 'bre': 0.05, 'cor': 0.005,
+                  'cvl': 0.04, 'est': 0.08, 'hdf': 0.09, 'idf': 0.19,
+                  'naq': 0.09, 'nor': 0.05, 'occ': 0.09, 'pac': 0.08,
+                  'pll': 0.06}
 
     """
     np.array(fdc_off.occ) * mix["occ"]["eolienneOFF"] * powOffshore +
@@ -439,20 +455,21 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
     (mix["occ"]["EPR2"] - nvPionsReg["occ"]["EPR2"] + mix["occ"]["centraleNuc"]) * factNuc +
     nbThermReg["occ"] * prodGaz / nbTherm)
     """
-    ratio={}
+    #ratio = {}
     prod = {}
-    diff={}
-    transfert={}
+    #diff = {}
+    transfert = {}
     for reg in population:
-        prod[reg] = (prod_renouvelables['regions'][reg]["eolienneOFF"].sum()+
+        prod[reg] = (prod_renouvelables['regions'][reg]["eolienneOFF"].sum() +
                      prod_renouvelables['regions'][reg]["eolienneON"].sum() +
                      prod_renouvelables['regions'][reg]["panneauPV"].sum())
         prod[reg] += (mix['nb'][reg]["EPR2"] + mix['nb'][reg]["centraleNuc"]) * factNuc
-        prod[reg] += nbThermReg[reg] * prodGaz / nbTherm
-        ratio[reg] = prod[reg] / prodTotale
-        diff[reg] = ratio[reg] - population[reg]
-        transfert[reg] = int(diff[reg] * 100.)
-
+        #prod[reg] += nbThermReg[reg] * prodGaz / nbTherm
+        prod[reg] += prodGaz * population[reg]
+        #ratio[reg] = prod[reg] / prodTotale
+        #diff[reg] = ratio[reg] - population[reg]
+        #transfert[reg] = int(diff[reg] * 100.)
+        transfert[reg] = prod[reg] - annuel['demande'] * population[reg]
 
     result = {"carte": mix["carte"],
               "annee": mix["annee"],
@@ -465,7 +482,7 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
               "prodGazFossile": round(consGazFossile),
               "demande": int(demane_annuelle), "production": prodTotale,
               "prodOnshore": prodOn, "puissanceEolienneON": round(mix['nb']["eolienneON"] * powOnshore, 2),
-              "prodOffshore":prodOff,
+              "prodOffshore": prodOff,
               "puissanceEolienneOFF": round(mix['nb']["eolienneOFF"] * powOffshore, 2),
               "prodPv": prodPv, "puissancePV": round(mix['nb']["panneauPV"] * powPV, 2),
               "prodEau": prodEau,

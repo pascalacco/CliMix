@@ -52,52 +52,66 @@ function recup(actions) {
 
                     } else {
                         alert(`La valeur ${unit_fin.value} saisie dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} est incorrecte!\n Débile(s) ! \n je l'efface pour vous.`);
-                        unit_fin.value=""
+                        unit_fin.value = ""
                     }
                     err = true;
 
                 }
             }
             var unit_nouv = document.getElementById(`${reg}_${pion}_nouv`);
+
             if (unit_nouv) {
-                if (unit_nouv) {
-                    if (unit_nouv.checkValidity(unit_nouv.value)) {
-                        if (Number(unit_nouv.value) !== 0) {
-                            actions['regions'][reg][pion][annee]['valeur'] = Number(unit_nouv.value)
-                            actions['regions'][reg][pion][annee]['action'] = '+'
-                        }
-                        else{
-                            alert(`        J'efface le ${unit_nouv.value} dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} pour vous.\n`);
-                            actions['regions'][reg][pion][annee]['valeur']=""
-                            actions['regions'][reg][pion][annee]['action']="="
-                            unit_nouv.value=''
-                        }
+                if (unit_nouv.checkValidity(unit_nouv.value)) {
+                    if (Number(unit_nouv.value) !== 0) {
+                        actions['regions'][reg][pion][annee]['valeur'] = Number(unit_nouv.value)
+                        actions['regions'][reg][pion][annee]['action'] = '+'
                     } else {
-                        if (unit_nouv.value !== '') {
-                            alert(`La valeur ${unit_nouv.value} dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} n'est pas correcte !\n
-                                       Je l'efface pour vous et recommencez...\n`);
-                            unit_nouv.value = ''
-                            err=true
-                        }
-                        actions['regions'][reg][pion][annee]['valeur']=""
-                        actions['regions'][reg][pion][annee]['action']="="
+                        alert(`        J'efface le ${unit_nouv.value} dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} pour vous.\n`);
+                        actions['regions'][reg][pion][annee]['valeur'] = ""
+                        actions['regions'][reg][pion][annee]['action'] = "="
+                        unit_nouv.value = ''
                     }
+                } else {
+                    if (unit_nouv.value !== '') {
+                        alert(`La valeur ${unit_nouv.value} dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} n'est pas correcte !\n
+                                       Je l'efface pour vous et recommencez...\n`);
+                        unit_nouv.value = ''
+                        err = true
+                    }
+                    actions['regions'][reg][pion][annee]['valeur'] = ""
+                    actions['regions'][reg][pion][annee]['action'] = "="
                 }
             }
+
         }
 
 
     }
-    actions['alea']['nouv']=document.getElementById("alea").value
 
-    if (Number(document.getElementById("stock").value) < Number(actions['stock']['actuel'])){
-        alert(`On ne peut pas baisser les batteries de ${actions['stock']['actuel']} à ${document.getElementById("stock").value} c'est gâcher !\n
-           Je les remets à la valeur d'avant car c'était mieux avant...\n   `)
-        document.getElementById("stock").value=actions['stock']['actuel']
-        err=true
-    } else
-    {
-        actions['stock']['nouv']=Number(document.getElementById("stock").value)
+    var lalea = $("#alea")
+    if (!(aleas.includes(lalea.val()))) {
+        alert("Le code aléa est invalide. Je remets l'ancien...");
+        lalea.val(actions['alea']['actuel'])
+        err = true;
+    } else {
+        actions['alea']['nouv'] = document.getElementById("alea").value
+    }
+
+    var lestock = document.getElementById("stock")
+
+    if (lestock.checkValidity(lestock.value)) {
+        if (Number(document.getElementById("stock").value) < Number(actions['stock']['actuel'])) {
+            alert(`On ne peut pas baisser les batteries de ${actions['stock']['actuel']} à ${document.getElementById("stock").value} c'est gâcher !\n
+                       Je les remets à la valeur d'avant car c'était mieux avant...\n   `)
+            document.getElementById("stock").value = actions['stock']['actuel']
+            err = true
+        } else {
+            actions['stock']['nouv'] = Number(document.getElementById("stock").value)
+        }
+    } else {
+        alert("Veuillez entrer une valeur entière de stock entre 1 et 10.\n Là je remets la valeur précédente...");
+        document.getElementById("stock").value = actions['stock']['actuel']
+        err = true;
     }
     return [err, actions];
 
@@ -125,8 +139,10 @@ function Calculer() {
                     } else {
                         $('#computeResults').html('Calculer');
                         displayError(data[0], data[1]);
-                        if (data[0] == "aleaChangement"){
-                            window.setTimeout(function(){window.location.reload()}, 5000)
+                        if (data[0] == "aleaChangement") {
+                            window.setTimeout(function () {
+                                window.location.reload()
+                            }, 5000)
                         }
 
                     }

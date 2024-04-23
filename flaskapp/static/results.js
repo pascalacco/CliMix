@@ -323,8 +323,8 @@ $(function () {
             let finIntervalle = Math.round(debutIntervalle + coeff);
             let couleur = couleurs[i];
 
-            divStr += `<span class="legende-couleur" style="background-color: ${couleur};"></span>
-                            [${debutIntervalle}  ,  ${finIntervalle}] </br>`;
+            divStr += `<span class="badge-pill" style="background-color: ${couleur};">
+                            de ${debutIntervalle}  à ${finIntervalle} GWh/an </br></span>`
         }
         $("#legendeItem").html(divStr);
     }
@@ -380,13 +380,15 @@ $(function () {
 
 
         let listeTransfert = [];
-        let couleurs = ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#5ace7d", "#5b8615"];
+        //let couleurs = ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#5ace7d", "#5b8615"];
+        let couleurs = ["#2980b9", "#58d68d", "#f1c40f ", "#eb984e", "#e74c3c", "#8e44ad"];
+
         for (const k in resultsData.transfert) {
             listeTransfert.push(resultsData.transfert[k]);
         }
         let min = Math.min(...listeTransfert);
         let max = Math.max(...listeTransfert);
-        let coeff = (max - min) / 6;
+        let coeff = (max - min) / 6. * 1.001;
 
 
         for (const k in resultsData.transfert) {

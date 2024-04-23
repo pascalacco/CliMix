@@ -89,7 +89,7 @@ def saisie_html(equipe, partie, annee):
             render_template("saisie.html", equipe=equipe, partie=partie, annee=annee,
                             unites=mix["unites"], nb=mix["nb"], capacites=mix["capacites"], actions=mix["actions"],
                             reg_convert=maitre_de_jeu.reg_convert, pion_convert=maitre_de_jeu.pion_convert,
-                            )
+                            aleas=maitre_de_jeu.aleas)
         )
 
     except:
