@@ -38,11 +38,11 @@ if __name__ == "__main__":
     input["scenario"] = partie
     result, save, chroniques = mj.strat_stockage_main(**input)
 
-    dm.set_chroniques(chroniques)
+    dm.set_chroniques(chroniques,annee)
     dm.set_fichier(fichier='save_tmp', dico=save)
     dm.set_item_fichier(fichier='resultats', item=annee, val=result)
 
-    chroniques = dm.get_chroniques()
+    chroniques = dm.get_chroniques(annee)
     self = vi.vProduction(chroniques)
     #self.show(self.fig_prod())
     self.show(self.fig_stock())

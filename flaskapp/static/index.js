@@ -62,6 +62,7 @@ $(function () {
                 success: function (data, textStatus, jqXHR) {
                     if (data[0] == "log_in_success") {
                         location.href = "/saisie/"+nom2groupe+"/"+scenario+"/2030";
+
                     } else {
                         displayError("http", data);
                     }

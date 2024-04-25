@@ -239,7 +239,7 @@ if __name__ == "__main__":
     dataPath = chemin + "/../flaskapp/"
     dm = archiveur.DataManager(equipe="winn", partie="S1", chemin=dataPath)
 
-    chroniques = dm.get_chroniques()
+    chroniques = dm.get_chroniques("2025")
     resultats = dm.get_results()
     chroniques.describe()
     self = vProduction(chroniques)

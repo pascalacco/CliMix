@@ -109,8 +109,8 @@ class DataManager:
 
     """
     chemin = os.path.dirname(os.path.realpath(__file__))
-    fichiers = ["save", "mix", "mixes", "resultats", "inputs", "logs"]
-    fichiers_init = ["save", "mix", "mixes", "resultats", "inputs", "logs"]
+    fichiers = ["mixes", "resultats"] #"save", "mix", "inputs",  "logs"
+    fichiers_init = ["mixes", "resultats"] #"save", "mix", "inputs", "logs"
     json_opts = {"indent": 4, "sort_keys": False}
     init_path = chemin+ "/game_data/"
 
@@ -206,13 +206,13 @@ class DataManager:
         self.set_fichier(fichier, dico)
         return dico
 
-    def set_chroniques(self, chroniques):
+    def set_chroniques(self, chroniques, annee):
         df = pandas.DataFrame(chroniques)
-        df.to_hdf(path_or_buf=self.chemin+"chroniques.hdf5", key='df', mode='w')
+        df.to_hdf(path_or_buf=self.chemin+"chroniques_"+annee+".hdf5", key='df', mode='w')
         #np.savez_compressed(self.chemin+"chroniques.npz", **chroniques)
 
-    def get_chroniques(self):
-        df = pandas.read_hdf(path_or_buf=self.chemin+"chroniques.hdf5", key='df')
+    def get_chroniques(self, annee):
+        df = pandas.read_hdf(path_or_buf=self.chemin+"chroniques_"+annee+".hdf5", key='df')
         return df
 
     def get_annee(self):

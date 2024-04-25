@@ -35,10 +35,10 @@ $(function () {
 
 
         let result1 = google.visualization.arrayToDataTable([['Technologie', 'Pourcentage', 'Unité'],
-            ['ONshore', resultsData.puissanceEolienneON , 'GW'],
-            ['OFFshore', resultsData.puissanceEolienneOFF , 'GW'],
+            ['ONshore', resultsData.puissanceEolienneON, 'GW'],
+            ['OFFshore', resultsData.puissanceEolienneOFF, 'GW'],
             ['Batterie', resultsData.puissanceBatterie, 'GW'],
-            ['Nucléaire', resultsData.puissanceNucleaire , 'GW'],
+            ['Nucléaire', resultsData.puissanceNucleaire, 'GW'],
             ['PV', resultsData.puissancePV, 'GW'],
             ['Step', resultsData.puissancePhs, 'GW'],
             ['Gaz2power', resultsData.puissanceGaz, 'GW']
@@ -47,9 +47,6 @@ $(function () {
         let options = {
             title: 'Puissance installée' + " : " + Math.round(TotalP) + " GW"
         };
-
-
-
 
 
         // Instantiate and draw the chart.
@@ -99,7 +96,6 @@ $(function () {
         }
         ;
         let resultamoi = google.visualization.arrayToDataTable(table);
-
 
 
         let options = {
@@ -405,8 +401,29 @@ $(function () {
 
 
         $("#turn").text(`Tour ${(resultsData.annee.toString() - 2030) / 5 + 1} : Année ${(resultsData.annee.toString())}`);
+        if ((annee_int - 5).toString() in resultsHistory) document.getElementById('previousYear').disabled=false;
+        else document.getElementById('previousYear').disabled=true;
+
+        let nextannee = (annee_int + 5).toString()
+        if ($.isEmptyObject(resultsHistory[nextannee])) document.getElementById('nextYear').disabled=true;
+        else document.getElementById('nextYear').disabled=false;
+
     }
 
+    $('#previousYear').click(() => {
+        annee_int = annee_int - 5;
+        annee = annee_int.toString();
+        resultsData = resultsHistory[annee];
+        fillPage();
+
+    });
+
+    $('#nextYear').click(() => {
+        annee_int = annee_int + 5;
+        annee = annee_int.toString();
+        resultsData = resultsHistory[annee];
+        fillPage();
+    });
 
     $('#commitResults').click(() => {
         location.href = "/commit";
@@ -418,7 +435,7 @@ $(function () {
 
     // DEBUT EXECUTION PAGE
     $.ajax({
-        url: "/get_results",
+        url: "/get_results/"+equipe+"/"+partie,
         type: "GET",
         dataType: "json",
         success: function (data, textStatus, jqXHR) {

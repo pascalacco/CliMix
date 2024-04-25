@@ -64,10 +64,10 @@
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
             crossorigin="anonymous"></script>
 <script>
-    const equipe  = '{{ equipe | safe }}'
-    const partie  = '{{ partie | safe }}'
-    const annee  = '{{ annee | safe }}'
-    const annee_int  = {{ annee | safe }}
+    const equipe  = '{{ equipe | safe }}';
+    const partie  = '{{ partie | safe }}';
+    var annee  = '{{ annee | safe }}';
+    var annee_int  = {{ annee | safe }};
 </script>
 
 {% endblock %}

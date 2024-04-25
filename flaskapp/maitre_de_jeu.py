@@ -40,6 +40,16 @@ pion_convert = {
     "methanation": "Power 2 Gaz",
     "biomasse": "Biomasse"
 }
+pion_short = {
+    "eolienneON": "ONshore",
+    "eolienneOFF": "OFFshore",
+    "panneauPV": "PV",
+    "centraleNuc": "Nuc.",
+    "EPR2": "EPR2",
+    "methanation": "P2G",
+    "biomasse": "Bio"
+}
+
 
 
 class errJeu(Exception):
@@ -50,7 +60,10 @@ def initialise_partie(dm):
     dm.init_partie()
 
 
-def nouveau_mix(annee, mix, alea=random.choice(aleas)):
+def nouveau_mix(annee, mix, alea=None):
+    if alea is None :
+        alea=random.choice(aleas)
+
     nmix = mix.copy()
     nmix["annee"] = annee
     nmix["actif"] = True
@@ -63,6 +76,7 @@ def nouveau_mix(annee, mix, alea=random.choice(aleas)):
 
 def recup_mix(dm, annee):
     mixes = dm.get_fichier("mixes")
+
     if annee in mixes:
         mix = mixes[annee]
     else:
@@ -76,7 +90,9 @@ def recup_mix(dm, annee):
         else:
             raise Exception(
                 "Accès au mix de l'année " + annee + " alors que l'année " + annee_precedente + " n'existe pas : ")
-    return mix
+
+    annee_active = [an for an in mixes if mixes[an]['actif']][0]
+    return mix, annee_active
 
 
 def nouv_capacite_alea(mix, alea):
@@ -241,7 +257,7 @@ def calculer_nb(mix, annee):
 
 def calculer(dm, annee, actions, scenario):
     try:
-        mix = recup_mix(annee=annee, dm=dm)
+        mix, annee_active = recup_mix(annee=annee, dm=dm)
         new = appliquer(actions, mix)
         dm.set_fichier(fichier="new", dico=new)
         mix["actions"] = actions
@@ -259,13 +275,13 @@ def calculer(dm, annee, actions, scenario):
 
         result = calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances)
         chroniques["date"] = df.index.values
-        dm.set_chroniques(chroniques)
+        dm.set_chroniques(chroniques,annee=annee)
         dm.set_item_fichier(fichier='resultats', item=annee, val=result)
         resp = ["success"]
 
     except errJeu as ex:
         if actions['alea']['action']:
-            oldmix = recup_mix(annee=(int(annee)-5).__str__(), dm=dm)
+            oldmix, annee_active = recup_mix(annee=(int(annee)-5).__str__(), dm=dm)
             new = nouveau_mix(annee=annee, mix=oldmix, alea=actions["alea"]['nouv'])
 
             dm.set_item_fichier(fichier='mixes', item=annee, val=new)

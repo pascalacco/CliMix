@@ -70,13 +70,14 @@
 </div>
 
 <!-- top -->
-<div id="top" class="row  bg-success bg-opacity-50 align-items-center rounded" >
+<div id="top" class="row  bg-success bg-opacity-50 align-items-center rounded">
 
     <!-- Année -->
     <div class="col-sm-auto mt-1 mb-1">
         <span class="badge bg-secondary align-items-center">
 
-            <input value={{annee}} min="2025" max="2050" step="5" type="number" id="annee" class="form-control-sm"/>
+            <input value={{annee}} min="2030" max="{{ annee_active}}" step="5" type="number" id="annee" class="form-control-sm"
+                   onchange="changer_annee();"/>
             <label for="annee"> Année</label>
         </span>
     </div>
@@ -85,7 +86,10 @@
     <div class="col-sm-auto mt-1 mb-1">
         <span class="badge bg-secondary align-items-center">
 
-            <input value="{{ actions['alea']['actuel'] }}" type="text" class="form-control-sm" id="alea" placeholder="Code aléa" name="alea">
+            <input value="{{ actions['alea']['actuel'] }}"
+                   type="text" class="form-control-sm"
+                   id="alea" placeholder="Code aléa" name="alea"
+                   onchange="Calculer();"  {% if not actif %} disabled {% endif %}>
             <label for="alea">Code aléa</label>
         </span>
     </div>
@@ -93,24 +97,17 @@
     <!-- Batteries -->
     <div class="col-sm-auto mt-1 mb-1">
         <span class="badge bg-primary align-items-center">
-             <input value="{{ actions['stock']['nouv'] }}" min="1" max="10" type="number" id="stock" class="form-control-sm"/>
+             <input value="{{ actions['stock']['nouv'] }}" min="1" max="10" type="number" id="stock"
+                    class="form-control-sm" {% if not actif %} disabled {% endif %}/>
              <label for="stock">Batteries</label>
         </span>
     </div>
 </div>
 
 <!-- replace info -->
-<div id="replaceInfo" class="container py-2 mb-5 text-danger border border-dark text text-center">
-    {% for reg in actions['regions'] %}
-    {% for pion in actions['regions'][reg] %}
-    {% for an in actions['regions'][reg][pion] %}
-    {% if actions['regions'][reg][pion][an]["forcee"] %}
-    Dans {{ reg_convert[reg] }} il y a {{ -actions['regions'][reg][pion][an]['min'] }}  {{ pion_convert[pion] }}  en fin de vie <br>
-    {% endif %}
-    {% endfor %}
-    {% endfor %}
-    {% endfor %}
-</div>
+
+<div id="replaceInfo" class="container col-auto py-2 mb-5 text-danger border border-dark text text-center"></div>
+
 
 <!-- milieu -->
 <div class="row">
@@ -197,8 +194,9 @@
                             {% for an in unites[reg][pion] %}
 
 
-                                {% if an in actions['regions'][reg][pion] and (actions['regions'][reg][pion][an]['forcee']) %}
-                                 <span class="badge badge-pill bg-danger">
+                            {% if actif and (an in actions['regions'][reg][pion]) and
+                            (actions['regions'][reg][pion][an]['forcee']) %}
+                            <span class="badge badge-pill bg-danger">
                                      <input id="{{ reg }}_{{ pion }}_fin"
                                             value="{{ actions['regions'][reg][pion][an]['valeur'] }}"
                                             placeholder="{{ actions['regions'][reg][pion][an]['min'] }} à {{ actions['regions'][reg][pion][an]['max'] }}"
@@ -209,11 +207,12 @@
                                             required/>
                                     <label for="{{ reg }}_{{ pion }}_fin">{{an}} [{{unites[reg][pion][an]}}]</label>
                                  </span>
-                                {% else %}
-                                <span class="badge badge-pill bg-secondary">{{an}} [{{unites[reg][pion][an]}}] </span>
-                                {% endif %}
+                            {% else %}
+                            <span class="badge badge-pill bg-secondary">{{an}} [{{unites[reg][pion][an]}}] </span>
+                            {% endif %}
                             {% endfor %}
-                            {% if annee in actions['regions'][reg][pion] and not actions['regions'][reg][pion][annee]['forcee'] %}
+                            {% if actif and (annee in actions['regions'][reg][pion]) and not
+                            actions['regions'][reg][pion][annee]['forcee'] %}
                             <span class="badge badge-pill bg-primary">
                                      <input id="{{ reg }}_{{ pion }}_nouv"
                                             value="{{actions['regions'][reg][pion][annee]['valeur']}}"
@@ -262,6 +261,7 @@
     const unites = JSON.parse('{{ unites| tojson }}')
     const reg_convert = JSON.parse('{{ reg_convert| tojson }}')
     const pion_convert = JSON.parse('{{ pion_convert| tojson }}')
+    const pion_short = JSON.parse('{{ pion_short| tojson }}')
     const aleas = JSON.parse('{{ aleas| tojson }}')
 </script>
 

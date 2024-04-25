@@ -1,13 +1,3 @@
-function btnCallbacks(plus, minus, nb) {
-    minus.click(() => {
-        nb.val((parseInt(nb.val()) > 0 ? parseInt(nb.val()) - 1 : 0));
-    });
-
-    plus.click(() => {
-        nb.val((parseInt(nb.val()) < 100 ? parseInt(nb.val()) + 1 : 100));
-    });
-}
-
 function displayError(reason, details) {
     let msg;
     const modal = new bootstrap.Modal($("#errModal"));
@@ -31,8 +21,10 @@ function displayError(reason, details) {
     modal.toggle();
 }
 
+
 function recup(actions) {
     let err = false;
+    let mesg = ''
     for (const reg in unites) {
         for (const pion in unites[reg]) {
             var unit_fin = document.getElementById(`${reg}_${pion}_fin`);
@@ -48,10 +40,10 @@ function recup(actions) {
 
                 } else {
                     if (unit_fin.value == '') {
-                        alert(`Cliquez dans la région ${reg_convert[reg]} et sélectionnez un choix pour  l'unité ${pion_convert[pion]} en fin de vie!\n`);
+                        mesg += `Cliquez dans la région ${reg_convert[reg]} et sélectionnez un choix pour  l'unité ${pion_convert[pion]} en fin de vie!<br>`;
 
                     } else {
-                        alert(`La valeur ${unit_fin.value} saisie dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} est incorrecte!\n Débile(s) ! \n je l'efface pour vous.`);
+                        mesg += `La valeur ${unit_fin.value} saisie dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} est incorrecte!<br> Débile(s) ! <br> je l'efface pour vous. <br>`;
                         unit_fin.value = ""
                     }
                     err = true;
@@ -66,15 +58,15 @@ function recup(actions) {
                         actions['regions'][reg][pion][annee]['valeur'] = Number(unit_nouv.value)
                         actions['regions'][reg][pion][annee]['action'] = '+'
                     } else {
-                        alert(`        J'efface le ${unit_nouv.value} dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} pour vous.\n`);
+                        alert(`        J'efface le ${unit_nouv.value} dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} pour vous.<br>`);
                         actions['regions'][reg][pion][annee]['valeur'] = ""
                         actions['regions'][reg][pion][annee]['action'] = "="
                         unit_nouv.value = ''
                     }
                 } else {
                     if (unit_nouv.value !== '') {
-                        alert(`La valeur ${unit_nouv.value} dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} n'est pas correcte !\n
-                                       Je l'efface pour vous et recommencez...\n`);
+                        mesg += `La valeur ${unit_nouv.value} dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} n'est pas correcte !<br>
+                                       Je l'efface pour vous et recommencez...<br>`;
                         unit_nouv.value = ''
                         err = true
                     }
@@ -87,33 +79,33 @@ function recup(actions) {
 
 
     }
-
     var lalea = $("#alea")
     if (!(aleas.includes(lalea.val()))) {
-        alert("Le code aléa est invalide. Je remets l'ancien...");
+        mesg += "Le code aléa est invalide. Je remets l'ancien...<br>";
         lalea.val(actions['alea']['actuel'])
         err = true;
     } else {
         actions['alea']['nouv'] = document.getElementById("alea").value
     }
 
+
     var lestock = document.getElementById("stock")
 
     if (lestock.checkValidity(lestock.value)) {
         if (Number(document.getElementById("stock").value) < Number(actions['stock']['actuel'])) {
-            alert(`On ne peut pas baisser les batteries de ${actions['stock']['actuel']} à ${document.getElementById("stock").value} c'est gâcher !\n
-                       Je les remets à la valeur d'avant car c'était mieux avant...\n   `)
+            mesg += `On ne peut pas baisser les batteries de ${actions['stock']['actuel']} à ${document.getElementById("stock").value} c'est gâcher !<br>
+                       Je les remets à la valeur d'avant car c'était mieux avant...<br>`;
             document.getElementById("stock").value = actions['stock']['actuel']
             err = true
         } else {
             actions['stock']['nouv'] = Number(document.getElementById("stock").value)
         }
     } else {
-        alert("Veuillez entrer une valeur entière de stock entre 1 et 10.\n Là je remets la valeur précédente...");
+        mesg += "Veuillez entrer une valeur entière de stock entre 1 et 10.<br> Là je remets la valeur précédente...<br>";
         document.getElementById("stock").value = actions['stock']['actuel']
         err = true;
     }
-    return [err, actions];
+    return [err, mesg, actions];
 
 }
 
@@ -122,8 +114,9 @@ function Calculer() {
     if (actions != false) {
         $('#computeResults').html('<span class="spinner-border spinner-border-sm"></span>&nbsp;&nbsp;Calcul...');
 
-        let [err, nouv_actions] = recup(actions)
+        let [err, mesg, nouv_actions] = recup(actions)
         if (err) {
+            displayError("errJeu", mesg)
             $('#computeResults').html('Calculer');
         } else {
             $.ajax({
@@ -182,7 +175,40 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+function remplacer_info() {
+    let [err, mesg, nouv_actions] = recup(actions)
+    let action_reg = nouv_actions['regions']
 
+    let Texte = ""
+    for (reg in action_reg) {
+        for (pion in action_reg[reg]) {
+            for (an in action_reg[reg][pion]) {
+                if (action_reg[reg][pion][an]['action'] === '?') {
+                    Texte += `<span class="badge badge-pill bg-danger">${reg_convert[reg]} : ${-action_reg[reg][pion][an]['min']} ${pion_convert[pion]}  en fin de vie </span>`;
+                } else if (action_reg[reg][pion][an]['action'] === '-') {
+                    if (action_reg[reg][pion][an]['valeur']<0)
+                        Texte += `<span class="badge badge-pill bg-secondary">${reg} : ${-action_reg[reg][pion][an]['valeur']} ${pion_short[pion]}  démantelée(s) </span>`;
+                    if (action_reg[reg][pion][an]['min']<action_reg[reg][pion][an]['valeur'])
+                        Texte += `<span class="badge badge-pill bg-info">${reg} : ${action_reg[reg][pion][an]['valeur']-action_reg[reg][pion][an]['min']} ${pion_short[pion]}  renouvelé(s) </span>`;
+                } else if (action_reg[reg][pion][an]['action'] === '+') {
+                    Texte += `<span class="badge badge-pill bg-primary">${reg} :  + ${action_reg[reg][pion][an]['valeur']}  ${pion_short[pion]}</span>`;
+                }
+                ;
+            }
+            ;
+
+        }
+        ;
+    }
+    ;
+
+    $("#replaceInfo").html(Texte)
+};
+
+function changer_annee(){
+    if (document.getElementById('annee').checkValidity())
+        location.href = "/saisie/" + equipe + "/" + partie + "/" + $('#annee').val();
+};
 $(function () {
 
     $("#carte").change(() => {
@@ -197,9 +223,18 @@ $(function () {
     });
 
     $('.resetMix').click(() => {
-        fillPage();
-    });
+        $('input').val('');
+        document.getElementById("stock").value = actions['stock']['actuel'];
+         $('#alea').val(actions['alea']['actuel']);
+        $('#annee').val(annee);
+        remplacer_info();
 
+    });
+    var action_back = actions
+    remplacer_info();
+     window.setInterval(function () {
+                                remplacer_info()
+                            }, 1000)
 
     $("#top").hide();
     $("#mid").hide();
