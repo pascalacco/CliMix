@@ -162,7 +162,7 @@ class TechnoBatteries(Techno):
     PoutMaxParUnite = 20.08/10.
     PinMaxParUnite = PoutMaxParUnite
     capaciteParUnite = 74.14/10.
-
+    coutParUnite = 0.8
     def __init__(self, nom='Batteries', stock=None,
                  etain=0.95, etaout=0.9, PoutMax=None, PinMax=None,
                  capacité=None, nb_units=1, H=Techno.H):
@@ -193,6 +193,7 @@ class TechnoGaz(Techno):
     etaout = 0.45
     PoutMax = 34.44
     PinMaxParUnite = 1.
+
     def __init__(self, nom='Gaz', stock=init_gaz,
                  etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=None,
                  capacité=capacité, nb_units=0, H=Techno.H):

@@ -51,7 +51,6 @@ pion_short = {
 }
 
 
-
 class errJeu(Exception):
     pass
 
@@ -61,8 +60,8 @@ def initialise_partie(dm):
 
 
 def nouveau_mix(annee, mix, alea=None):
-    if alea is None :
-        alea=random.choice(aleas)
+    if alea is None:
+        alea = random.choice(aleas)
 
     nmix = mix.copy()
     nmix["annee"] = annee
@@ -158,7 +157,7 @@ def get_actions(mix):
                                                "forcee": False,
                                                "date": annee}
 
-    actions = {"alea":  {'actuel': mix["alea"], 'action': False},
+    actions = {"alea": {'actuel': mix["alea"], 'action': False},
                "stock": {'actuel': mix["stock"], 'nouv': mix["stock"]},
                "regions": replace_dict}
 
@@ -177,7 +176,8 @@ def appliquer(actions, mix):
         actions["stock"]["action"] = actions["stock"]['nouv'] - actions["stock"]['actuel']
 
     elif actions["stock"]['nouv'] < actions["stock"]['actuel']:
-        raise errJeu(f"On ne peut pas réduire le stock de batteries de {actions['stock']['actuel']} à {actions['stock']['nouv']} ! C'est gâcher")
+        raise errJeu(
+            f"On ne peut pas réduire le stock de batteries de {actions['stock']['actuel']} à {actions['stock']['nouv']} ! C'est gâcher")
 
     unites = {}
 
@@ -204,7 +204,7 @@ def appliquer(actions, mix):
 
                 if act["action"] == "+":
                     if p == "EPR2":
-                        l_annee = (int(an)+5).__str__()
+                        l_annee = (int(an) + 5).__str__()
                         act["EPR2_en_construction"] = act['valeur']
 
                     else:
@@ -269,19 +269,19 @@ def calculer(dm, annee, actions, scenario):
 
         df = df.loc[annee_en_cours + "-1-1 0:0": annee_en_cours + "-12-31 23:0"]
         chroniques, prod_renouvelables, puissances = stratege.simuler(demande=df["demande"].values,
-                                              electrolyse=df["electrolyse"].values,
-                                              mix=mix,
-                                              nb=mix["nb"])
+                                                                      electrolyse=df["electrolyse"].values,
+                                                                      mix=mix,
+                                                                      nb=mix["nb"])
 
         result = calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances)
         chroniques["date"] = df.index.values
-        dm.set_chroniques(chroniques,annee=annee)
+        dm.set_chroniques(chroniques, annee=annee)
         dm.set_item_fichier(fichier='resultats', item=annee, val=result)
         resp = ["success"]
 
     except errJeu as ex:
         if actions['alea']['action']:
-            oldmix, annee_active = recup_mix(annee=(int(annee)-5).__str__(), dm=dm)
+            oldmix, annee_active = recup_mix(annee=(int(annee) - 5).__str__(), dm=dm)
             new = nouveau_mix(annee=annee, mix=oldmix, alea=actions["alea"]['nouv'])
 
             dm.set_item_fichier(fichier='mixes', item=annee, val=new)
@@ -292,11 +292,13 @@ def calculer(dm, annee, actions, scenario):
     return resp
 
 
-def calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances ):
+def calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances):
     result = {}
     annuel = {item: sum(val) for item, val in chroniques.items()}
-    renouv = appliquer_a_dict(actions['regions'], lambda dic: sum([act['nb_renouveles'] for an, act in dic.items() if 'nb_renouveles' in act]))
-    nouv = appliquer_a_dict(actions['regions'], lambda dic: sum([act['nb_nouvelles'] for an, act in dic.items() if 'nb_nouvelles' in act]))
+    renouv = appliquer_a_dict(actions['regions'], lambda dic: sum(
+        [act['nb_renouveles'] for an, act in dic.items() if 'nb_renouveles' in act]))
+    nouv = appliquer_a_dict(actions['regions'],
+                            lambda dic: sum([act['nb_nouvelles'] for an, act in dic.items() if 'nb_nouvelles' in act]))
     renouv = sommer_dict(renouv)
     nouv = sommer_dict(nouv)
 
@@ -306,12 +308,14 @@ def calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances 
     # result.update(result_ressources(mix, save, nbPions, nvPions))
     return result
 
+
 def result_couts(actions, annuel, renouv, nouv):
     prixGaz = 324.6e-6  # prix de l'electricite produite à partir du gaz/charbon --> moyenne des deux (35€ le MWh)
     prixNuc = 7.6e-6  # part du combustible dans le prix de l'electricite nucleaire (7.6€ le MWh)
 
     # carte alea MEGC (lance 1 / 3)
-    if actions['alea']['actuel'] == "MEGC1" or actions['alea']['actuel'] == "MEGC2" or actions['alea']['actuel'] == "MEGC3":
+    if actions['alea']['actuel'] == "MEGC1" or actions['alea']['actuel'] == "MEGC2" or actions['alea'][
+        'actuel'] == "MEGC3":
         prixGaz *= 1.5  # alea1
 
     if actions['alea']['actuel'] == "MEGC3":
@@ -322,8 +326,8 @@ def result_couts(actions, annuel, renouv, nouv):
         prixGaz *= 1.3
         prixNuc *= 1.2
 
-
-
+    cout_gaz = round(10.*(annuel['Gprod'] * prixGaz))/10.
+    cout_uranium = round(10*(annuel['Nprod'] * prixNuc))/10.
     cout = ((nouv["eolienneON"] + renouv["eolienneON"]) * 3.5 +
             (nouv["eolienneOFF"] + renouv["eolienneOFF"]) * 6 +
             nouv["panneauPV"] * 3.6 +
@@ -331,13 +335,16 @@ def result_couts(actions, annuel, renouv, nouv):
             renouv["centraleNuc"] * 2 +
             nouv["biomasse"] * 0.12 +
             nouv["methanation"] * 4.85 +
-            (actions['stock']['actuel']*0.8) +    # formule BIZARE  (B.PoutMax * 0.0012) / 0.003
-            (annuel['Nprod'] * prixNuc) +
-            (annuel['Gprod'] * prixGaz))
+            ((actions['stock']['nouv'] - actions['stock']['actuel']) * 0.8) +
+            # formule BIZARE  (B.PoutMax * 0.0012) / 0.003
+            cout_uranium +
+            cout_gaz)
+    cout = round(10*cout)/10.
+
     # (S.PoutMax * 0.455) / 0.91 +
 
-    #formule BIZARE
-    #if mix["annee"] != 2030:
+    # formule BIZARE
+    # if mix["annee"] != 2030:
     #    cout += (10 - renouv["centraleNuc"]) * 0.5
 
     # budget à chaque tour sauf si carte evènement bouleverse les choses
@@ -348,14 +355,16 @@ def result_couts(actions, annuel, renouv, nouv):
         budget -= 10
 
     # carte MEMDA : lance 1 / 2
-    if actions['alea']['actuel'] == "MEMDA1" or actions['alea']['actuel'] == "MEMDA2" or actions['alea']['actuel'] == "MEMDA3":
-        budget += 3.11625   #BIZARE
+    if actions['alea']['actuel'] == "MEMDA1" or actions['alea']['actuel'] == "MEMDA2" or actions['alea'][
+        'actuel'] == "MEMDA3":
+        budget += 3.11625  # BIZARE
 
     if actions['alea']['actuel'] == "MEMDA2" or actions['alea']['actuel'] == "MEMDA3":
-        cout -= 1.445  #BIZARE
+        cout -= 1.445  # BIZARE
 
     # carte MEGDT : lance 1 / 3
-    if actions['alea']['actuel'] == "MEGDT1" or actions['alea']['actuel'] == "MEGDT2" or actions['alea']['actuel'] == "MEGDT3":
+    if actions['alea']['actuel'] == "MEGDT1" or actions['alea']['actuel'] == "MEGDT2" or actions['alea'][
+        'actuel'] == "MEGDT3":
         cout += 1. / 3. * nouv["pac"]["panneauPV"] * 3.6
 
     if actions['alea']['actuel'] == "MEGDT3":
@@ -363,15 +372,16 @@ def result_couts(actions, annuel, renouv, nouv):
         # d'après le rapport de stage, un pion d'éolienneOFF devrait coûter 6 Mds et non 1.2 Mds
         cout += nouv["pll"]["eolienneOFF"] * 6
 
-    result = {"cout": round(cout),
+    result = {"cout": cout,
               "budget": round(budget),
+              "cout_gaz": cout_gaz,
+              "cout_uranium": cout_uranium
               }
 
     return result
 
 
 def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
-
     prodOn = int(annuel["prodOnshore"])
     prodOff = int(annuel["prodOffshore"])
     prodPv = int(annuel["prodPV"])
@@ -381,13 +391,10 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
     prodPhs = int(annuel["Sprod"])
     prodBat = int(annuel["Bprod"])
 
+    prodTotale = prodOn + prodOff + prodPv + prodEau + prodNuc + prodGaz + prodPhs + prodBat
 
-
-    prodTotale = prodOn + prodOff + prodPv+ prodEau + prodNuc + prodGaz + prodPhs + prodBat
-
-
-    s=chroniques["s"]
-    p=chroniques["p"]
+    s = chroniques["s"]
+    p = chroniques["p"]
 
     nbS = 0
     nbP = 0
@@ -409,9 +416,9 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
             listePenuriesHoraire[i % 24] += 1
 
     consoGazGlobale = (chroniques['Gstored'][0] - chroniques['Gstored'][-1])
-    consGazG2P= annuel['Gprod']/technologies.TechnoGaz.etaout # gaz brulé pour le G2P
+    consGazG2P = annuel['Gprod'] / technologies.TechnoGaz.etaout  # gaz brulé pour le G2P
     prodGazP2G = -annuel['Gcons'] * technologies.TechnoGaz.etaout  # gaz produit par le P2G
-    prodGazBiomasse = mix['nb']["biomasse"] * 2 * 0.1 * 0.71 * stratege.H #gaz produit en bio masse
+    prodGazBiomasse = mix['nb']["biomasse"] * 2 * 0.1 * 0.71 * stratege.H  # gaz produit en bio masse
 
     #  gaz =        nbPions      * nbCentraleParPion * puissance * fdc * nbHeures
 
@@ -421,19 +428,15 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
     if mix["alea"] == "MEMFDC2":
         prodGazBiomasse -= mix['nb']["naq"]["biomasse"] * 2. * 0.1 * 0.71 * stratege.H
 
-    consGazFossile = annuel["electrolyse"] + consGazG2P - prodGazP2G   - prodGazBiomasse
+    consGazFossile = annuel["electrolyse"] + consGazG2P - prodGazP2G - prodGazBiomasse
     if consGazFossile < 0.:
         consGazFossile = 0.
 
-
     EmissionCO2 = prodOn * 10 + prodOff * 9 + prodPv * 55 + prodEau * 10 + prodNuc * 6 + consGazFossile * 443  # variable EmissionCO2
-
 
     demane_annuelle = annuel["demande"]  # variable demande
 
-
     # calcul des productions par region
-
 
     # Puissance d'un pion
     powOnshore = 1.4
@@ -457,7 +460,8 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
         "cor": 0
     }
 
-    factNuc = 0 if (mix['nb']['EPR2'] + mix['nb']['centraleNuc'] == 0) else prodNuc / (mix['nb']['EPR2'] + mix['nb']['centraleNuc'])
+    factNuc = 0 if (mix['nb']['EPR2'] + mix['nb']['centraleNuc'] == 0) else prodNuc / (
+                mix['nb']['EPR2'] + mix['nb']['centraleNuc'])
 
     population = {'ara': 0.12, 'bfc': 0.04, 'bre': 0.05, 'cor': 0.005,
                   'cvl': 0.04, 'est': 0.08, 'hdf': 0.09, 'idf': 0.19,
@@ -471,20 +475,20 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
     (mix["occ"]["EPR2"] - nvPionsReg["occ"]["EPR2"] + mix["occ"]["centraleNuc"]) * factNuc +
     nbThermReg["occ"] * prodGaz / nbTherm)
     """
-    #ratio = {}
+    # ratio = {}
     prod = {}
-    #diff = {}
+    # diff = {}
     transfert = {}
     for reg in population:
         prod[reg] = (prod_renouvelables['regions'][reg]["eolienneOFF"].sum() +
                      prod_renouvelables['regions'][reg]["eolienneON"].sum() +
                      prod_renouvelables['regions'][reg]["panneauPV"].sum())
         prod[reg] += (mix['nb'][reg]["EPR2"] + mix['nb'][reg]["centraleNuc"]) * factNuc
-        #prod[reg] += nbThermReg[reg] * prodGaz / nbTherm
+        # prod[reg] += nbThermReg[reg] * prodGaz / nbTherm
         prod[reg] += prodGaz * population[reg]
-        #ratio[reg] = prod[reg] / prodTotale
-        #diff[reg] = ratio[reg] - population[reg]
-        #transfert[reg] = int(diff[reg] * 100.)
+        # ratio[reg] = prod[reg] / prodTotale
+        # diff[reg] = ratio[reg] - population[reg]
+        # transfert[reg] = int(diff[reg] * 100.)
         transfert[reg] = prod[reg] - annuel['demande'] * population[reg]
 
     result = {"carte": mix["carte"],
@@ -514,4 +518,3 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
               }
 
     return result
-

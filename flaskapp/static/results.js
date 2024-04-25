@@ -144,12 +144,12 @@ $(function () {
 
         let result3 = google.visualization.arrayToDataTable([
             ['Année', 'Emissions CO2', {role: "style"}],
-            ['2025', 26494417, 'color : green'],
-            ['2030', co2Array[0], 'color : green'],
-            ['2035', co2Array[1], 'color : green'],
-            ['2040', co2Array[2], 'color : green'],
-            ['2045', co2Array[3], 'color : green'],
-            ['2050', co2Array[4], 'color : green']
+            ['2025', 26494417/1e6, 'color : green'],
+            ['2030', co2Array[0]/1e6, 'color : green'],
+            ['2035', co2Array[1]/1e6, 'color : green'],
+            ['2040', co2Array[2]/1e6, 'color : green'],
+            ['2045', co2Array[3]/1e6, 'color : green'],
+            ['2050', co2Array[4]/1e6, 'color : green']
         ]);
 
         let options = {
@@ -250,8 +250,10 @@ $(function () {
         result6.addColumn('string', 'Bilan');
         result6.addColumn('number', '');
         result6.addRows([
-            ['Dépense', {v: resultsData.cout, f: resultsData.cout + ' Md€'}],
             ['Budget disponible', {v: resultsData.budget, f: resultsData.budget + ' Md€'}],
+            ['Dépense totale', {v: resultsData.cout, f: resultsData.cout + ' Md€'}],
+            ['-> Coût Gaz', {v: resultsData.cout_gaz, f: resultsData.cout_gaz + ' Md€'}],
+            ['-> Coût Uranium', {v: resultsData.cout_uranium, f: resultsData.cout_uranium + ' Md€'}],
             ['_____________Bilan électrique______________', {v: 0, f: ''}],
 
             ['Demande électrique', {v: resultsData.demande, f: resultsData.demande + ' GWh/an'}],
@@ -275,10 +277,10 @@ $(function () {
                 v: resultsData.GazElectrolyse,
                 f: resultsData.GazElectrolyse + ' GWh/an'
             }],
-            ['Variation stock P2G, G2P (stock debut - stock fin)', {
+            /*['Variation stock P2G, G2P (stock debut - stock fin)', {
                 v: resultsData.consoGaz,
                 f: resultsData.consoGaz + ' GWh/an'
-            }],
+            }],*/
             ['Production Gaz par Bio/déchets (équivalent électrique)', {
                 v: resultsData.biogaz,
                 f: resultsData.biogaz + ' GWh/an'

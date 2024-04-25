@@ -94,14 +94,14 @@ function recup(actions) {
     if (lestock.checkValidity(lestock.value)) {
         if (Number(document.getElementById("stock").value) < Number(actions['stock']['actuel'])) {
             mesg += `On ne peut pas baisser les batteries de ${actions['stock']['actuel']} à ${document.getElementById("stock").value} c'est gâcher !<br>
-                       Je les remets à la valeur d'avant car c'était mieux avant...<br>`;
+                       Je les remets à la valeur d'avant, car c'était mieux avant...<br>`;
             document.getElementById("stock").value = actions['stock']['actuel']
             err = true
         } else {
             actions['stock']['nouv'] = Number(document.getElementById("stock").value)
         }
     } else {
-        mesg += "Veuillez entrer une valeur entière de stock entre 1 et 10.<br> Là je remets la valeur précédente...<br>";
+        mesg += "Veuillez entrer une valeur entière de stock entre 1 et 10.<br> Là, je remets la valeur précédente...<br>";
         document.getElementById("stock").value = actions['stock']['actuel']
         err = true;
     }
@@ -198,15 +198,12 @@ function remplacer_info() {
                         Texte += `<span class="badge badge-pill bg-info" onclick="focus_region($('#l${reg}')[0].childNodes[1]);">${reg} : ${action_reg[reg][pion][an]['valeur'] - action_reg[reg][pion][an]['min']} ${pion_short[pion]}  renouvelé(s) </span>`;
                 } else if (action_reg[reg][pion][an]['action'] === '+') {
                     Texte += `<span class="badge badge-pill bg-primary" onclick="focus_region($('#l${reg}')[0].childNodes[1]);">${reg} :  + ${action_reg[reg][pion][an]['valeur']}  ${pion_short[pion]} </span>`;
-                }
-                ;
-            }
-            ;
+                };
+            };
+        };
+    };
 
-        }
-        ;
-    }
-    ;
+    if (actions['stock']['nouv']>actions['stock']['actuel']) Texte += `<span class="badge badge-pill bg-primary"> Batt. :  + ${actions['stock']['nouv']-actions['stock']['actuel']} </span>`;
 
     $("#replaceInfo").html(Texte)
 };
