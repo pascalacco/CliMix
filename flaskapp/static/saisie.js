@@ -149,6 +149,24 @@ function Calculer() {
     }
 }
 
+
+function focus_region(laregion)
+{
+    const regions = document.querySelectorAll(".map__image path")
+    // Reset color for all regions
+    regions.forEach((r) => r.classList.remove("active"));
+
+    // Set color to green for the clicked region
+    laregion.classList.add("active");
+    $('.region').hide();
+    // Display corresponding region information
+
+    //remove the first letter of the id to get the region name
+    var regionName = laregion.parentNode.id.substring(1);
+    $('#' + regionName).show();
+};
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const regionInfo = document.getElementById("region-info");
     const regions = document.querySelectorAll(".map__image path");
@@ -159,19 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //show region on click
 
     regions.forEach((region) => {
-        region.addEventListener("click", function () {
-            // Reset color for all regions
-            regions.forEach((r) => r.classList.remove("active"));
-
-            // Set color to green for the clicked region
-            this.classList.add("active");
-            $('.region').hide();
-            // Display corresponding region information
-
-            //remove the first letter of the id to get the region name
-            var regionName = this.parentNode.id.substring(1);
-            $('#' + regionName).show();
-        });
+        region.addEventListener("click", function () {focus_region(this)});
     });
 });
 
@@ -184,14 +190,14 @@ function remplacer_info() {
         for (pion in action_reg[reg]) {
             for (an in action_reg[reg][pion]) {
                 if (action_reg[reg][pion][an]['action'] === '?') {
-                    Texte += `<span class="badge badge-pill bg-danger">${reg_convert[reg]} : ${-action_reg[reg][pion][an]['min']} ${pion_convert[pion]}  en fin de vie </span>`;
+                    Texte += `<span class="badge badge-pill bg-danger" onclick="focus_region($('#l${reg}')[0].childNodes[1]);">${reg_convert[reg]} : ${-action_reg[reg][pion][an]['min']} ${pion_convert[pion]}  en fin de vie </span>`;
                 } else if (action_reg[reg][pion][an]['action'] === '-') {
-                    if (action_reg[reg][pion][an]['valeur']<0)
-                        Texte += `<span class="badge badge-pill bg-secondary">${reg} : ${-action_reg[reg][pion][an]['valeur']} ${pion_short[pion]}  démantelée(s) </span>`;
-                    if (action_reg[reg][pion][an]['min']<action_reg[reg][pion][an]['valeur'])
-                        Texte += `<span class="badge badge-pill bg-info">${reg} : ${action_reg[reg][pion][an]['valeur']-action_reg[reg][pion][an]['min']} ${pion_short[pion]}  renouvelé(s) </span>`;
+                    if (action_reg[reg][pion][an]['valeur'] < 0)
+                        Texte += `<span class="badge badge-pill bg-secondary" onclick="focus_region($('#l${reg}')[0].childNodes[1]);">${reg} : ${-action_reg[reg][pion][an]['valeur']} ${pion_short[pion]}  démantelée(s) </span>`;
+                    if (action_reg[reg][pion][an]['min'] < action_reg[reg][pion][an]['valeur'])
+                        Texte += `<span class="badge badge-pill bg-info" onclick="focus_region($('#l${reg}')[0].childNodes[1]);">${reg} : ${action_reg[reg][pion][an]['valeur'] - action_reg[reg][pion][an]['min']} ${pion_short[pion]}  renouvelé(s) </span>`;
                 } else if (action_reg[reg][pion][an]['action'] === '+') {
-                    Texte += `<span class="badge badge-pill bg-primary">${reg} :  + ${action_reg[reg][pion][an]['valeur']}  ${pion_short[pion]}</span>`;
+                    Texte += `<span class="badge badge-pill bg-primary" onclick="focus_region($('#l${reg}')[0].childNodes[1]);">${reg} :  + ${action_reg[reg][pion][an]['valeur']}  ${pion_short[pion]} </span>`;
                 }
                 ;
             }
@@ -205,7 +211,7 @@ function remplacer_info() {
     $("#replaceInfo").html(Texte)
 };
 
-function changer_annee(){
+function changer_annee() {
     if (document.getElementById('annee').checkValidity())
         location.href = "/saisie/" + equipe + "/" + partie + "/" + $('#annee').val();
 };
@@ -225,16 +231,16 @@ $(function () {
     $('.resetMix').click(() => {
         $('input').val('');
         document.getElementById("stock").value = actions['stock']['actuel'];
-         $('#alea').val(actions['alea']['actuel']);
+        $('#alea').val(actions['alea']['actuel']);
         $('#annee').val(annee);
         remplacer_info();
 
     });
     var action_back = actions
     remplacer_info();
-     window.setInterval(function () {
-                                remplacer_info()
-                            }, 1000)
+    window.setInterval(function () {
+        remplacer_info()
+    }, 1000)
 
     $("#top").hide();
     $("#mid").hide();
