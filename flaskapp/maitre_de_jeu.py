@@ -303,13 +303,13 @@ def calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances)
     nouv = sommer_dict(nouv)
 
     result = result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances)
-    result.update(result_couts(actions, annuel, renouv, nouv))
+    result.update(result_couts(actions, annuel, renouv, nouv, result['prodGazFossile']))
 
     # result.update(result_ressources(mix, save, nbPions, nvPions))
     return result
 
 
-def result_couts(actions, annuel, renouv, nouv):
+def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
     prixGaz = 324.6e-6  # prix de l'electricite produite à partir du gaz/charbon --> moyenne des deux (35€ le MWh)
     prixNuc = 7.6e-6  # part du combustible dans le prix de l'electricite nucleaire (7.6€ le MWh)
 
@@ -326,7 +326,7 @@ def result_couts(actions, annuel, renouv, nouv):
         prixGaz *= 1.3
         prixNuc *= 1.2
 
-    cout_gaz = round(10.*(annuel['Gprod'] * prixGaz))/10.
+    cout_gaz = round(10.*(prodGazFossile * prixGaz))/10.
     cout_uranium = round(10*(annuel['Nprod'] * prixNuc))/10.
     cout = ((nouv["eolienneON"] + renouv["eolienneON"]) * 3.5 +
             (nouv["eolienneOFF"] + renouv["eolienneOFF"]) * 6 +

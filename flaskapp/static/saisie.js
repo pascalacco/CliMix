@@ -58,7 +58,7 @@ function recup(actions) {
                         actions['regions'][reg][pion][annee]['valeur'] = Number(unit_nouv.value)
                         actions['regions'][reg][pion][annee]['action'] = '+'
                     } else {
-                        alert(`        J'efface le ${unit_nouv.value} dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} pour vous.<br>`);
+                        alert(`        J'efface le ${unit_nouv.value} dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} pour vous.\n`);
                         actions['regions'][reg][pion][annee]['valeur'] = ""
                         actions['regions'][reg][pion][annee]['action'] = "="
                         unit_nouv.value = ''
