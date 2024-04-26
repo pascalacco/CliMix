@@ -116,7 +116,11 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script type="text/javascript">
-  Array.prototype.reduce = undefined;
+Array.prototype.reduce=function(fun){var len=this.length>>>0;if(typeof fun!="function")throw
+new TypeError;if(len==0&&arguments.length==1)throw new TypeError;var i=0;if(arguments.length>=2)var
+rv=arguments[1];else{do{if(i in this){var rv=this[i++];break}if(++i>=len)throw new
+TypeError;}while(true)}for(;i<len;i++)if(i in this)rv=fun.call(undefined,rv,this[i],i,this);return
+rv};
 </script>
 <script type="text/javascript" src="/static/constantes.js"></script>
 <script type="text/javascript" src="/static/results.js"></script>

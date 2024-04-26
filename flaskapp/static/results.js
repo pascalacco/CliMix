@@ -5,6 +5,7 @@ $(function () {
     let resultsHistory = null;
     let mixData = null;
 
+
     function displayError(reason, details) {
         let msg;
         const modal = new bootstrap.Modal($("#errModal"));
@@ -249,9 +250,11 @@ $(function () {
         let result6 = new google.visualization.arrayToDataTable([]);
         result6.addColumn('string', 'Bilan');
         result6.addColumn('number', '');
+        const cout_construction = Number((resultsData.cout - resultsData.cout_gaz -resultsData.cout_uranium).toFixed(1));
         result6.addRows([
             ['Budget disponible', {v: resultsData.budget, f: resultsData.budget + ' Md€'}],
             ['Dépense totale', {v: resultsData.cout, f: resultsData.cout + ' Md€'}],
+            ['-> Coût constructions', {v: cout_construction, f: cout_construction + ' Md€'}],
             ['-> Coût Gaz', {v: resultsData.cout_gaz, f: resultsData.cout_gaz + ' Md€'}],
             ['-> Coût Uranium', {v: resultsData.cout_uranium, f: resultsData.cout_uranium + ' Md€'}],
             ['_____________Bilan électrique______________', {v: 0, f: ''}],
@@ -329,6 +332,8 @@ $(function () {
 
 
     function fillPage() {
+        // Load the Visualization API and the piechart package.
+        google.load('visualization', '1.0', {'packages':['corechart']});
         google.charts.load('current', {'packages': ['table']});
         google.charts.load('current', {'packages': ['corechart']});
         google.charts.load('current', {'packages': ['geochart']}, {mapsApiKey: 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'});
