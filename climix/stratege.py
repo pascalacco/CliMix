@@ -259,8 +259,7 @@ def calculer_prod_non_pilot(mix, nb):
     return chroniques, prod
 
 
-
-def result_ressources(mix, save, nbPions, nvPions, ):
+def result_ressources(mix, save, nbPions, nvPions, actions):
 
     Sol = (nbPions["eolienneON"] * 300 + nbPions["eolienneOFF"] * 400 + nbPions["panneauPV"] * 26 +
            nbPions["centraleNuc"] * 1.5 + nbPions[
@@ -318,78 +317,6 @@ def result_ressources(mix, save, nbPions, nvPions, ):
     return result
 
 
-def simulation(scenario, mix, save, nbPions, nvPions, nvPionsReg, electrolyse):
-    """ Optimisation de strategie de stockage et de destockage du Mix energetique
-    
-    Args:
-        scenario (array) : scenario de consommation heure par heure
-        mix (dict) : donnees du plateau
-        save (dict) : donnees du tour precedent
-        nbPions (dict) : nombre de pions total pour chaque techno
-        nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
-        nvPionsReg (dict) : nombre de pions total pour chaque techno
-        electrolyse (float) : demande en electrolyse du scenar (kWh)
-    Returns:
-        result (dict) : dictionnaire contenant les résultats d'une seule année (result sans s à la fin)
-    """
-
-    # carte alea MEVUAPV  (lance de 1 / 2)
-    # if actions['alea']['actuel'] == "MEVUAPV1" or actions['alea']['actuel'] == "MEVUAPV2" or actions['alea']['actuel'] == "MEVUAPV3":
-    #     save["varConso"] = 9e4
-    # scenario += np.ones(H) * (save["varConso"]/H)
-
-    if actions['alea']['actuel'] == "MEVUAPV2" or actions['alea']['actuel'] == "MEVUAPV3":
-        mix["innovPV"] = 0.15
-
-    # carte alea MEMDA (lance 3)
-    if actions['alea']['actuel'] == "MEMDA3":
-        scenario = 0.95 * scenario
-
-    chroniques = {"demande": scenario,
-                  "electrolyse": electrolyse}
-
-    chroniques.update(calculer_prod_non_pilot(save, mix, nbPions))
-
-    # Calcul de la production residuelle
-    # prodresiduelle = prod2006_offshore + prod2006_onshore + prod2006_pv + rivprod - scenario
-    prodresiduelle = chroniques["prodOffshore"] + chroniques["prodOnshore"] + chroniques["prodPV"] + chroniques["rivprod"] - scenario
-
-    # Definition des differentes technologies
-
-    # Techno params : name, stored, prod, etain, etaout, Q, S, vol
-
-    S = te.TechnoStep()
-    B = te.TechnoBatteries(nb_units=mix["stock"])
-    G = te.TechnoGaz(nb_units=mix["methanation"])
-    L = te.TechnoLacs()
-
-    # reacteurs nucleaires effectifs qu'après 1 tour
-    nbProdNuc = mix["centraleNuc"]
-    #nbProdNuc2 = (nbPions["EPR2"] - nvPions["EPR2"])
-    nbProdNuc2 = mix["EPR2"]
-
-    N = te.TechnoNucleaire(nb_units_EPR=nbProdNuc, nb_units_EPR2=nbProdNuc2)
-
-    if mix["alea"] == "MEMFDC3":
-        N.PoutMax *= 45 / 60
-
-    s, p = strat_stockage(prodres=prodresiduelle, Step=S, Battery=B,
-                          Gas=G, Lake=L, Nuclear=N)
-
-    chroniques.update(extraire_chroniques(s=s, p=p, prodres=prodresiduelle,
-                                          S=S, B=B, G=G, L=L, N=N))
-
-    result= {}
-    #result = result_prod_region(mix=mix, save=save, nbPions=nbPions, nvPionsReg=nvPionsReg,
-    #                             chroniques=chroniques, L=L, N=N, G=G, S=S, B=B)
-    #result.update(result_couts(mix, save, nbPions, nvPions, nvPionsReg, B, S, N))
-
-    #result.update(result_ressources(mix, save, nbPions, nvPions))
-
-
-    return result, save, chroniques
-
-
 def simuler(demande, electrolyse, mix, nb):
     """ Optimisation de strategie de stockage et de destockage du Mix energetique
 
@@ -424,8 +351,7 @@ def simuler(demande, electrolyse, mix, nb):
 
     # Calcul de la production residuelle
     # prodresiduelle = prod2006_offshore + prod2006_onshore + prod2006_pv + rivprod - scenario
-    prodresiduelle = chroniques["prodOffshore"] + chroniques["prodOnshore"] + chroniques["prodPV"] + chroniques[
-        "rivprod"] - demande
+    prodresiduelle = chroniques["prodOffshore"] + chroniques["prodOnshore"] + chroniques["prodPV"] + chroniques["rivprod"] - demande
 
     # Definition des differentes technologies
 

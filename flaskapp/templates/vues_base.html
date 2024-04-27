@@ -31,8 +31,15 @@
             <button class="btn btn-success" onclick="window.location.href = '/saisie/{{equipe}}/{{partie}}/{{annee}}';" type="button">< Retourner au mix pour le modifier</button>
             {% set annee_int = annee | int%}
             {% set next_annee = (annee_int +5) | safe%}
+
+            {% if annee_int >= 2050 %}
+            <button class="btn btn-success" onclick="window.location.href = '/commit/{{equipe}}/{{partie}}/{{annee}}';" type="button"> Terminer le jeu >
+            </button>
+            {% else %}
             <button class="btn btn-success" onclick="window.location.href = '/commit/{{equipe}}/{{partie}}/{{annee}}';" type="button">Valider ce mix et passer au tour suivant >
             </button>
+            {% endif %}
+
         </div>
     </ul>
 

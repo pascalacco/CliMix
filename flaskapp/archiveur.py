@@ -25,11 +25,13 @@ class Parties:
         Gère la vision globale de toutes les parties
 
     """
-    chemin = os.path.dirname(os.path.realpath(__file__))
 
+    chemin_archiveur = os.path.dirname(os.path.realpath(__file__))
+    chemin_game_data_relatif = "game_data/"
+    chemin_game_data = chemin_archiveur + "/" + chemin_game_data_relatif
     def __init__(self, chemin=None):
         if chemin is None:
-            self.chemin = Parties.chemin+"/game_data/"
+            self.chemin = Parties.chemin_game_data
         else:
             self.chemin = chemin
         self.data_managers = {}
@@ -37,17 +39,17 @@ class Parties:
     def get_liste_equipes(self):
         grouplist = {}
         # list game_data games only directoires and teams on subdirectories
-        for filename in os.listdir(dataPath + 'game_data/'):
+        for filename in os.listdir(self.chemin):
 
             # print(filename+' is a directory? '+str(os.path.isdir(os.path.join(dataPath+'game_data/',filename))))
-            if os.path.isdir(os.path.join(dataPath + 'game_data/', filename)):
+            if os.path.isdir(os.path.join(self.chemin, filename)):
                 # add key to the dictionary
                 grouplist[filename] = []
-                for fileteam in os.listdir(dataPath + 'game_data/' + filename):
-                    if os.path.isdir(os.path.join(dataPath + 'game_data/' + filename, fileteam)) == True:
+                for fileteam in os.listdir(self.chemin + filename):
+                    if os.path.isdir(os.path.join(self.chemin + filename, fileteam)) == True:
 
                         # read the json file
-                        with open(dataPath + 'game_data/' + filename + '/' + fileteam + '/resultats.json') as json_file:
+                        with open(self.self.chemin + filename + '/' + fileteam + '/resultats.json') as json_file:
                             data = json.load(json_file)
                             currentYear = 0
                             # get the first key of the json file
@@ -108,20 +110,22 @@ class DataManager:
     @revision : rempalcer group par équipe et team par équipe
 
     """
-    chemin = os.path.dirname(os.path.realpath(__file__))
+    chemin_archiveur = Parties.chemin_archiveur
+    chemin_game_data = Parties.chemin_game_data
+    chemin_init_partie = chemin_game_data
+
     fichiers = ["mixes", "resultats"] #"save", "mix", "inputs",  "logs"
     fichiers_init = ["mixes", "resultats"] #"save", "mix", "inputs", "logs"
     json_opts = {"indent": 4, "sort_keys": False}
-    init_path = chemin+ "/game_data/"
 
     def __init__(self, equipe, partie, chemin=None):
 
         self.equipe = equipe
         self.partie = partie
         if chemin is None:
-            self.chemin = Parties.chemin+"/game_data/{}/{}/".format(equipe, partie)
+            self.chemin = DataManager.chemin_game_data+"{}/{}/".format(equipe, partie)
         else:
-            self.chemin = chemin + "game_data/{}/{}/".format(equipe, partie)
+            self.chemin = chemin
         self.data_managers = {}
 
         self.results_path = self.chemin + "game_data/{}/{}/resultats.json".format(equipe, partie)
@@ -136,7 +140,7 @@ class DataManager:
         self.infos_path = self.chemin + "game_data/{}/{}/infos.json".format(equipe, partie)
 
     def init_fichier(self, fich, format=".json"):
-        with open(DataManager.init_path + fich + "_init" + format, "r") as src:
+        with open(DataManager.chemin_init_partie + fich + "_init" + format, "r") as src:
             dico = json.load(src)
         with open(self.chemin + fich + format, "w") as dst:
             json.dump(dico, dst, **DataManager.json_opts)
@@ -238,7 +242,16 @@ class DataManager:
     def get_mix(self):
         return self.get_fichier(fichier="mix")
 
-    ### Pas à jour
+    def sauve_tout(self, annee):
+        import shutil
+        from datetime import datetime
+        date = datetime.today().strftime('%Y_%m_%d_%Hh_%Mmn')
+        fichier = self.equipe + '_' + self.partie + '_' + annee +'_du_' + date
+        shutil.make_archive(self.chemin+'../'+fichier, 'zip', self.chemin)
+        return fichier+'.zip'
+
+        ###____________________________________________________________________________________
+        ### Pas à jour
     def get_mdp(self):
         ## Aller chercher dans le bon fichier self.chemin/infos.json le mot de passe
         ## et return None si pas de fichier ou autre

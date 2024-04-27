@@ -243,12 +243,12 @@
 
 <!-- bot -->
 <div id="bot">
-    <div class="mb-5" style="visibility: hidden;">SPACING</div>
+    <!--div class="mb-5" style="visibility: hidden;">SPACING</div-->
 
     <div class="text-center pt-5 my-5">
         <div class="row justify-content-evenly">
-            <button class="btn btn-danger col-4 resetMix" type="button">Revenir aux valeurs initiales</button>
-            <button class="btn btn-primary col-4" type="button" onclick="Calculer()" id="computeResults">Valider
+            <button class="btn btn-danger col-4 resetMix" type="button" {% if not actif %} disabled {% endif %}>Revenir aux valeurs initiales</button>
+            <button class="btn btn-primary col-4" type="button" onclick="Calculer()" id="computeResults" {% if not actif %} disabled {% endif %}>Valider
             </button>
         </div>
     </div>

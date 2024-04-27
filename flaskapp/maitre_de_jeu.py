@@ -90,7 +90,13 @@ def recup_mix(dm, annee):
             raise Exception(
                 "Accès au mix de l'année " + annee + " alors que l'année " + annee_precedente + " n'existe pas : ")
 
-    annee_active = [an for an in mixes if mixes[an]['actif']][0]
+    for an in mixes:
+        if mixes[an]["actif"]:
+            annee_active = an
+            break
+        else:
+            annee_active = an
+
     return mix, annee_active
 
 
@@ -281,7 +287,11 @@ def calculer(dm, annee, actions, scenario):
         df = pd.read_hdf(chemin_scenarios + scenario + "_25-50.h5", "df")
         annee_en_cours = (mix['annee']).__str__()
 
-        df = df.loc[annee_en_cours + "-1-1 0:0": annee_en_cours + "-12-31 23:0"]
+        if int(annee_en_cours) >= 2050:
+            df = df.loc["2050-1-1 0:0":"2050-12-31 23:0"]
+        else:
+            df = df.loc[annee_en_cours + "-1-1 0:0": annee_en_cours + "-12-31 23:0"]
+
         chroniques, prod_renouvelables, puissances = stratege.simuler(demande=df["demande"].values,
                                                                       electrolyse=df["electrolyse"].values,
                                                                       mix=mix,

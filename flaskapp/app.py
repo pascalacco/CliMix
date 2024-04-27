@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify, render_template, redirect, make_response
+import jinja2
+from flask import Flask, request, jsonify, render_template, redirect, make_response, send_file
 from flask_cors import CORS, cross_origin
 
 import datetime
@@ -10,6 +11,7 @@ dataPath = os.path.dirname(os.path.realpath(__file__)) + '/'
 from bokeh.resources import INLINE
 
 from flaskapp.archiveur import DataManager
+from flaskapp import archiveur
 from flaskapp import maitre_de_jeu
 from climix import visualiseur
 
@@ -65,7 +67,7 @@ def saisie_html(equipe, partie, annee):
         mix, annee_active = maitre_de_jeu.recup_mix(dm, annee)
         resp = make_response(
             render_template("saisie.html", equipe=equipe, partie=partie, annee=annee,
-                            actif = mix['actif'], annee_active=annee_active,
+                            actif=mix['actif'], annee_active=annee_active,
                             unites=mix["unites"], nb=mix["nb"], capacites=mix["capacites"], actions=mix["actions"],
                             reg_convert=maitre_de_jeu.reg_convert, pion_convert=maitre_de_jeu.pion_convert,
                             pion_short=maitre_de_jeu.pion_short,
@@ -145,16 +147,58 @@ def calculer(equipe, partie, annee):
 def commit(equipe, partie, annee):
     try:
         dm = DataManager(equipe=equipe, partie=partie)
-        annee_suivante = (int(annee) + 5).__str__()
+
+        annee_suivante_int = int(annee) + 5
+        annee_suivante = annee_suivante_int.__str__()
         new = dm.get_fichier("new")
         new["actif"] = False
 
         dm.set_item_fichier(fichier='mixes', item=annee, val=new)
 
-        if annee_suivante == 2055:
-            return redirect("/")
+        if annee_suivante_int > 2050:
+            return redirect("/sauvegarder/" + equipe + "/" + partie + "/" + annee)
         else:
             return redirect("/saisie/" + equipe + "/" + partie + "/" + annee_suivante)
+
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+        resp = ["err", traceback.format_exc()]
+    resp = jsonify(resp)
+
+    return resp
+
+
+@app.route("/telecharger/<path:chemin>", methods=["GET"])
+def telecharger(chemin):
+    try:
+        return send_file(chemin)
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+        resp = ["err", traceback.format_exc()]
+    resp = jsonify(resp)
+
+    return resp
+
+
+@app.route("/sauvegarder/<equipe>/<partie>/<annee>")
+def sauvegarder(equipe, partie, annee):
+    try:
+        dm = DataManager(equipe=equipe, partie=partie)
+        fichier = dm.sauve_tout(annee)
+        repertoire_relatif = ("/telecharger/" +
+                              archiveur.Parties.chemin_game_data_relatif +
+                              equipe + "/")
+
+        t = jinja2.Template('<a href="{{path_to_file}}" download="{{proposed_file_name}}">Télécharger</a>')
+        return make_response(render_template('fin.html',
+                                             equipe=equipe, partie=partie,
+                                             annee=annee, annee_suivante=(int(annee)+5).__str__(),
+                                             fichier=fichier,
+                                             path_to_file=repertoire_relatif + fichier,
+                                             proposed_file_name=fichier)
+                             )
 
     except:
         with open(dataPath + 'logs.txt', 'a') as logs:

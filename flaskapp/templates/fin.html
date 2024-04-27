@@ -1,125 +1,18 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="utf-8">
-    <meta name="author" content="Aymeric Shinawi">
-    <meta name="description" content="Jeu Mix Energétique pour l'INSA Toulouse">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% extends 'bandeau_base.html' %}
 
-    <title>Entrée manuelle - Jeu mix énergétique</title>
 
-    <link rel="icon" type="image/x-icon" href="static/img/favicon.ico">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block title %} Saisie du mix {% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.0.js"
-            integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="/static/constantes.js"></script>
-    <script type="text/javascript" src="/static/manual.js"></script>
-    <style>
-        #region-info {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 10px;
-            background-color: #ffffff;
-            border: 1px solid #000000;
-            display: none;
-        }
 
-        .map__image path:hover {
-            fill: #ffcc00;
-            cursor: pointer;
-        }
+{% block head %}
+{{ super() }}
 
-        .map__image a text {
-            pointer-events: none;
-        }
 
-        .map__image a:hover text {
-            fill: #000;
-        }
+{% endblock %}
 
-        .map__image path.active {
-            fill: #00ff00; /* Change the color to green */
-        }
 
-        .region {
-            display: none;
-        }
-    </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const regionInfo = document.getElementById("region-info");
-            const regions = document.querySelectorAll(".map__image path");
-
-            //hide all regions
-            $('.region').hide();
-
-            //show region on click
-
-            regions.forEach((region) => {
-                region.addEventListener("click", function () {
-                    // Reset color for all regions
-                    regions.forEach((r) => r.classList.remove("active"));
-
-                    // Set color to green for the clicked region
-                    this.classList.add("active");
-                    $('.region').hide();
-                    // Display corresponding region information
-
-                    //remove the first letter of the id to get the region name
-                    var regionName = this.parentNode.id.substring(1);
-                    $('#' + regionName).show();
-                });
-            });
-        });
-    </script>
-
-</head>
-
-<body>
-
-  <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg fixed-top bg-light navbar-light">
-        <div class="container">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="/">
-                    <img id="Climix-logo"
-                         src="static/logo.png"
-                         alt="Climix Logo"
-                         draggable="false"
-                         height="60"
-                    />
-                </a>
-                <a class="navbar-brand" href="#">
-                    Saisie Mix
-                </a>
-            </div>
-            <button
-                    class="navbar-toggler"
-                    type="button"
-                    data-mdb-toggle="collapse"
-                    data-mdb-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-            >
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a>Groupe : <span class="badge bg-secondary">{{group}}</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a>Scénario : <span class="badge bg-secondary">{{team}}</span></a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
+{% block content %}
+{{ super() }}
 
 <!--Pop-Up d'erreur-->
 <div class="modal fade" id="errModal">
@@ -145,59 +38,14 @@
 </div>
 
 
-<h1 id="titre" class="container pt-2 pb-4 text-center">Saisie du mix énergétique</h1>
-
-<!-- top -->
-<div id="top" class="row mt-2 mb-2 bg-success bg-opacity-50 align-items-center rounded" style="display: none;">
-
-    <!-- Année -->
-    <div class="col-4 mt-2 mb-2">
-        <span class="badge bg-secondary align-items-center">
-        <!--<div class="col mt-2 h2 text-center">-->
-            <form>
-                <select name="annee" id="annee" class="form-select form-select-lg">
-                    <option value="default">Choisir une année...</option>
-                    <option value="2030">2025 -> 2030</option>
-                    <option value="2035">2030 -> 2035</option>
-                    <option value="2040">2035 -> 2040</option>
-                    <option value="2045">2040 -> 2045</option>
-                    <option value="2050">2045 -> 2050</option>
-                </select>
-            </form>
-            <label for="annee"> Année</label>
-        </span>
-    </div>
-
-    <!-- Aléa -->
-    <div class="col-4">
-        <span class="badge bg-secondary align-items-center">
-        <!--<div class="col mt-2 h2 text-center">-->
-            <input type="text" class="form-control" id="alea" placeholder="Code aléa" name="alea">
-            <label for="alea">Code aléa</label>
-
-        </span>
-    </div>
-
-    <!-- Batteries -->
-    <div class="col-4">
-        <span class="badge bg-primary align-items-center">
-             <input value="1" min="1" max="10" type="number" id="stock" class="form-control"/>
-             <label for="stock">Batteries</label>
-        </span>
-    </div>
-</div>
-
-<div id="replaceInfo" class="container py-2 mb-5 text-danger border border-dark text text-center"></div>
-
 <!-- milieu -->
 <div class="row">
     <!-- Carte -->
     <div class="col-3 align-items-top">
         <div class="map text-primary" id="map">
-            Cliquez une région
             <div class="map__image">
                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:amcharts="http://amcharts.com/ammap"
-                     xmlns:xlink="http://www.w3.org/1999/xlink"  viewbox="0 0 612 583">
+                     xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 612 583">
 
                     <g>
                         <a id="lest">
@@ -258,26 +106,38 @@
         </div>
     </div>
 
-    <!-- mid"-->
-    <div class="col-9 align-items-top">
-        <!--Partie créée dynamiquement-->
-        <div id="mid" class="container mt-2" style="display: none;"></div>
+    <div class="col-9">
+        <h1>Bravo, vous avez atteint l'année {{annee}} ! </h1>
+
+        Vous pouvez télécharger le fichier {{fichier}} : <a href="{{path_to_file}}" download="{{proposed_file_name}}">Télécharger</a>
+        <BR>
+        Ce fichier contient toute votre simulation.
+
     </div>
+
 </div>
 
-
 <!-- bot -->
-<div id="bot" style="display: none;">
-    <div class="mb-5" style="visibility: hidden;">SPACING</div>
+<div id="bot">
 
     <div class="text-center pt-5 my-5">
         <div class="row justify-content-evenly">
-            <button class="btn btn-danger col-4 resetMix" type="button">Revenir aux valeurs initiales</button>
-            <button class="btn btn-primary col-4" type="button" id="computeResults">Valider</button>
+            <button class="btn btn-danger col-4" onclick="window.location.href='https://explore.org/livecams/player/brown-bears/brown-bear-salmon-cam-brooks-falls';" type="button">Regarder un ours</button>
+            <button class="btn btn-success col-4"
+                    onclick="window.location.href = '/saisie/{{equipe}}/{{partie}}/{{annee_suivante}}';"
+                    type="button">Continuer la simulation >
+            </button>
+            </button>
         </div>
     </div>
 </div>
 
-</body>
-</html>
+{% endblock%}
+
+{% block endscripts %}
+{{ super() }}
+
+
+{% endblock %}
+
         
