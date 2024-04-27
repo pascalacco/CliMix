@@ -280,7 +280,8 @@ $(function () {
                 v: resultsData.GazElectrolyse,
                 f: resultsData.GazElectrolyse + ' GWh/an'
             }],
-            /*['Variation stock P2G, G2P (stock debut - stock fin)', {
+            /*
+            ['Variation stock P2G, G2P (stock debut - stock fin)', {
                 v: resultsData.consoGaz,
                 f: resultsData.consoGaz + ' GWh/an'
             }],*/

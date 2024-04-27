@@ -99,11 +99,16 @@ def nouv_capacite_alea(mix, alea):
     # carte alea MECS (lance 1 / 2)
     if alea == "MECS1" or alea == "MECS2" or alea == "MECS3":
         for k in capmax_info:
-            capmax_info[k]["eolienneON"] = int(capmax_info[k]["eolienneON"] * 0.4)
+            capmax_info[k]["eolienneON"] -= int(capmax_info[k]["eolienneON"] * 0.6)
 
     if alea == "MECS2" or alea == "MECS3":
         capmax_info["occ"]["eolienneON"] *= 2
         capmax_info["occ"]["panneauPV"] *= 2
+
+    if alea == "MECS3":
+        for k in capmax_info:
+            capmax_info[k]["EPR2"]=0
+            capmax_info[k]["centraleNuc"] = 0
 
     # carte alea MEGDT (lance 2)
     if alea == "MEGDT2" or alea == "MEGDT3":
@@ -124,13 +129,22 @@ def get_actions(mix):
             nb = mix["nb"][reg][p]
             if p == "centraleNuc":
                 duree = 40
-                cap = 0
+                if 'centraleNuc' in mix['capacites'][reg]:
+                    cap = mix['capacites'][reg]['centraleNuc']-nb
+                else:
+                    cap = 0
+
             elif p == "EPR2":
+                if 'EPR2' in mix['capacites'][reg]:
+                    cap = mix['capacites'][reg]['EPR2']
+                else:
+                    cap = 20-nb
                 duree = 40
-                cap = 20 - nb
+
             elif p == "methanation":
                 duree = 100
                 cap = 40 - nb
+
             elif p == "eolienneON" or p == "eolienneOFF":
                 duree = 15
                 cap = mix["capacites"][reg][p] - nb
@@ -144,7 +158,7 @@ def get_actions(mix):
                     replace_dict[reg][p][an] = {"action": "?",
                                                 "valeur": "",
                                                 "min": -mix["unites"][reg][p][an],
-                                                "max": cap_fin_de_vie,
+                                                "max": max(cap_fin_de_vie, -mix["unites"][reg][p][an]),
                                                 "forcee": True,
                                                 "date": annee}
                     cap -= cap_fin_de_vie
@@ -311,6 +325,7 @@ def calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances)
 
 def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
     prixGaz = 324.6e-6  # prix de l'electricite produite à partir du gaz/charbon --> moyenne des deux (35€ le MWh)
+    # prixGaz = 32.46e-6  # prix de l'electricite produite à partir du gaz/charbon --> moyenne des deux (35€ le MWh)
     prixNuc = 7.6e-6  # part du combustible dans le prix de l'electricite nucleaire (7.6€ le MWh)
 
     # carte alea MEGC (lance 1 / 3)
@@ -326,8 +341,8 @@ def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
         prixGaz *= 1.3
         prixNuc *= 1.2
 
-    cout_gaz = round(10.*(prodGazFossile * prixGaz))/10.
-    cout_uranium = round(10*(annuel['Nprod'] * prixNuc))/10.
+    cout_gaz = prodGazFossile * prixGaz
+    cout_uranium = annuel['Nprod'] * prixNuc
     cout = ((nouv["eolienneON"] + renouv["eolienneON"]) * 3.5 +
             (nouv["eolienneOFF"] + renouv["eolienneOFF"]) * 6 +
             nouv["panneauPV"] * 3.6 +
@@ -339,7 +354,6 @@ def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
             # formule BIZARE  (B.PoutMax * 0.0012) / 0.003
             cout_uranium +
             cout_gaz)
-    cout = round(10*cout)/10.
 
     # (S.PoutMax * 0.455) / 0.91 +
 
@@ -372,10 +386,10 @@ def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
         # d'après le rapport de stage, un pion d'éolienneOFF devrait coûter 6 Mds et non 1.2 Mds
         cout += nouv["pll"]["eolienneOFF"] * 6
 
-    result = {"cout": cout,
-              "budget": round(budget),
-              "cout_gaz": cout_gaz,
-              "cout_uranium": cout_uranium
+    result = {"cout": round(cout*10.)/10.,
+              "budget": round(budget*10.)/10.,
+              "cout_gaz": round(cout_gaz*10.)/10.,
+              "cout_uranium": round(cout_uranium*10.)/10.
               }
 
     return result
@@ -417,7 +431,7 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
 
     consoGazGlobale = (chroniques['Gstored'][0] - chroniques['Gstored'][-1])
     consGazG2P = annuel['Gprod'] / technologies.TechnoGaz.etaout  # gaz brulé pour le G2P
-    prodGazP2G = -annuel['Gcons'] * technologies.TechnoGaz.etaout  # gaz produit par le P2G
+    prodGazP2G = -annuel['Gcons'] * technologies.TechnoGaz.etain  # gaz produit par le P2G
     prodGazBiomasse = mix['nb']["biomasse"] * 2 * 0.1 * 0.71 * stratege.H  # gaz produit en bio masse
 
     #  gaz =        nbPions      * nbCentraleParPion * puissance * fdc * nbHeures

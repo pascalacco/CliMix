@@ -86,10 +86,15 @@
     <div class="col-sm-auto mt-1 mb-1">
         <span class="badge bg-secondary align-items-center">
 
-            <input value="{{ actions['alea']['actuel'] }}"
+            <select
                    type="text" class="form-control-sm"
                    id="alea" placeholder="Code aléa" name="alea"
-                   onchange="Calculer();"  {% if not actif %} disabled {% endif %}>
+                   onchange="Calculer();"  {% if not actif %} disabled {% endif %}
+            >
+                {% for alea in aleas %}
+                <option value="{{alea}}" {% if actions['alea']['actuel'] == alea %}selected{% endif %}> {{alea}} </option>
+                {% endfor %}
+            </select>
             <label for="alea">Code aléa</label>
         </span>
     </div>
