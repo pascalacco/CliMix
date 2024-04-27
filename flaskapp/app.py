@@ -60,6 +60,22 @@ def set_group():
     return resp
 
 
+@app.route('/saisie/<equipe>/<partie>/')
+def saisie(equipe, partie):
+    try:
+        dm = DataManager(equipe=equipe, partie=partie)
+        mix, annee_active = maitre_de_jeu.recup_mix(dm, "2030")
+        resp = saisie_html(equipe=equipe, partie=partie, annee=annee_active)
+
+    except:
+        with open(dataPath + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
+
+        resp = ["err", traceback.format_exc()]
+
+    return resp
+
+
 @app.route('/saisie/<equipe>/<partie>/<annee>')
 def saisie_html(equipe, partie, annee):
     try:
