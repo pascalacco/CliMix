@@ -11,9 +11,9 @@ chemin_scenarios = ceChemin + "../climix/mix_data/"
 #########################
 
 aleas = ["", "MEGC1", "MEGC2", "MEGC3", "MEMFDC1", "MEMFDC2", "MEMFDC3",
-         "MECS1", "MECS2", "MECS3", "MEVUAPV1", "MEVUAPV2", "MEVUAPV3",
+         "MECS1", "MECS2", "MEVUAPV1", "MEVUAPV2", "MEVUAPV3",
          "MEMDA1", "MEMDA2", "MEMDA3", "MEMP1", "MEMP2", "MEMP3",
-         "MEGDT1", "MEGDT2", "MEGDT3"];
+         "MEGDT1", "MEGDT2", "MEGDT3"] #, "MECS3"
 
 reg_convert = {
     "hdf": "Hauts-de-France",
