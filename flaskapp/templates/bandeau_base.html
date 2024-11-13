@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="author" content="Pascal Acco">
+    <meta name="description" content="Bandeau ">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %} {% endblock %}</title>
+
+    <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous">
+
+    {% endblock %}
+
+</head>
+<body>
+{% block content %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg  bg-light navbar-light">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">
+                <img id="Climix-logo"
+                     src="/static/logo.png"
+                     alt="Climix Logo"
+                     draggable="false"
+                     height="60"
+                />
+            </a>
+            <a class="navbar-brand" id="navSaisie">
+                Saisie
+            </a>
+            <a class="navbar-brand" id="navVue">
+                Vue
+            </a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a>Groupe : <span class="badge bg-secondary">{{equipe}}</span></a>
+                </li>
+                <li class="nav-item">
+                    <a>Scénario : <span class="badge bg-secondary">{{partie}}</span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% endblock %}
+
+
+{% block endscripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
+            crossorigin="anonymous"></script>
+<script>
+    const equipe  = '{{ equipe | safe }}';
+    const partie  = '{{ partie | safe }}';
+    var annee  = '{{ annee | safe }}';
+    var annee_int  = {{ annee | safe }};
+</script>
+
+{% endblock %}
+</body>
+</html>

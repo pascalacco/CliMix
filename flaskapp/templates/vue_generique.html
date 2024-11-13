@@ -1,0 +1,36 @@
+{% extends 'vues_base.html' %}
+
+
+
+{% block head %}
+    {{ super() }}
+
+    {{ bokeh_ressources|safe }}
+
+    <style>
+        .embed-wrapper {
+            display: flex;
+            justify-content: space-evenly;
+        }
+    </style>
+
+{% endblock %}
+
+
+{% block content %}
+    {{ super() }}
+    <h1>{% block title %} {{ vue }} * {% endblock %}</h1>
+        {% for nom, div in bokeh_divs.items() %}
+            <row>
+                <col class="embed-wrapper">
+                    <h3> {{ nom }} </h3>
+                        {{ div|safe }}
+                </col>
+            </row>
+
+        {% endfor %}
+
+    {{ bokeh_script|safe  }}
+
+
+{% endblock %}

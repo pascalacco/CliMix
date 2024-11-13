@@ -1,5 +1,5 @@
 {
-    "carte" : "",
+    "carte" : "France",
 
     "annee" : 2030,
 
@@ -11,6 +11,9 @@
     "innovPV" : 0,
 
     "co2" : [],
+
+    "consoGaz" : 0,
+    "GazElectrolyse" : 0,
 
     "scores" : {"Uranium": 100, "Hydro": 100, "Bois": 100, "Dechet": 0, "totstockbois":100},
 
@@ -40,17 +43,177 @@
         "cor": {"eolienneON": 1, "eolienneOFF": 3, "panneauPV": 7, "biomasse": 4}
     },
 
-    "hdf": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "idf": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "est": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "nor": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "occ": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "pac": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "bre": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "cvl": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "pll": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "naq": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "ara": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "bfc": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}, 
-    "cor": {"eolienneON": [], "eolienneOFF": [], "panneauPV": [], "methanation": [], "centraleNuc": [], "biomasse": [], "EPR2": []}
+    "hdf": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [
+            1995,
+            1995,
+            1995,
+            1995,
+            1995,
+            1995
+        ],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "idf": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "est": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [
+            2005,
+            2010,
+            2010,
+            2010,
+            2010
+        ],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "nor": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [
+            2010,
+            2010,
+            2010,
+            2020,
+            2020,
+            2020,
+            2020,
+            2020
+        ],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "occ": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [
+            2020,
+            2020
+        ],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "pac": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [
+            2000,
+            2000,
+            2000,
+            2000,
+            2000,
+            2000,
+            2000,
+            2000
+        ],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "bre": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "cvl": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [
+            2005,
+            2005,
+            2005,
+            2005,
+            2005,
+            2005,
+            2005
+        ],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "pll": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "naq": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [
+            1995,
+            1995,
+            1995,
+            1995,
+            2000,
+            2000
+        ],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "ara": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [
+            2010,
+            2010,
+            2010
+        ],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "bfc": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [
+            2005,
+            2005
+        ],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    },
+    "cor": {
+        "EPR2": [],
+        "biomasse": [],
+        "centraleNuc": [],
+        "eolienneOFF": [],
+        "eolienneON": [],
+        "methanation": [],
+        "panneauPV": []
+    }
 }

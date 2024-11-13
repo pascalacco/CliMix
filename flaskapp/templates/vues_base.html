@@ -1,0 +1,64 @@
+{% extends 'bandeau_base.html' %}
+
+
+{% block title %} Visualisation {% endblock %}
+
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+
+
+{% block content %}
+{{ super() }}
+
+<div class="row">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link {% if vue == 'resultats' %} active {% endif %}"
+            onclick="spin('resultats')" id="resultats">Résultats</a>
+        </li>
+        <li class="nav-item">
+            <button type="button" class="nav-link {% if vue == 'production' %} active {% endif %}" aria-current="page"
+              onclick="spin('production')" id="production">Production</button>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if vue == 'scenario' %} active {% endif %}" aria-current="page"
+               onclick="spin('scenario')" id="scenario" >Scenario</a>
+        </li>
+        <div class="text-center mt-3 mb-5">
+            <button class="btn btn-success" onclick="window.location.href = '/saisie/{{equipe}}/{{partie}}/{{annee}}';" type="button">< Retourner au mix pour le modifier</button>
+            {% set annee_int = annee | int%}
+            {% set next_annee = (annee_int +5) | safe%}
+
+            {% if annee_int >= 2050 %}
+            <button class="btn btn-success" onclick="window.location.href = '/commit/{{equipe}}/{{partie}}/{{annee}}';" type="button"> Terminer le jeu >
+            </button>
+            {% else %}
+            <button class="btn btn-success" onclick="window.location.href = '/commit/{{equipe}}/{{partie}}/{{annee}}';" type="button">Valider ce mix et passer au tour suivant >
+            </button>
+            {% endif %}
+
+        </div>
+    </ul>
+
+</div>
+
+
+
+
+{% endblock %}
+
+
+
+
+{% block endscripts %}
+
+{{ super() }}
+
+
+
+<script type="text/javascript" src="/static/vues.js"></script>
+
+ {% endblock %}
