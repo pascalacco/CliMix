@@ -1,11 +1,10 @@
 flask
 flask_cors
-flask_restx
 numpy
-opencv-contrib-python
 pandas
+tables
 sphynx
 myst-parser
 sphinxcontrib-mermaid
 sphinx-automodapi
-pytest
+flask-restx

@@ -1,29 +1,38 @@
+SHELL := /bin/bash
 .ONESHELL:
 
 venv :
 	./creer_venv.sh
-
-
-deploiement : 
-	cp -rf . /var/www/html/master
-	chmod a+w -R /var/www/html/master/flaskapp/game_data
-	touch /var/www/html/master/flaskapp/logs.txt
-	chmod a+w -R /var/www/html/master/flaskapp/logs.txt	
-
-exec_locale : 
-	. venv/bin/activate && python flaskapp/app.py
-
-deploiement_doc :
-	cp -rf doc/build/html /var/www/html/doc
+	touch venv/touche
 
 maj_python : venv/touche venv/climix_touche
 
-venv/touche : requirements.txt
-	venv/bin/pip install -r requirements.txt
+venv/touche : requirements.txt notebooks_requirements.txt
+	source venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt
+	source venv/bin/activate && pip install -r notebooks_requirements.txt
 	touch venv/touche
 
-venv/climix_touche : setup.py foret/*.py
-	venv/bin/pip install -e .
+venv/climix_touche : setup.py $(wildcard  climix/*.py) $(wildcard climix/*/*.py) $(wildcard flaskapp/*.py) $(wildcard pythonapp/*.py) 
+
+	source venv/bin/activate && pip install -e .
 	touch venv/climix_touche
 
-.PHONY : venv deploiement exec_locale 
+exec_locale : 
+	source venv/bin/activate && python flaskapp/app.py
+
+edit :
+	source venv/bin/activate
+	pycharm.sh .
+
+doc :
+	source venv/bin/activate &&  cd ./doc && ./apidoc_modules.sh && make  html
+
+deploiement_test :
+	source ./deploiement.sh && redeplois . /var/www/climix-test
+
+deploiement_stable :
+	source ./deploiement.sh && redeplois . /var/www/climix
+
+
+
+.PHONY : venv deploiement_test deploiement_stable  exec_locale doc

@@ -7,6 +7,8 @@ import sys
 import pathlib
 
 sys.path.insert(0, os.path.abspath('../../flaskapp/'))
+sys.path.insert(0, os.path.abspath('../../pythonapp/'))
+sys.path.insert(0, os.path.abspath('../../climix/'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information

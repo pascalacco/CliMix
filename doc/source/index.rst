@@ -10,11 +10,14 @@ Welcome to CliMix's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   apidoc/climix/climix
+   apidoc/flaskapp/flaskapp
+   apidoc/pythonapp/pythonapp
    doc_howto
    deploiement
    politique
-   alea   
-   modules
+   alea
+   pages_v0
 
 
 Indices and tables  
