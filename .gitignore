@@ -266,3 +266,8 @@ flaskapp/logs.txt
 flaskapp/__pycache__/
 logs.txt
 flaskapp/logs.txt
+
+venv/
+.vscode
+apidoc
+simulateur.html
