@@ -199,6 +199,13 @@ class DataManager:
         self.set_fichier(fichier, dico)
         return dico
 
+    def get_item_fichier(self, fichier, item, ext=".json"):
+
+        dico = self.get_fichier(fichier)
+
+        return dico[item]
+
+
     def set_item_enfouis_dans_fichier(self, fichier, items, val, ext=".json"):
 
         dico = self.get_fichier(fichier)

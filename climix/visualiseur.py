@@ -7,6 +7,9 @@ from bokeh.io import curdoc
 import numpy as np
 import pandas as pd
 
+from bokeh.resources import INLINE
+import flaskapp.journal.journal as jr
+
 
 def init_couleur_et_noms():
     init_cols = ['demande', 'electrolyse',
@@ -63,11 +66,30 @@ colonnes, couleurs, noms = init_couleur_et_noms()
 
 class Visualiseur:
 
-    def __init__(self, chroniques, data_mix="./data_mix/"):
+    def __init__(self, dm, annee, vue, data_mix="./data_mix/"):
         self.data_mix = data_mix
-        self.figs = {}
+        self.dm = dm
+        self.annee = annee
+        self.vue = vue
+        self.jinja_params = {
+            "equipe": dm.equipe, 
+            "partie": dm.partie,
+            "annee": annee, 
+            "vue": vue}
+        
+    def get_jinja_parameters(self):
+        return self.jinja_params
 
-        self.chroniques = chroniques.apply(lambda col : col.repeat(2))
+    def genere_jinja_parameters(self):
+        pass
+
+class VisualiseurBokeh(Visualiseur):
+
+    def __init__(self, dm, annee, vue, data_mix="./data_mix/"):
+        super().__init__(dm, annee, vue, data_mix)
+        self.figs = {}
+        self.chroniques = dm.get_chroniques(annee)
+        self.chroniques.apply(lambda col : col.repeat(2))
         dates = np.empty_like(self.chroniques["date"].values)
         dates[:-1] = self.chroniques["date"].values[1:]
         dates[-1] = self.chroniques["date"].values[-1]
@@ -76,6 +98,18 @@ class Visualiseur:
         self.source = bk.models.ColumnDataSource(self.chroniques)
 
         self.dates = np.array(self.chroniques['date'], dtype=np.datetime64)
+
+    def genere_jinja_parameters(self):
+        self.set_figs()
+        composants = self.get_composants()
+        resources = INLINE.render()
+        script = composants["script"]
+        divs = composants["divs"]
+        self.jinja_params.update({"bokeh_ressources": INLINE.render(),
+                            "bokeh_script": script,
+                            "bokeh_divs": divs
+                            })
+
 
     def get_dates_et_source(self):
         return self.dates, self.source
@@ -125,7 +159,7 @@ class Visualiseur:
         bkp.show(fig)
 
 
-class vScenario(Visualiseur):
+class vScenario(VisualiseurBokeh):
 
     def set_fig_1(self):
         fich = "S1_25-50.csv"
@@ -136,7 +170,7 @@ class vScenario(Visualiseur):
         self.set_fig(fig, "Scenario")
 
 
-class vProduction(Visualiseur):
+class vProduction(VisualiseurBokeh):
 
 
     def fig_prod(self):
@@ -227,7 +261,17 @@ class vProduction(Visualiseur):
         self.set_fig(self.fig_prod(), "Pilotage de la production")
 
 
+class vJournal(Visualiseur):
+    def genere_jinja_parameters(self):
+
+        datas = jr.calculer_data(self.dm, self.annee)
+
+        self.jinja_params.update({"article": jr.exemple(datas)
+                            })
+   
+
 vuesClasses = {"resultats": Visualiseur,
+               "journal": vJournal,
                "scenario": vScenario,
                "production": vProduction
                }

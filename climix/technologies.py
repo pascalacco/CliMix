@@ -6,6 +6,40 @@ import pandas as pd
 chemin = os.path.dirname(os.path.realpath(__file__))
 chemin_donnees = chemin + "/mix_data"
 
+
+pion_convert = {
+    "eolienneON": "Eoliennes on.",
+    "eolienneOFF": "Eoliennes off.",
+    "panneauPV": "Panneaux PV",
+    "centraleNuc": "Ancien nuc.",
+    "EPR2": "EPR 2",
+    "methanation": "Power 2 Gaz",
+    "biomasse": "Biomasse"
+}
+pion_short = {
+    "eolienneON": "ONshore",
+    "eolienneOFF": "OFFshore",
+    "panneauPV": "PV",
+    "centraleNuc": "Nuc.",
+    "EPR2": "EPR2",
+    "methanation": "P2G",
+    "biomasse": "Bio"
+}
+
+PoutMaxBio = 2 * 0.1 * 0.71 * (24 * 365)
+#  = nbCentraleParPion * puissance * fdc * nbHeures
+infos = {
+    "eolienneON":   {"PoutMax": 1.4,        "Cout" : 3.5,      "FacteurCO2": 10},
+    "eolienneOFF":  {"PoutMax": 2.4,        "Cout" : 6,        "FacteurCO2": 9},
+    "panneauPV":    {"PoutMax": 3,          "Cout" : 3.6,      "FacteurCO2": 55},
+    "centraleNuc":  {"PoutMax": 1.08,       "Cout" : 2,        "FacteurCO2": 6},
+    "EPR2":         {"PoutMax": 1.67,       "Cout" : 8.6,      "FacteurCO2": 6},
+    "methanation":  {"PoutMax": None,       "Cout" : 4.85,     "FacteurCO2": 0},
+    "biomasse":     {"PoutMax": PoutMaxBio, "Cout" : 0.12,     "FacteurCO2": 0},
+    "batt" :        {"PoutMax": 20.08/10.,  "Cout" : 0.8,      "FacteurCO2": 0}
+}
+
+
 class Techno:
     """Classe regroupant toutes les technologies de stockage et de production pilotables
 
@@ -159,10 +193,10 @@ class TechnoBatteries(Techno):
     """
     etain = 0.95
     etaout = 0.9
-    PoutMaxParUnite = 20.08/10.
+    PoutMaxParUnite = infos["batt"]["PoutMax"]
     PinMaxParUnite = PoutMaxParUnite
     capaciteParUnite = 74.14/10.
-    coutParUnite = 0.8
+    coutParUnite = infos["batt"]["Cout"]
     def __init__(self, nom='Batteries', stock=None,
                  etain=0.95, etaout=0.9, PoutMax=None, PinMax=None,
                  capacité=None, nb_units=1, H=Techno.H):
@@ -416,8 +450,8 @@ def fc_min_max_nuke(k, Pmax=1):
     return sMin*Pmax, sMax*Pmax
 
 class TechnoNucleaire(Techno):
-    PoutMaxParUniteEPR2 = 1.67
-    PoutMaxParUniteEPR = 1.08
+    PoutMaxParUniteEPR2 = infos["EPR2"]["PoutMax"]
+    PoutMaxParUniteEPR = infos["centraleNuc"]["PoutMax"]
 
     ramp_up = 0.25           # % de PoutMax /heure
     ramp_down = ramp_up

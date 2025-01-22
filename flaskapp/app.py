@@ -8,7 +8,6 @@ import os
 
 dataPath = os.path.dirname(os.path.realpath(__file__)) + '/'
 
-from bokeh.resources import INLINE
 
 from flaskapp.archiveur import DataManager
 from flaskapp import archiveur
@@ -252,19 +251,10 @@ def vues_html(equipe, partie, annee, vue="resultats"):
             resp = make_response(redirect("/"))
         else:
 
-            chroniques = dm.get_chroniques(annee)
-            vw = visualiseur.vuesClasses[vue](chroniques)
-            vw.set_figs()
-            composants = vw.get_composants()
-            resources = INLINE.render()
-            script = composants["script"]
-            divs = composants["divs"]
-            jinja_params = {"equipe": equipe, "partie": partie, "annee": annee,
-                            "vue": vue,
-                            "bokeh_ressources": INLINE.render(),
-                            "bokeh_script": script,
-                            "bokeh_divs": divs
-                            }
+            vw = visualiseur.vuesClasses[vue](dm, annee, vue)
+            vw.genere_jinja_parameters()
+            jinja_params = vw.get_jinja_parameters()
+
             try:
                 # return make_response(html)
                 resp = make_response(

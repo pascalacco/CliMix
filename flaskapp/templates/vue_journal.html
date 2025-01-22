@@ -1,0 +1,39 @@
+{% extends 'vues_base.html' %}
+
+{% block title %} {{ super() }} - Général {% endblock %}
+
+{% block content %}
+{{ super() }}
+<!--h1 id="titre" class="container-fluid pt-2 pb-1 text-center">Visualisation du mix</h1-->
+
+<div id="journal" class="container pt-5" style="">
+
+
+    <div id="changeYear" class="row justify-content-between mb-5">
+        <button class="btn col-1 btn-lg fs-1 btn-primary" id="previousYear" type="button">⊲</button>
+        <div class="col-10 fs-1 text-s text-center" id="turn"> Tour </div>
+        <button class="btn col-1 btn-lg fs-1 btn-primary" id="nextYear" type="button">⊳</button>
+    </div>
+
+    <div id="article" class="row justify-content-between mb-5"> {{article}} </div>
+    
+</div>
+
+
+{% endblock %}
+
+{% block endscripts %}
+{{ super() }}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script type="text/javascript">
+Array.prototype.reduce=function(fun){var len=this.length>>>0;if(typeof fun!="function")throw
+new TypeError;if(len==0&&arguments.length==1)throw new TypeError;var i=0;if(arguments.length>=2)var
+rv=arguments[1];else{do{if(i in this){var rv=this[i++];break}if(++i>=len)throw new
+TypeError;}while(true)}for(;i<len;i++)if(i in this)rv=fun.call(undefined,rv,this[i],i,this);return
+rv};
+</script>
+<script type="text/javascript" src="/static/constantes.js"></script>
+<script type="text/javascript" src="/static/journal.js"></script>
+
+{% endblock %}

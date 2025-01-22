@@ -4,6 +4,9 @@ import pandas as pd
 from climix import stratege, technologies
 import random
 
+from climix.technologies import infos
+
+
 ceChemin = os.path.dirname(os.path.realpath(__file__)) + '/'
 chemin_scenarios = ceChemin + "../climix/mix_data/"
 #########################
@@ -353,14 +356,14 @@ def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
 
     cout_gaz = prodGazFossile * prixGaz
     cout_uranium = annuel['Nprod'] * prixNuc
-    cout = ((nouv["eolienneON"] + renouv["eolienneON"]) * 3.5 +
-            (nouv["eolienneOFF"] + renouv["eolienneOFF"]) * 6 +
-            nouv["panneauPV"] * 3.6 +
-            nouv["EPR2"] * 8.6 +
-            renouv["centraleNuc"] * 2 +
-            nouv["biomasse"] * 0.12 +
-            nouv["methanation"] * 4.85 +
-            ((actions['stock']['nouv'] - actions['stock']['actuel']) * 0.8) +
+    cout = ((nouv["eolienneON"] + renouv["eolienneON"]) * infos["eolienneON"]["Cout"] +
+            (nouv["eolienneOFF"] + renouv["eolienneOFF"]) * infos["eolienneOFF"]["Cout"] +
+            nouv["panneauPV"] * infos["panneauPV"]["Cout"] +
+            nouv["EPR2"] * infos["EPR2"]["Cout"] +
+            renouv["centraleNuc"] * infos["centraleNuc"]["Cout"] +
+            nouv["biomasse"] * infos["biomasse"]["Cout"] +
+            nouv["methanation"] *infos["methanation"]["Cout"] +
+            ((actions['stock']['nouv'] - actions['stock']['actuel']) *infos["batt"]["Cout"]) +
             # formule BIZARE  (B.PoutMax * 0.0012) / 0.003
             cout_uranium +
             cout_gaz)
@@ -450,13 +453,19 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
     # carte alea MEMFDC (lance 2 / 3)
     # un an de moins de biomasse en nouvelle aquitaine (impact sur cette année)
     if mix["alea"] == "MEMFDC2":
-        prodGazBiomasse -= mix['nb']["naq"]["biomasse"] * 2. * 0.1 * 0.71 * stratege.H
+        prodGazBiomasse -= mix['nb']["naq"]["biomasse"] * infos["biomasse"]["PoutMax"]
 
     consGazFossile = annuel["electrolyse"] + consGazG2P - prodGazP2G - prodGazBiomasse
     if consGazFossile < 0.:
         consGazFossile = 0.
 
-    EmissionCO2 = prodOn * 10 + prodOff * 9 + prodPv * 55 + prodEau * 10 + prodNuc * 6 + consGazFossile * 443  # variable EmissionCO2
+    EmissionCO2 = prodOn * infos["eolienneON"]["FacteurCO2"] 
+    + prodOff * infos["eolienneOFF"]["FacteurCO2"] 
+    + prodPv * infos["panneauPV"]["FacteurCO2"] 
+    + prodEau * 10 
+    + prodNuc * infos["centraleNuc"]["FacteurCO2"] 
+    + consGazFossile * 443  # variable EmissionCO2
+    # Pascal : 6 g/kWh pour nucléaire et toutes les prods en GWh => unitées en tonnes de CO2
 
     demane_annuelle = annuel["demande"]  # variable demande
 
