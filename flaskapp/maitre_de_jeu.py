@@ -459,12 +459,12 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
     if consGazFossile < 0.:
         consGazFossile = 0.
 
-    EmissionCO2 = prodOn * infos["eolienneON"]["FacteurCO2"] 
-    + prodOff * infos["eolienneOFF"]["FacteurCO2"] 
-    + prodPv * infos["panneauPV"]["FacteurCO2"] 
-    + prodEau * 10 
-    + prodNuc * infos["centraleNuc"]["FacteurCO2"] 
-    + consGazFossile * 443  # variable EmissionCO2
+    EmissionCO2 = prodOn * infos["eolienneON"]["FacteurCO2"] \
+        + prodOff * infos["eolienneOFF"]["FacteurCO2"] \
+        + prodPv * infos["panneauPV"]["FacteurCO2"] \
+        + prodEau * 10. \
+        + prodNuc * infos["centraleNuc"]["FacteurCO2"]\
+        + consGazFossile * 443.  # variable EmissionCO2
     # Pascal : 6 g/kWh pour nucléaire et toutes les prods en GWh => unitées en tonnes de CO2
 
     demane_annuelle = annuel["demande"]  # variable demande

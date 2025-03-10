@@ -10,6 +10,7 @@ import pandas as pd
 from bokeh.resources import INLINE
 import flaskapp.journal.journal as jr
 
+from flaskapp.maitre_de_jeu import chemin_scenarios
 
 def init_couleur_et_noms():
     init_cols = ['demande', 'electrolyse',
@@ -162,10 +163,21 @@ class VisualiseurBokeh(Visualiseur):
 class vScenario(VisualiseurBokeh):
 
     def set_fig_1(self):
-        fich = "S1_25-50.csv"
-        df = pd.read_csv(self.data_mix + fich)
 
+        df = pd.read_hdf(chemin_scenarios + self.dm.partie + "_25-50.h5", "df")
+        df.groupby(pd.Grouper( freq='5Y')).sum() 
+        """ annee_en_cours = (self.annee.__str__())
+
+        if int(annee_en_cours) >= 2050:
+            df = df.loc["2050-1-1 0:0":"2050-12-31 23:0"]
+        else:
+            df = df.loc[annee_en_cours + "-1-1 0:0": annee_en_cours + "-12-31 23:0"]
+        
+        demande = df.groupby(df.date.dt.year)['demande'].sum() """
+
+        return df
     def set_figs(self):
+        self.set_fig_1()
         fig = self.stack_plot(cols=['demande', 'electrolyse'])
         self.set_fig(fig, "Scenario")
 
