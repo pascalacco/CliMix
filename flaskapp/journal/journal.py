@@ -3,6 +3,7 @@ import random
 from flaskapp.journal.texteur import *
 from climix.technologies import infos
 
+
 class Personnage:
     def __init__(self, nom, prenom, role, affiliation):
         self.nom = nom
@@ -23,6 +24,7 @@ class Personnage:
         )
         print(details)
 
+
 def generer_listes_personnages(personnages):
     # Dictionnaire pour identifier les personnages selon leur fonction
     premier_ministre = next(p for p in personnages if p.role == "première ministre")
@@ -39,27 +41,28 @@ def generer_listes_personnages(personnages):
 
     # Choix aléatoire pour la première apparition de l'activiste
     premier_syndicaliste_activiste = random.choice([syndicaliste_agricole, activiste])
-    autre_syndicaliste_activiste = syndicaliste_agricole if premier_syndicaliste_activiste == activiste else activiste 
-    
+    autre_syndicaliste_activiste = syndicaliste_agricole if premier_syndicaliste_activiste == activiste else activiste
+
     # Choix aléatoire pour le syndicaliste
     premier_politique = random.choice([leader_greenpeace, elu])
     autre_politique = leader_greenpeace if premier_politique == elu else elu
 
     # Création des listes avec les contraintes ajustées
     listes = [
-        [premier_ministre, premier_pdg, premier_syndicaliste_activiste],  
-        [autre_pdg, premier_politique, autre_syndicaliste_activiste],  
-        [premier_ministre, premier_pdg, autre_politique],  
-        [autre_pdg, premier_syndicaliste_activiste, premier_politique], 
-        [premier_ministre, autre_pdg, autre_politique]  
+        [premier_ministre, premier_pdg, premier_syndicaliste_activiste],
+        [autre_pdg, premier_politique, autre_syndicaliste_activiste],
+        [premier_ministre, premier_pdg, autre_politique],
+        [autre_pdg, premier_syndicaliste_activiste, premier_politique],
+        [premier_ministre, autre_pdg, autre_politique]
     ]
 
     return listes
 
 
 class Region:
-    def __init__(self, nom, prefecture, sous_prefectures, villes_cotieres, foires_agricoles, personnalites, elus, centrales_nucleaires, especes_terrestres, especes_marines):
-        self.nom=nom
+    def __init__(self, nom, prefecture, sous_prefectures, villes_cotieres, foires_agricoles, personnalites, elus,
+                 centrales_nucleaires, especes_terrestres, especes_marines):
+        self.nom = nom
         self.prefecture = prefecture
         self.sous_prefectures = sous_prefectures
         self.villes_cotieres = villes_cotieres
@@ -69,6 +72,7 @@ class Region:
         self.centrales_nucleaires = centrales_nucleaires
         self.especes_terrestres = especes_terrestres
         self.especes_marines = especes_marines
+
     def afficher_infos(self):
         print(f"Nom : {self.nom}")
         print(f"Préfecture : {self.prefecture}")
@@ -83,21 +87,22 @@ class Region:
 
 
 class DataForGazette:
-    def __init__(self, 
-        emissions_co2=1234.56,
-        equilibre_enr_nucleaire=75,
-        regions_photovoltaiques=["Occitanie"],
-        regions_eolien_onshore=["Normandie", "Bretagne"],
-        regions_eolien_offshore=["Pays de la Loire"],
-        puissance_photovoltaique_tour=500,
-        puissance_photovoltaique_totale=15000,
-        puissance_eolienne_tour=1200,
-        puissance_eolienne_totale=25000,
-        regions_suppression_nucleaire=["Occitanie"],
-        regions_sous_production=["Bretagne"],
-        regions_methaniseur=["Bretagne", "Normandie"],
-        regions_centrales_nucleaires=["Pays de la Loire", "Occitanie"] 
-        ):
+
+    def __init__(self,
+                 emissions_co2=1234.56,
+                 equilibre_enr_nucleaire=75,
+                 regions_photovoltaiques=["Occitanie"],
+                 regions_eolien_onshore=["Normandie", "Bretagne"],
+                 regions_eolien_offshore=["Pays de la Loire"],
+                 puissance_photovoltaique_tour=500,
+                 puissance_photovoltaique_totale=15000,
+                 puissance_eolienne_tour=1200,
+                 puissance_eolienne_totale=25000,
+                 regions_suppression_nucleaire=["Occitanie"],
+                 regions_sous_production=["Bretagne"],
+                 regions_methaniseur=["Bretagne", "Normandie"],
+                 regions_centrales_nucleaires=["Pays de la Loire", "Occitanie"]
+                 ):
         self.emissions_co2 = emissions_co2  # Emissions de CO2 (réel)
         self.equilibre_enr_nucleaire = equilibre_enr_nucleaire  # Equilibre ENR/Nucléaire (réel)
         self.regions_photovoltaiques = regions_photovoltaiques  # Régions Photovoltaiques (liste)
@@ -130,65 +135,71 @@ class DataForGazette:
 
 
 def calculer_data(dm, annee):
-    
+    """
+    Exploite les résultats pour obtenir des indicateur globaux et par régions pour influencer la rédaction du journal
+    @param dm: permet d'accéder aux "resultats" de la partie
+    @param annee: accéder au bon tour de la partie
+    @return: datas par regions et globales nécessaires pour influencer la génération du journal
+    """
     datas = DataForGazette()
 
     ## On exploite le fichier de résultats
     resultats = dm.get_fichier(fichier='resultats')[annee]
 
-    datas.emissions_co2= int(resultats["co2"])
-    datas.puissance_photovoltaique_totale = int(resultats["puissancePV"] *1000.0) #GWH -> MWh
-    datas.puissance_eolienne_totale = int((resultats["puissanceEolienneOFF"]+resultats["puissanceEolienneOFF"]) *1000.0) #GWH -> MWh
+    datas.emissions_co2 = int(resultats["co2"])
+    datas.puissance_photovoltaique_totale = int(resultats["puissancePV"] * 1000.0)  #GWH -> MWh
+    datas.puissance_eolienne_totale = int(
+        (resultats["puissanceEolienneOFF"] + resultats["puissanceEolienneOFF"]) * 1000.0)  #GWH -> MWh
     datas.equilibre_enr_nucleaire = int(resultats["prodNucleaire"] / (resultats["prodNucleaire"] +
-    resultats["prodOnshore"] + resultats["prodOffshore"] + 
-    resultats["prodPv"] + resultats["prodEau"])*100.)
+                                                                      resultats["prodOnshore"] + resultats[
+                                                                          "prodOffshore"] +
+                                                                      resultats["prodPv"] + resultats[
+                                                                          "prodEau"]) * 100.)
 
-
-    neg_transfert = [ 
-        resultats['transfert'][reg] for reg in resultats['transfert'] 
+    neg_transfert = [
+        resultats['transfert'][reg] for reg in resultats['transfert']
         if (resultats['transfert'][reg] < 0.)
-        ]
-    seuil = sum(neg_transfert)/len(neg_transfert)
+    ]
+    seuil = sum(neg_transfert) / len(neg_transfert)
     datas.regions_sous_production = [reg for reg in resultats['transfert'] if (resultats['transfert'][reg] < seuil)]
 
     ##  On exploite le fichier détaillé de mix
     mix = dm.get_item_fichier(fichier='mixes', item=annee)
 
-    reg_technos={}
+    reg_technos = {}
     for techno in ("panneauPV", "eolienneON", "eolienneOFF", "methanation", "centraleNuc", "EPR2"):
-        reg_technos[techno] = [ reg for reg in mix['unites'] if mix['nb'][reg][techno]>0]
-    
+        reg_technos[techno] = [reg for reg in mix['unites'] if mix['nb'][reg][techno] > 0]
+
     datas.regions_photovoltaiques = reg_technos["panneauPV"]
     datas.regions_eolien_offshore = reg_technos["eolienneOFF"]
     datas.regions_eolien_onshore = reg_technos["eolienneON"]
     datas.regions_methaniseur = reg_technos["methanation"]
-    datas.regions_centrales_nucleaires = reg_technos['centraleNuc'] +  reg_technos['EPR2'] 
+    datas.regions_centrales_nucleaires = reg_technos['centraleNuc'] + reg_technos['EPR2']
     # region deux fois si les deux technos => plus de proba que si une seule...
     # sinon faire list(set(reg_technos['centraleNuc'] +  reg_technos['EPR2'])) pour même proba
 
     ## On exploite mix['actions'] pour repérer ce qui a été choisi dans le tour
-    datas.regions_suppression_nucleaire=[]
+    datas.regions_suppression_nucleaire = []
     datas.puissance_eolienne_tour = 0.
     datas.puissance_photovoltaique_tour = 0.
     for reg in mix['actions']['regions']:
-        for annee, action in mix['actions']['regions'][reg]['centraleNuc'].items() :
-            if (("nb_demanteles" in action) and (action['nb_demanteles']>0)):
+        for annee, action in mix['actions']['regions'][reg]['centraleNuc'].items():
+            if (("nb_demanteles" in action) and (action['nb_demanteles'] > 0)):
                 datas.regions_suppression_nucleaire.append(reg)
 
-        for annee, action in mix['actions']['regions'][reg]['panneauPV'].items() :
-            if (action["action"]=="+") :
+        for annee, action in mix['actions']['regions'][reg]['panneauPV'].items():
+            if (action["action"] == "+"):
                 datas.puissance_photovoltaique_tour += action["valeur"] * infos['panneauPV']["PoutMax"] * 1000.
 
-        for annee, action in mix['actions']['regions'][reg]['eolienneON'].items() :
-            if (action["action"]=="+") :
+        for annee, action in mix['actions']['regions'][reg]['eolienneON'].items():
+            if (action["action"] == "+"):
                 datas.puissance_eolienne_tour += action["valeur"] * infos["eolienneON"]["PoutMax"] * 1000.
 
-        for annee, action in mix['actions']['regions'][reg]['eolienneOFF'].items() :
-            if (action["action"]=="+") :
-                datas.puissance_eolienne_tour += action["valeur"] * infos["eolienneOFF"]["PoutMax"]*1000.
-    
-    return datas
+        for annee, action in mix['actions']['regions'][reg]['eolienneOFF'].items():
+            if (action["action"] == "+"):
+                datas.puissance_eolienne_tour += action["valeur"] * infos["eolienneOFF"]["PoutMax"] * 1000.
 
+    return datas
 
 
 # # Choix des sujets pour les différents rôles.
@@ -235,7 +246,7 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
         else:
             infrastructure = 'éolien'
             region = 'France'
-        
+
         return infrastructure, region
 
     elif personnage.role == 'texte_resultat':
@@ -259,7 +270,7 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
         else:
             infrastructure_choisie = 'photovoltaïque'
             region = 'France'
-        
+
         return infrastructure_choisie, region
 
     elif personnage.role == 'activiste':
@@ -287,7 +298,7 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
         else:
             infrastructure_choisie = 'photovoltaïque'
             region = 'France'
-        
+
         return infrastructure_choisie, region
 
     elif personnage.role == 'greenpeace':
@@ -321,9 +332,8 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
     return "Aucune infrastructure ou région disponible selon les critères du personnage."
 
 
-
 def generate_article(character, data, dictionnaire_regions, year):
-    if character.role!='première ministre':
+    if character.role != 'première ministre':
         infrastructure, region_choisie = choisir_infrastructure_et_region(character, data)
         print(character.role)
         print(infrastructure)
@@ -338,11 +348,11 @@ def generate_article(character, data, dictionnaire_regions, year):
     elif character.role == 'PDG éolien':
         texte = texte_pdg_eolien(character, dictionnaire_regions.get(region_choisie))
     elif character.role == 'activiste':
-        texte = texte_activiste(character, dictionnaire_regions.get(region_choisie),infrastructure)
+        texte = texte_activiste(character, dictionnaire_regions.get(region_choisie), infrastructure)
     elif character.role == 'élue':
-        texte = texte_elue(character, dictionnaire_regions.get(region_choisie),infrastructure)
+        texte = texte_elue(character, dictionnaire_regions.get(region_choisie), infrastructure)
     elif character.role == 'première ministre':
-        texte = texte_premiere_ministre(character,data,year)
+        texte = texte_premiere_ministre(character, data, year)
     else:
         texte = "Rôle non reconnu. Veuillez vérifier le personnage."
 
@@ -351,22 +361,23 @@ def generate_article(character, data, dictionnaire_regions, year):
 
 def exemple(datas):
     personnages = [Personnage("Dossal", "Charles", "texte_resultat", "Paysans en colère")]
-   
-    personnages.append( Personnage("Rondepierre", "Aude", "activiste", "La nature avant les profits"))
-    
-    personnages.append( Personnage("Cros", "Marion", "PDG solaire", "Power Solar"))
-    
-    personnages.append( Personnage("Lachaize", "Sébastien", "PDG éolien", "Wind Power"))
-   
-    personnages.append( Personnage("Delga", "Carole", "élue", "Parti Socialiste"))
-   
-    personnages.append( Personnage("Acco", "Pascal", "greenpeace", "greenpeace"))
-    
-    personnages.append( Personnage(nom='Swift', prenom='Taylor', role='première ministre', affiliation='La République En Marche'))
-    
+
+    personnages.append(Personnage("Rondepierre", "Aude", "activiste", "La nature avant les profits"))
+
+    personnages.append(Personnage("Cros", "Marion", "PDG solaire", "Power Solar"))
+
+    personnages.append(Personnage("Lachaize", "Sébastien", "PDG éolien", "Wind Power"))
+
+    personnages.append(Personnage("Delga", "Carole", "élue", "Parti Socialiste"))
+
+    personnages.append(Personnage("Acco", "Pascal", "greenpeace", "greenpeace"))
+
+    personnages.append(
+        Personnage(nom='Swift', prenom='Taylor', role='première ministre', affiliation='La République En Marche'))
+
     listes_personnages = generer_listes_personnages(personnages)
 
-    character = random.choice(listes_personnages) # Assurez-vous que perso6 est défini quelque part dans votre code
+    character = random.choice(listes_personnages)  # Assurez-vous que perso6 est défini quelque part dans votre code
 
     from flaskapp.journal.france import dictionnaire_regions as regions
 
@@ -376,8 +387,8 @@ def exemple(datas):
 
 if __name__ == "__main__":
 
-
     from flaskapp.journal.france import dictionnaire_regions, france_data, personnages
+
     data = france_data
 
     print(exemple(france_data, dictionnaire_regions))
@@ -388,26 +399,23 @@ if __name__ == "__main__":
     article = texte_premiere_ministre(personnages[0], data, year)
     print(article)
 
-    
     # Exemple d'utilisation
-    character = personnages[4]  
+    character = personnages[4]
     article = generate_article(character, france_data, dictionnaire_regions, 2024)
     print(article)
-
 
     # %% [markdown]
     # # Quelques tests pour terminer.
 
     # %%
     perso2 = personnages[1]
-    infrastructure2, region2 = choisir_infrastructure_et_region( perso2, data, dictionnaire_regions)
+    infrastructure2, region2 = choisir_infrastructure_et_region(perso2, data, dictionnaire_regions)
     print(region2)
     print(infrastructure2)
-    texte_activiste(perso2,dictionnaire_regions.get(region2), infrastructure2)
-
+    texte_activiste(perso2, dictionnaire_regions.get(region2), infrastructure2)
 
     # %%
-    infrastructure,region_choisie = choisir_infrastructure_et_region(perso2, data)
+    infrastructure, region_choisie = choisir_infrastructure_et_region(perso2, data)
     print(infrastructure)
     print(region_choisie)
     texte_greenpeace(perso2, dictionnaire_regions.get(region_choisie), infrastructure)
@@ -453,33 +461,32 @@ if __name__ == "__main__":
     print(texte_resultat)
     print()
     # Si on indique la région France, le personnage regrette les choix du gouvernement de ne pas en faire plus pour le secteur.
-    texte_resultat = texte_pdg_solaire(perso3,  dictionnaire_regions["France"])
+    texte_resultat = texte_pdg_solaire(perso3, dictionnaire_regions["France"])
     print(texte_resultat)
 
     # Exemple d'utilisation
-    perso4=personnages[3]
-    texte_resultat = texte_pdg_eolien(perso4,  dictionnaire_regions["Occitanie"])
+    perso4 = personnages[3]
+    texte_resultat = texte_pdg_eolien(perso4, dictionnaire_regions["Occitanie"])
     print(texte_resultat)
     print()
     # Variante où il n'y a pas suffisamment d'éolien posé.
     texte_resultat = texte_pdg_eolien(perso4, dictionnaire_regions["France"])
     print(texte_resultat)
 
-    perso5=personnages[4]
+    perso5 = personnages[4]
     # Générer un texte pour une situation "supprimée" (ville avec une centrale nucléaire)
     print(texte_elue(perso5, dictionnaire_regions["Pays de la Loire"], "supprimée"))
     print()
     # Générer un texte pour une situation de sous-production
     print(texte_elue(perso5, dictionnaire_regions["Occitanie"], "sous-production"))
 
-    perso6=personnages[5]
-    
+    perso6 = personnages[5]
+
     # Cas d'une centrale supprimée
     print(texte_greenpeace(perso6, dictionnaire_regions["Occitanie"], "supprimée"))
     print()
     # Cas d'une centrale maintenue
-    print(texte_greenpeace(perso6,dictionnaire_regions["Auvergne-Rhône-Alpes"], "maintenue"))
+    print(texte_greenpeace(perso6, dictionnaire_regions["Auvergne-Rhône-Alpes"], "maintenue"))
 
     # Exemple d'utilisation
     print(tirer_arguments_greenpeace())
-

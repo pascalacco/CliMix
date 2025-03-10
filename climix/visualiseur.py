@@ -133,6 +133,7 @@ class VisualiseurBokeh(Visualiseur):
             méthode(stackers=cols, x="date", color=couleurs[cols].to_list(), source=self.source)
 
         else:
+            
             méthode(stackers=cols, x="date", color=couleurs[cols].to_list(),
                         legend_label=noms[cols].to_list(), source=self.source)
 
