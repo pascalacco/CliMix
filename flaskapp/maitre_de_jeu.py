@@ -298,7 +298,7 @@ def calculer(dm, annee, actions, scenario):
         chroniques, prod_renouvelables, puissances = stratege.simuler(demande=df["demande"].values,
                                                                       electrolyse=df["electrolyse"].values,
                                                                       mix=mix,
-                                                                      nb=mix["nb"])
+                                                                      pays=dm.pays)
 
         result = calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances)
         chroniques["date"] = df.index.values

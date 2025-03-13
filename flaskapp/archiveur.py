@@ -4,7 +4,7 @@ import os
 import json
 
 from flaskapp.journal.utils import *
-
+import climix.geographe.pays
 
 def normap(value, start1, stop1, start2, stop2):
     """
@@ -127,7 +127,7 @@ class DataManager:
         else:
             self.chemin = chemin
         self.data_managers = {}
-
+        self.pays = climix.geographe.pays.pays()
         self.results_path = self.chemin + "game_data/{}/{}/resultats.json".format(equipe, partie)
         self.scores_path = self.chemin + "game_data/{}/{}/scores.json".format(equipe, partie)
         self.mix_path = self.chemin + "game_data/{}/{}/mix.json".format(equipe, partie)

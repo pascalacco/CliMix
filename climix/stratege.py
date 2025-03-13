@@ -196,7 +196,10 @@ def extraire_chroniques(s, p, prodres, S, B, G, L, N):
     return chroniques
 
 
-def calculer_prod_non_pilot(mix, nb):
+def calculer_prod_non_pilot(mix, pays):
+
+    fdcs = pays.get_fdcs_meteo(mix["annee"])
+
 
     fdc_on = pd.read_csv(dataPath + "mix_data/fdc_on.csv")
     fdc_off = pd.read_csv(dataPath + "mix_data/fdc_off.csv")
@@ -209,13 +212,15 @@ def calculer_prod_non_pilot(mix, nb):
     powPV = 3
 
     # On fait la somme des prods par region pour chaque techno (FacteurDeCharge * NbPions * PuissanceParPion)
-    powers_renouvables = {"eolienneON": 1.4,
-                          "panneauPV": 3,
-                          "eolienneOFF": 3}
+    powers_renouvables = {"eolienneON": te.infos["eolienneON"]["PoutMax"], # old 1.4
+                          "panneauPV": te.infos["panneauPV"]["PoutMax"], # old 3
+                          "eolienneOFF": te.infos["eolienneOFF"]["PoutMax"]} # old 3 , DIFFERENT DE 2.4 !
     # note de Hugo, je ne sais pas à quoi sert cette ligne, l'effet de la carte aléa correspondant est déjà écrit à un autre endroit.
     # Alea +15% prod PV
     if "innovPV" in mix:
-        fdc_pv += mix["innovPV"] * fdc_pv
+        for reg in fdcs:
+            fdcs[reg]["panneauPV"] = [ val * (1. + mix["innovPV"]) for val in fdcs[reg]["panneauPV"]]
+
 
     reg_non_off_shore = [ "bfc", "ara", "cvl", "idf", "est"]
 
@@ -224,8 +229,8 @@ def calculer_prod_non_pilot(mix, nb):
     prodPV = np.zeros(H)
 
     prod = {"eolienneON": np.zeros(H),
-                "panneauPV": np.zeros(H),
-                "eolienneOFF": np.zeros(H)}
+            "panneauPV": np.zeros(H),
+            "eolienneOFF": np.zeros(H)}
     prod_reg={}
     for reg in mix['unites']:
         prod_reg[reg] = {}
@@ -233,7 +238,7 @@ def calculer_prod_non_pilot(mix, nb):
             if p=="eolienneOFF" and reg in reg_non_off_shore:
                 prod_reg[reg][p] = np.zeros(H)
             else:
-                prod_reg[reg][p] = np.array(fdc_on[reg]) * nb[reg][p] * pow
+                prod_reg[reg][p] = np.array(fdcs[reg][p]) * mix["nb"][reg][p] * pow
                 prod[p] += prod_reg[reg][p]
 
 
@@ -317,7 +322,7 @@ def result_ressources(mix, save, nbPions, nvPions, actions):
     return result
 
 
-def simuler(demande, electrolyse, mix, nb):
+def simuler(demande, electrolyse, mix, pays):
     """ Optimisation de strategie de stockage et de destockage du Mix energetique
 
     Args:
@@ -328,6 +333,8 @@ def simuler(demande, electrolyse, mix, nb):
         nvPions (dict) : nombre de nouveaux pions total pour chaque techno ce tour-ci
         nvPionsReg (dict) : nombre de pions total pour chaque techno
         electrolyse (float) : demande en electrolyse du scenar (kWh)
+        pays (obj) : objet de type pays donnant acces aux météos facteur de charge etc
+
     Returns:
         result (dict) : dictionnaire contenant les résultats d'une seule année (result sans s à la fin)
     """
@@ -336,7 +343,7 @@ def simuler(demande, electrolyse, mix, nb):
     # if mix["alea"] == "MEVUAPV1" or mix["alea"] == "MEVUAPV2" or mix["alea"] == "MEVUAPV3":
     #     save["varConso"] = 9e4
     # scenario += np.ones(H) * (save["varConso"]/H)
-
+    nb = mix["nb"]
     if mix["alea"] == "MEVUAPV2" or mix["alea"] == "MEVUAPV3":
         mix["innovPV"] = 0.15
 
@@ -344,7 +351,7 @@ def simuler(demande, electrolyse, mix, nb):
     if mix["alea"] == "MEMDA3":
         demande = 0.95 * demande
 
-    chroniques, prod_renouvelables = calculer_prod_non_pilot(mix, nb)
+    chroniques, prod_renouvelables = calculer_prod_non_pilot(mix, pays)
 
     chroniques.update({"demande": demande,
                   "electrolyse": electrolyse})
