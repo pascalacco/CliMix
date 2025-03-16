@@ -337,9 +337,50 @@ def calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances)
 
 
 def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
-    prixGaz = 324.6e-6  # prix de l'electricite produite à partir du gaz/charbon --> moyenne des deux (35€ le MWh)
-    # prixGaz = 32.46e-6  # prix de l'electricite produite à partir du gaz/charbon --> moyenne des deux (35€ le MWh)
-    prixNuc = 7.6e-6  # part du combustible dans le prix de l'electricite nucleaire (7.6€ le MWh)
+    """
+    PACCO
+    Selon 
+    https://www.kelwatt.fr/prix/gaz-peg-cours-marche-gros
+    le prox du Gaz sur le marché de gros (PEG) passe de 
+    2025 41  euro/MWh
+    2026 33
+    2027 28
+    2028 25
+
+    cela fait environ 30  euro/MW.h 
+    soit 30 kEuro/GW.h
+    soit 30.10-6  Meuro/GW.h  Meuro = milliard d'euros
+
+
+    Pour le cout combustible voir aussi :
+    https://cereme.fr/wp-content/uploads/2022/07/C-12-Comparaison-des-couts-complets-de-production-de-lelectricite_.pdf
+    Induire le cout indirect (B) dans le cout du combustible (A) du tableau cereme
+    Attention cereme par GWH(élec) et prix GWH(thermique PCS)
+
+    Gaz        224,6 €/MWh(é)(A) + 9,7(B) €/MWhé  
+        pour un cout du gaz 100€/Gwh thermique (cerem) et rendement 44.52% cela fait 
+        ramené en GWh(th)
+    Gaz         100 €/MWh(th) (A) + 4.3(B) €/MWh(th)
+    Le marché étant maintenant plutôt vers 30 €/MWH(th) que les 100€/MWh du cereme
+
+    Je propose
+    nucléaire 7,6(A) + 20,1(B) euro/MWh(élec)
+    Gaz       35 (A) + 4.3(B)  euro/MWh(élec)
+    
+    """
+
+    #vieux prixGaz = 32.46e-6  # MillardEuro /GWH 
+    prixGaz = 39.3e-6  # MillardEuro /GWh(th PCS) 
+                        #prix de l'electricite produite à partir du 
+                       #gaz/charbon --> moyenne des deux (35€ le MWh)
+ 
+
+    # 
+    # vieux prixGaz = 324.6e-6  # prix de l'electricite produite à partir du 
+                        #gaz/charbon --> moyenne des deux (35€ le MWh)
+    #vieux prixNuc = 7.6e-6  # Meuro/GWh part du combustible dans le prix de l'electricite 
+                      # nucleaire (7.6€ le MWh)
+    prixNuc = 27.7e-6   # Meuro/GWh(élec) part du combustible dans le prix de l'electricite 
 
     # carte alea MEGC (lance 1 / 3)
     if actions['alea']['actuel'] == "MEGC1" or actions['alea']['actuel'] == "MEGC2" or actions['alea'][
@@ -354,8 +395,8 @@ def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
         prixGaz *= 1.3
         prixNuc *= 1.2
 
-    cout_gaz = prodGazFossile * prixGaz
-    cout_uranium = annuel['Nprod'] * prixNuc
+    cout_gaz = prodGazFossile * prixGaz * 5.      #car 5 années
+    cout_uranium = annuel['Nprod'] * prixNuc * 5. # car 5 années
     cout = ((nouv["eolienneON"] + renouv["eolienneON"]) * infos["eolienneON"]["Cout"] +
             (nouv["eolienneOFF"] + renouv["eolienneOFF"]) * infos["eolienneOFF"]["Cout"] +
             nouv["panneauPV"] * infos["panneauPV"]["Cout"] +
@@ -375,11 +416,11 @@ def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
     #    cout += (10 - renouv["centraleNuc"]) * 0.5
 
     # budget à chaque tour sauf si carte evènement bouleverse les choses
-    budget = 70
+    budget = 70.
 
     # carte alea MEVUAPV : lance 3
     if actions['alea']['actuel'] == "MEVUAPV3":
-        budget -= 10
+        budget -= 10.
 
     # carte MEMDA : lance 1 / 2
     if actions['alea']['actuel'] == "MEMDA1" or actions['alea']['actuel'] == "MEMDA2" or actions['alea'][
@@ -443,6 +484,13 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
             listePenuriesHoraire[i % 24] += 1
 
     consoGazGlobale = (chroniques['Gstored'][0] - chroniques['Gstored'][-1])
+    # PACCO compter l'hydro si le niveau du lac est plus bas c'est que l'on 
+    # fait baisser le niveau d'étiage du lac. On considère que que ces GWh électrique
+    # Lac auraient été consommés en utilisant du gaz...  
+    #consoHydro = (chroniques['Lstored'][0] - chroniques['Lstored'][-1])
+    #consoGazGlobale += consoHydro / G.etaout 
+    
+    
     consGazG2P = annuel['Gprod'] / technologies.TechnoGaz.etaout  # gaz brulé pour le G2P
     prodGazP2G = -annuel['Gcons'] * technologies.TechnoGaz.etain  # gaz produit par le P2G
     prodGazBiomasse = mix['nb']["biomasse"] * 2 * 0.1 * 0.71 * stratege.H  # gaz produit en bio masse

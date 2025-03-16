@@ -177,9 +177,42 @@ class Techno:
 class TechnoStep(Techno):
     etain = 0.95
     etaout = 0.9
-    PoutMax = 9.3
-    PinMax = 9.3
-    capacité = 180
+    """
+        PACCO
+        Rendement step entre 70% et 85%
+        ici on a 95%*90 = 85,5%
+        plutôt optimiste....
+    """
+    #PoutMax = 9.3
+    #PinMax = 9.3
+    #capacité = 180
+    """
+    PACCO 
+    https://www.revolution-energetique.com/dossiers/ou-se-trouvent-les-stations-de-transfert-denergie-par-pompage-step-en-france/
+
+    Pomp.   Turb.  Cap 
+    Gw      Gw      Gw.h
+
+    1,160   1.79    53,7      Grand’Maison en Isère, d’une puissance en turbine de 1 790 MW ;
+    0,870   0.92    38,8      Montézic 1
+    0,630   0.73    3,65     Super-Bissorte en Savoie (730 MW) ;
+    0,720   0.72    3,6       Revin dans les Ardennes (720 MW) ;
+    0,480   0.46    2,76       Le Cheylas en Isère (460 MW)
+    0,310   0.33    0,99       La Coche en Savoie (330 MW). 
+            0.044   0.344     Le Pouget
+            0.051   0.408     Sainte Croix
+            0.073   0.576     Vouglans
+    
+    4,338   5.118   104.828   Total France 
+
+            1.1     20         Redenat projet suspendu
+
+    https://www.edf.fr/groupe-edf/produire-une-energie-respectueuse-du-climat/accelerer-le-developpement-des-energies-renouvelables/lenergie-hydraulique/nous-preparons-lavenir-de-lenergie-hydraulique/developpement-et-stockage-step
+    Parle de 5.72GW...
+    """
+    PoutMax = 5.118 + 1.1     #projet suspendu...
+    PinMax = 4.338 + 1.1
+    capacité = 104.828 + 20.
 
     def __init__(self, nom='Step', stock=16,
                  etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax, capacité=capacité, H=Techno.H):
@@ -217,15 +250,35 @@ class TechnoBatteries(Techno):
 
 
 class TechnoGaz(Techno):
+    #Suggestion PACCO selon https://www.edf.fr/groupe-edf/comprendre/production/thermique/thermique-a-flamme-en-chiffres
+
     capacité = 10000000.
     init_gaz = capacité / 2.
     # Methanation : 1 pion = 10 unites de 100 MW = 1 GW
     # T = Techno('Centrale thermique', None, np.zeros(H), None, 1, 0.7725*nbTherm, None, None)
     # Puissance : 1.08 GWe (EDF)
     # Meme rendement
-    etain = 0.59
     etaout = 0.45
-    PoutMax = 34.44
+    # etaout = 35 à 40% jusqu'à 50%/60% avec cogénération nouvelles du gaz naturel
+
+    #vieux etain = 0.59
+    # rendement du p2G et G2p de l'hydrogène à 25%
+    # Comme les gaz sont mélangés on fait
+    # etain(H2) * etaout(Gaz) = 0.25 
+    # d'où un fauc etain H2 à = 0.25/0.45 = 0.55
+    # le vieux etain donne etain * etaout = 26.55%
+    # ça semble correct 
+    etain = 0.59
+    
+    #PACCO vieux PoutMax = 34.44
+    PoutMax = 18.54 # GWe installé en france en 2019....
+    """# source https://www.services-rte.com/fr/visualisez-les-donnees-publiees-par-rte/capacite-installee-de-production.html?activation_key%3D9410cc48-8e65-4ecb-aace-1e2e8a710cf3%26activation_type%3Dpublic=true
+    # https://analysesetdonnees.rte-france.com/disponibilite-production
+    #   GAZ 12.9 + Fioul 2.6 + charbon 1.8 =  17,3 15/03/2025   """
+    """
+    Td dis 4 diesel * 0.44 + 9 Gaz * 2.015 + 12 GazComb
+                1.76      + 18.135         +  6.64   =   26.85  
+    """
     PinMaxParUnite = 1.
 
     def __init__(self, nom='Gaz', stock=init_gaz,
@@ -247,7 +300,9 @@ class TechnoLacs(Techno):
     duree_mois = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])*24
     etain = 1
     etaout = 1
-    PoutMax = 10
+    #PoutMax = 10
+    #PACCO https://analysesetdonnees.rte-france.com/disponibilite-production
+    PoutMax = 25.8 
     PinMax = 10
     capacité = TechnoStep.capacité
 
