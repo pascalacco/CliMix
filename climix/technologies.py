@@ -183,9 +183,11 @@ class TechnoStep(Techno):
         ici on a 95%*90 = 85,5%
         plutôt optimiste....
     """
-    #PoutMax = 9.3
-    #PinMax = 9.3
-    #capacité = 180
+    #vieux
+    PoutMax = 9.3
+    PinMax = 9.3
+    capacité = 180
+
     """
     PACCO 
     https://www.revolution-energetique.com/dossiers/ou-se-trouvent-les-stations-de-transfert-denergie-par-pompage-step-en-france/
@@ -210,9 +212,10 @@ class TechnoStep(Techno):
     https://www.edf.fr/groupe-edf/produire-une-energie-respectueuse-du-climat/accelerer-le-developpement-des-energies-renouvelables/lenergie-hydraulique/nous-preparons-lavenir-de-lenergie-hydraulique/developpement-et-stockage-step
     Parle de 5.72GW...
     """
-    PoutMax = 5.118 + 1.1     #projet suspendu...
-    PinMax = 4.338 + 1.1
-    capacité = 104.828 + 20.
+    # suggéré PACCO
+    #PoutMax = 5.118 + 1.1     #projet suspendu...
+    #PinMax = 4.338 + 1.1
+    #capacité = 104.828 + 20.
 
     def __init__(self, nom='Step', stock=16,
                  etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax, capacité=capacité, H=Techno.H):
@@ -250,10 +253,74 @@ class TechnoBatteries(Techno):
 
 
 class TechnoGaz(Techno):
-    #Suggestion PACCO selon https://www.edf.fr/groupe-edf/comprendre/production/thermique/thermique-a-flamme-en-chiffres
+    """
+       PACCO
+        Suggestion PACCO selon https://www.edf.fr/groupe-edf/comprendre/production/thermique/thermique-a-flamme-en-chiffres
+        Selon
+       https://www.kelwatt.fr/prix/gaz-peg-cours-marche-gros
+       le prox du Gaz sur le marché de gros (PEG) passe de
+       2025 41  euro/MWh
+       2026 33
+       2027 28
+       2028 25
 
+       cela fait environ 30  euro/MW.h
+       soit 30 kEuro/GW.h
+       soit 30.10-6  Meuro/GW.h  Meuro = milliard d'euros
+
+
+       Pour le cout combustible voir aussi :
+       https://cereme.fr/wp-content/uploads/2022/07/C-12-Comparaison-des-couts-complets-de-production-de-lelectricite_.pdf
+       Induire le cout indirect (B) dans le cout du combustible (A) du tableau cereme
+       Attention cereme par GWH(élec) et prix GWH(thermique PCS)
+
+       Gaz        224,6 €/MWh(é)(A) + 9,7(B) €/MWhé
+           pour un cout du gaz 100€/Gwh thermique (cerem) et rendement 44.52% cela fait
+           ramené en GWh(th)
+       Gaz         100 €/MWh(th) (A) + 4.3(B) €/MWh(th)
+       Le marché étant maintenant plutôt vers 30 €/MWH(th) que les 100€/MWh du cereme
+
+       Je propose
+       nucléaire 7,6(A) + 20,1(B) euro/MWh(élec)
+       Gaz       35 (A) + 4.3(B)  euro/MWh(élec)
+
+        Selon https://entreprises-collectivites.engie.fr/actualites/stockage-gaz-naturel-comment-france/
+        Capacité de 132 TWH en stockage
+
+        À voir
+        https://www.data.gouv.fr/fr/datasets/sites-dinjection-de-biomethane-en-france/
+
+        #etain
+        # rendement du p2G et G2p de l'hydrogène à 25%
+        # Comme les gaz sont mélangés on fait
+        # etain(H2) * etaout(Gaz) = 0.25
+        # d'où un fauc etain H2 à = 0.25/0.45 = 0.55
+        # le vieux etain donne etain * etaout = 26.55%
+        # ça semble correct
+
+        Pout MAx :
+        # source https://www.services-rte.com/fr/visualisez-les-donnees-publiees-par-rte/capacite-installee-de-production.html?activation_key%3D9410cc48-8e65-4ecb-aace-1e2e8a710cf3%26activation_type%3Dpublic=true
+        # https://analysesetdonnees.rte-france.com/disponibilite-production
+        #   GAZ 12.9 + Fioul 2.6 + charbon 1.8 =  17,3 15/03/2025
+        Td dis 4 diesel * 0.44 + 9 Gaz * 2.015 + 12 GazComb
+                1.76      + 18.135         +  6.64   =   26.85
+    """
+    #vieux
     capacité = 10000000.
     init_gaz = capacité / 2.
+    #prix = 324.6e-6  # prix de l'electricite produite à partir du
+    # gaz/charbon --> moyenne des deux (35€ le MWh) Erreur ! 350 €/MWh
+    prix = 32.46e-6  # vieux prix de l'electricite produite à partir du
+    # gaz/charbon --> moyenne des deux (35€ le MWh) Corrigé
+    PoutMax = 34.44
+
+
+    #suggéré PACCO
+    # capacité = 132000.
+    # init_gaz = capacité / 2.
+    # prix = 39.3e-6  # MillardEuro /GWh(th PCS)
+    # PoutMax = 18.54 # GWe installé en france en 2019....
+
     # Methanation : 1 pion = 10 unites de 100 MW = 1 GW
     # T = Techno('Centrale thermique', None, np.zeros(H), None, 1, 0.7725*nbTherm, None, None)
     # Puissance : 1.08 GWe (EDF)
@@ -262,23 +329,9 @@ class TechnoGaz(Techno):
     # etaout = 35 à 40% jusqu'à 50%/60% avec cogénération nouvelles du gaz naturel
 
     #vieux etain = 0.59
-    # rendement du p2G et G2p de l'hydrogène à 25%
-    # Comme les gaz sont mélangés on fait
-    # etain(H2) * etaout(Gaz) = 0.25 
-    # d'où un fauc etain H2 à = 0.25/0.45 = 0.55
-    # le vieux etain donne etain * etaout = 26.55%
-    # ça semble correct 
     etain = 0.59
     
-    #PACCO vieux PoutMax = 34.44
-    PoutMax = 18.54 # GWe installé en france en 2019....
-    """# source https://www.services-rte.com/fr/visualisez-les-donnees-publiees-par-rte/capacite-installee-de-production.html?activation_key%3D9410cc48-8e65-4ecb-aace-1e2e8a710cf3%26activation_type%3Dpublic=true
-    # https://analysesetdonnees.rte-france.com/disponibilite-production
-    #   GAZ 12.9 + Fioul 2.6 + charbon 1.8 =  17,3 15/03/2025   """
-    """
-    Td dis 4 diesel * 0.44 + 9 Gaz * 2.015 + 12 GazComb
-                1.76      + 18.135         +  6.64   =   26.85  
-    """
+
     PinMaxParUnite = 1.
 
     def __init__(self, nom='Gaz', stock=init_gaz,
@@ -295,15 +348,24 @@ class TechnoGaz(Techno):
 
 
 class TechnoLacs(Techno):
+    """
+    # vieux
     # Puissance centrales territoire : 18.54 GWe repartis sur 24 centrales (EDF)
     # Rendement meca (inutile ici) : ~35% generalement (Wiki)
+    #PACCO https://analysesetdonnees.rte-france.com/disponibilite-production
+    """
     duree_mois = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])*24
     etain = 1
     etaout = 1
-    #PoutMax = 10
-    #PACCO https://analysesetdonnees.rte-france.com/disponibilite-production
-    PoutMax = 25.8 
+
+    #vieux
+    PoutMax = 10
     PinMax = 10
+
+    # suggéré PACCO
+    PoutMax = 25.8
+    PinMax = 10
+
     capacité = TechnoStep.capacité
 
     def __init__(self, nom='Lacs', stock=None,
@@ -505,6 +567,27 @@ def fc_min_max_nuke(k, Pmax=1):
     return sMin*Pmax, sMax*Pmax
 
 class TechnoNucleaire(Techno):
+    """
+        #vieux
+         7.6e-6  Meuro/GWh part du combustible dans le prix de l'electricite
+                    # nucleaire (7.6€ le MWh)
+
+         Pour le cout combustible voir  :
+       https://cereme.fr/wp-content/uploads/2022/07/C-12-Comparaison-des-couts-complets-de-production-de-lelectricite_.pdf
+       Induire le cout indirect (B) dans le cout du combustible (A) du tableau cereme
+
+       Je propose
+       nucléaire 7,6(A) + 20,1(B) euro/MWh(élec)
+    """
+
+
+    #vieux
+    prix = 7.6e-6  # Meuro/GWh part du combustible dans le prix de l'electricite
+                    # nucleaire (7.6€ le MWh)
+    #suggéré PACCO
+    # prixNuc = 27.7e-6   # Meuro/GWh(élec) part du combustible dans le prix de l'electricite
+
+
     PoutMaxParUniteEPR2 = infos["EPR2"]["PoutMax"]
     PoutMaxParUniteEPR = infos["centraleNuc"]["PoutMax"]
 
