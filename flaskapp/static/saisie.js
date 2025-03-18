@@ -65,7 +65,7 @@ function recup(actions) {
                     }
                 } else {
                     if (unit_nouv.value !== '') {
-                        mesg += `La valeur ${unit_nouv.value} dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} n'est pas correcte !<br>
+                        mesg += `La valeur ${unit_nouv.value} dans la région ${reg_convert[reg]} pour l'unité ${pion_convert[pion]} n'est pas correcte !<br>
                                        Je l'efface pour vous et recommencez...<br>`;
                         unit_nouv.value = ''
                         err = true

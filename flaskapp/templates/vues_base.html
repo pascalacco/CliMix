@@ -27,10 +27,7 @@
             <a class="nav-link {% if vue == 'scenario' %} active {% endif %}" aria-current="page"
                onclick="spin('scenario')" id="scenario" >Scenario</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link {% if vue == 'journal' %} active {% endif %}" aria-current="page"
-               onclick="spin('journal')" id="journal" >Journal</a>
-        </li>
+
         <div class="text-center mt-3 mb-5">
             <button class="btn btn-success" onclick="window.location.href = '/saisie/{{equipe}}/{{partie}}/{{annee}}';" type="button">< Retourner au mix pour le modifier</button>
             {% set annee_int = annee | int%}
