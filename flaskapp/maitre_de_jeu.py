@@ -453,6 +453,7 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
     
     consGazG2P = annuel['Gprod'] / technologies.TechnoGaz.etaout  # gaz brulé pour le G2P
     prodGazP2G = -annuel['Gcons'] * technologies.TechnoGaz.etain  # gaz produit par le P2G
+    #PACCO TOdo passer dans techno
     prodGazBiomasse = mix['nb']["biomasse"] * 2 * 0.1 * 0.71 * stratege.H  # gaz produit en bio masse
 
     #  gaz =        nbPions      * nbCentraleParPion * puissance * fdc * nbHeures

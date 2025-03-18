@@ -312,14 +312,14 @@ class TechnoGaz(Techno):
     # gaz/charbon --> moyenne des deux (35€ le MWh) Erreur ! 350 €/MWh
     prix = 32.46e-6  # vieux prix de l'electricite produite à partir du
     # gaz/charbon --> moyenne des deux (35€ le MWh) Corrigé
-    PoutMax = 34.44
+    #PoutMax = 34.44
 
 
     #suggéré PACCO
-    # capacité = 132000.
-    # init_gaz = capacité / 2.
-    # prix = 39.3e-6  # MillardEuro /GWh(th PCS)
-    # PoutMax = 18.54 # GWe installé en france en 2019....
+    capacité = 132000.
+    init_gaz = capacité / 2.
+    prix = 39.3e-6  # MillardEuro /GWh(th PCS)
+    PoutMax = 18.54 # GWe installé en france en 2019....
 
     # Methanation : 1 pion = 10 unites de 100 MW = 1 GW
     # T = Techno('Centrale thermique', None, np.zeros(H), None, 1, 0.7725*nbTherm, None, None)
@@ -349,9 +349,41 @@ class TechnoGaz(Techno):
 
 class TechnoLacs(Techno):
     """
-    # vieux
-    # Puissance centrales territoire : 18.54 GWe repartis sur 24 centrales (EDF)
-    # Rendement meca (inutile ici) : ~35% generalement (Wiki)
+    ========
+    Les Lacs
+    ========
+
+    Retenues pilotables alimentées par les pluies et fontes de neige.
+    Seulement turbinage pour production.
+    Pas de stockage
+
+    Capacité
+    --------
+
+    Sur le graphe des capacités on voit (GWh)
+    =====   =======     =========   ==============  ========    ================
+    Année   Janvier     Min(Mars)   Max(Juil Aout)  Decembre    Stockage Dec-Jan
+    =====   =======     =========   ==============  ========    ================
+    2017    1731        839         2550            1493        -224
+    2018    1577        586         2869            2164        587
+    2020    2780        1513        3100            2532        248
+
+    On prévoit une capacité moyenne en janvier de 2000 GWh
+
+    Recharge
+    --------
+    Les données lake inflows du modèle éole ("/lake_inflows.csv") donnent
+    entre 800 et 1900 GWh par mois
+
+
+    2020 Lacs - > 18600 GWh produits + 248 stockés => 18848 GWh lake inflows
+    inflow par heure 18848/8766 = 2.15 GWh/h
+
+    Sources
+    -------
+        - https://analysesetdonnees.rte-france.com/production/reserve-hydraulique
+
+
     #PACCO https://analysesetdonnees.rte-france.com/disponibilite-production
     """
     duree_mois = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])*24
@@ -359,15 +391,18 @@ class TechnoLacs(Techno):
     etaout = 1
 
     #vieux
-    PoutMax = 10
-    PinMax = 10
+    #PoutMax = 10
+    #PinMax = 10
 
     # suggéré PACCO
     PoutMax = 25.8
+    #PoutMax = 6. # maxPACCO test pente pour vider en 3 mois
     PinMax = 10
 
-    capacité = TechnoStep.capacité
-
+    # vieux
+    #capacité = TechnoStep.capacité
+    capacité = 5000.
+    capacité_initiale = 2000.
     def __init__(self, nom='Lacs', stock=None,
                  etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax,
                  capacité=capacité, H=Techno.H):
@@ -382,7 +417,43 @@ class TechnoLacs(Techno):
 
     def Pout(self, k):
         """Renvoie la puissance maximum de décharge à l'heure k """
-        return min(self.stock[k] * self.etaout, self.PoutMax-self.décharge[k])
+
+
+        # on veut un pic verrs Aout avant de revenir au stock de janvier
+        kpla = 6 * 30 * 24 # mois d'Ju
+        kpic = 10 * 30 * 24 # mois d'Oct
+
+        if k>kpic :
+            objectif = self.stock[0] # revenir au stock initial
+            kobj = self.H
+            inflow_restante = self.recharge[k:].sum()
+        elif k>kpla:
+            objectif = 3500.
+            kobj = kpic
+            inflow_restante = self.recharge[k:kpic].sum()
+        else :
+            objectif = 3500.
+            kobj = kpla
+            inflow_restante = self.recharge[k:kpla].sum()
+
+        # marge stock : est-il possible de revenir au stock initial en fin d'année
+        if self.stock[k] + inflow_restante < objectif :
+            pout_obj = 0
+        else:
+            pout_obj = self.stock[k] + inflow_restante - objectif
+
+        horizon_vidage = 24*15 #0 en 15 jours
+        if (k+horizon_vidage) > self.H :
+            inflow_avant_vidage  = self.recharge[k:].sum() + self.recharge[0:(k+horizon_vidage-self.H)].sum()
+        else:
+            inflow_avant_vidage = self.recharge[k:(k+horizon_vidage)].sum()
+
+        # Pout pour atteindre stock 0 en temps heures
+        pout_vidage = max(0, (self.stock[k]+inflow_avant_vidage)/horizon_vidage)
+
+        p_moy = min(pout_obj, pout_vidage)
+        p_k = p_moy* (1.-np.cos(float(k % 24)/24.*2.*np.pi))
+        return min(self.stock[k], p_k, self.PoutMax-self.décharge[k])
 
     def set_stock_et_cons_from_csv(self, fichier=chemin_donnees + "/lake_inflows.csv"):
         lake = pd.read_csv(fichier, header=None)
@@ -390,11 +461,11 @@ class TechnoLacs(Techno):
         lakeprod = np.array(lake.prod2)
 
         # Calcul de ce qui est stocke dans les lacs pour chaque mois
-        self.stock = np.ones(self.H)*self.capacité
+        self.stock = np.ones(self.H)*self.capacité_initiale
         k = 0
         for m in range(12):
             ksuiv = k + TechnoLacs.duree_mois[m]
-            self.recharge[k:ksuiv] = lakeprod[m]
+            self.recharge[k:ksuiv] = lakeprod[m] * 1000./self.duree_mois[m]
             k = ksuiv
 
     def recharger(self, k):
@@ -406,8 +477,9 @@ class TechnoLacs(Techno):
 
     def produire_minimum(self, k):
         self.stock[k:] += self.recharge[k]
-        produit = self.décharger(k, self.recharge[k])
-        self.recharge[k] -= produit
+        #produit = self.décharger(k, self.recharge[k])
+        #self.recharge[k] -= produit
+        produit = 0
         return produit
 
     def décharger(self, k, aproduire):

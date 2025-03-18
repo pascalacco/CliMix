@@ -14,8 +14,8 @@ H = (24 * 365)
 
 
 class PredicteurGlissant():
-    def __init__(self, méthode, horizon=24, cyclique=H):
-        self.horizon = horizon*10
+    def __init__(self, méthode, horizon=24*10, cyclique=H):
+        self.horizon = horizon
         self.méthode = méthode
         self.trainard = 0
         self.somme=0
@@ -91,7 +91,7 @@ def strat_stockage(prodres, Step, Battery, Gas, Lake, Nuclear):
 
         prodres_k = prodres[k]
 
-        prodres_k += Lake.produire_minimum(k)
+        #prodres_k += Lake.produire_minimum(k)
 
         stock_SB = Step.stock[k] + Battery.stock[k]
         a_decharger_SB = stock_SB - consigne_SB
