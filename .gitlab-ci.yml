@@ -27,7 +27,7 @@ deploy_production:
       - sudo /etc/init.d/apache2 restart
 
 deploy_production:
-  stage: pre
+  stage: deploy
   environment: Staging
   script:
       - pwd
