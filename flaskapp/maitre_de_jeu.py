@@ -287,13 +287,18 @@ def calculer(dm, annee, actions, scenario):
         mix["nb"] = new["nb"]
         dm.set_item_fichier(fichier='mixes', item=annee, val=mix)
 
-        df = pd.read_hdf(chemin_scenarios + scenario + "_25-50.h5", "df")
         annee_en_cours = (mix['annee']).__str__()
 
-        if int(annee_en_cours) >= 2050:
-            df = df.loc["2050-1-1 0:0":"2050-12-31 23:0"]
+        if scenario=="2025Plat":
+            df = pd.read_hdf(chemin_scenarios + "S1_25-50.h5", "df")
+            df = df.loc["2025-1-1 0:0":"2025-12-31 23:0"]
         else:
-            df = df.loc[annee_en_cours + "-1-1 0:0": annee_en_cours + "-12-31 23:0"]
+            df = pd.read_hdf(chemin_scenarios + scenario + "_25-50.h5", "df")
+
+            if int(annee_en_cours) >= 2050:
+                df = df.loc["2050-1-1 0:0":"2050-12-31 23:0"]
+            else:
+                df = df.loc[annee_en_cours + "-1-1 0:0": annee_en_cours + "-12-31 23:0"]
 
         chroniques, prod_renouvelables, puissances = stratege.simuler(demande=df["demande"].values,
                                                                       electrolyse=df["electrolyse"].values,

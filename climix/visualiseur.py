@@ -165,8 +165,17 @@ class vScenario(VisualiseurBokeh):
 
     def set_fig_1(self):
 
-        df = pd.read_hdf(chemin_scenarios + self.dm.partie + "_25-50.h5", "df")
-        df.groupby(pd.Grouper( freq='5Y')).sum() 
+        if self.dm.partie == "2025Plat":
+            df = pd.read_hdf(chemin_scenarios + "S1_25-50.h5", "df")
+        else:
+            df = pd.read_hdf(chemin_scenarios + self.dm.partie + "_25-50.h5", "df")
+
+        df = df.groupby(pd.Grouper( freq='5Y')).sum()
+        df["annee"] = [y.__str__() for y in df.index.year.values]
+        cols = ['demande', 'electrolyse']
+        #fig = bkp.figure(x_axis_type="datetime")
+        fig = bkp.figure(x_range= df["annee"].values)
+        fig.vbar_stack(stackers=cols, x="annee", color=couleurs[cols].to_list(),legend_label=noms[cols].to_list(), source=df)
         """ annee_en_cours = (self.annee.__str__())
 
         if int(annee_en_cours) >= 2050:
@@ -176,10 +185,10 @@ class vScenario(VisualiseurBokeh):
         
         demande = df.groupby(df.date.dt.year)['demande'].sum() """
 
-        return df
+        return fig
     def set_figs(self):
-        self.set_fig_1()
-        fig = self.stack_plot(cols=['demande', 'electrolyse'])
+        fig = self.set_fig_1()
+        #fig = self.stack_plot(cols=['demande', 'electrolyse'])
         self.set_fig(fig, "Scenario")
 
 
