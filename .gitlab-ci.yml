@@ -20,11 +20,10 @@ deploy_production:
     - tags
   script:
       - pwd
-      - rm -rf .git/
-      - rm flaskapp/app.wsgi
-      - cp -r . /var/www/climix/
-      - cd /var/www/climix/
-      - source venv/bin/activate
-      - ./deploiement.sh
+      - ls /var/www/climix-test/flaskapp/game_data
+      - rm flaskapp/static/logo.png
+      - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
+      - make deploiement_stable
       - sudo /etc/init.d/apache2 restart
+
 
