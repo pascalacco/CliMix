@@ -26,4 +26,13 @@ deploy_production:
       - make deploiement_stable
       - sudo /etc/init.d/apache2 restart
 
+deploy_production:
+  stage: reset
+  environment: Staging
+  script:
+      - pwd
+      - rm -rf /var/www/climix_test/venv
+      - cd /var/www/climix_test && ./creer_venv.sh
+      - make deploiement_stable
+      - sudo /etc/init.d/apache2 restart
 

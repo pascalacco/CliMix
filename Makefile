@@ -34,5 +34,9 @@ deploiement_stable :
 	source ./deploiement.sh && redeplois . /var/www/climix
 
 
+venv_reset :
+	rm -rf venv
+	mdir venv
+	./creer_venv.sh
 
 .PHONY : venv deploiement_test deploiement_stable  exec_locale doc
