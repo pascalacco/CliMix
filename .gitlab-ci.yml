@@ -7,7 +7,7 @@ deploy_stage:
     environment: Staging
     script:
       - pwd
-      - ls /var/www/climix_test/flaskapp/game_data
+      - ls /var/www/climix-test/flaskapp/game_data
       - rm flaskapp/static/logo.png
       - mv flaskapp/static/logoTest.png flaskapp/static/logo.png
       - make deploiement_test
@@ -31,8 +31,8 @@ deploy_reset_test:
       - pwd && python3 --version
       - ls /var/www/
       - make deploiement_test
-      - rm -rf /var/www/climix_test/venv
-      - cd /var/www/climix_test && ./creer_venv.sh
-      - make deploiement_test
+      - rm -rf /var/www/climix-test/venv
+      - cd /var/www/climix-test && ./creer_venv.sh
+      - make deploiement-test
       - sudo /etc/init.d/apache2 restart
 
