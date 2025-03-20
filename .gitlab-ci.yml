@@ -28,7 +28,7 @@ deploy_reset_test:
   stage: deploy
   environment: Staging
   script:
-      - pwd && python 3 --version
+      - pwd && python3 --version
       - make deploiement_test
       - rm -rf /var/www/climix_test/venv
       - cd /var/www/climix_test && ./creer_venv.sh
