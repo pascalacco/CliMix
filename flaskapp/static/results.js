@@ -32,7 +32,8 @@ $(function () {
             resultsData.puissanceGaz +
             resultsData.puissanceNucleaire +
             resultsData.puissancePV +
-            resultsData.puissancePhs);
+            resultsData.puissancePhs+
+            resultsData.puissanceEau);
 
 
         let result1 = google.visualization.arrayToDataTable([['Technologie', 'Pourcentage', 'Unité'],
@@ -41,7 +42,7 @@ $(function () {
             ['Batterie', resultsData.puissanceBatterie, 'GW'],
             ['Nucléaire', resultsData.puissanceNucleaire, 'GW'],
             ['PV', resultsData.puissancePV, 'GW'],
-            ['Step', resultsData.puissancePhs, 'GW'],
+            ['Hydrau', resultsData.puissanceEau + resultsData.puissancePhs, 'GW'],
             ['Gaz2power', resultsData.puissanceGaz, 'GW']
         ]);
 
@@ -101,7 +102,7 @@ $(function () {
 
         let options = {
             width: 600,
-            title: 'Production électrique par technologie (en GWh)',
+            title: 'Production électrique par technologie : ' + Math.round(resultsData.production/1000) + " TWh/an",
             height: 400,
             legend: {position: 'right'},
             bar: {groupWidth: '75%'},
@@ -119,16 +120,16 @@ $(function () {
             ['ONshore', resultsData.prodOnshore],            // RGB value
             ['OFFshore', resultsData.prodOffshore],            // English color name
             ['Batterie', resultsData.prodBatterie],
-            ['Riv. + Lacs', resultsData.prodEau],
-            ['Gaz 2 Power', resultsData.prodGaz],
             ['Nucléaire', resultsData.prodNucleaire],
             ['PV', resultsData.prodPv],
+            ['Riv. + Lacs', resultsData.prodEau],
             ['Step', resultsData.prodPhs],
+            ['Gaz 2 Power', resultsData.prodGaz]
             // CSS-style declaration
         ]);
 
         let options = {
-            title: 'Production électrique (en GWh)',
+            title: 'Production électrique (en GWh) : Total de ' + Math.round(resultsData.production/1000) + " TWh/an",
             legend: 'none'
         };
 

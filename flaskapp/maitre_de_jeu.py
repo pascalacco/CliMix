@@ -552,7 +552,7 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
               "prodOffshore": prodOff,
               "puissanceEolienneOFF": round(mix['nb']["eolienneOFF"] * powOffshore, 2),
               "prodPv": prodPv, "puissancePV": round(mix['nb']["panneauPV"] * powPV, 2),
-              "prodEau": prodEau,
+              "prodEau": prodEau, "puissanceEau": round(puissances['L'], 2),
               "prodNucleaire": prodNuc, "puissanceNucleaire": round(puissances['N'], 2),
               "prodGaz": consGazG2P, "puissanceGaz": round(puissances['G'], 2),
               "prodPhs": prodPhs, "puissancePhs": round(puissances['S'], 2),

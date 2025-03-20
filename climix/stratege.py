@@ -385,6 +385,6 @@ def simuler(demande, electrolyse, mix, pays):
     chroniques.update(extraire_chroniques(s=s, p=p, prodres=prodresiduelle,
                                           S=S, B=B, G=G, L=L, N=N))
 
-    puissances = { Lettre: tech.PoutMax for Lettre, tech in {'N':N, 'G':G, 'L':G, 'S':S, 'B':B}.items()}
+    puissances = { Lettre: tech.PoutMax for Lettre, tech in {'N':N, 'G':G, 'L':L, 'S':S, 'B':B}.items()}
 
     return chroniques, prod_renouvelables, puissances

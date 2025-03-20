@@ -371,6 +371,10 @@ class TechnoLacs(Techno):
 
     On prévoit une capacité moyenne en janvier de 2000 GWh
 
+    Pout
+    ----
+    Sur RTE 25.8 au total il faut enlever STEP
+
     Recharge
     --------
     Les données lake inflows du modèle éole ("/lake_inflows.csv") donnent
@@ -379,6 +383,8 @@ class TechnoLacs(Techno):
 
     2020 Lacs - > 18600 GWh produits + 248 stockés => 18848 GWh lake inflows
     inflow par heure 18848/8766 = 2.15 GWh/h
+
+
 
     Sources
     -------
@@ -396,8 +402,7 @@ class TechnoLacs(Techno):
     #PinMax = 10
 
     # suggéré PACCO
-    PoutMax = 25.8
-    #PoutMax = 6. # maxPACCO test pente pour vider en 3 mois
+    PoutMax = 25.8 - TechnoStep.PoutMax
     PinMax = 10
 
     # vieux
