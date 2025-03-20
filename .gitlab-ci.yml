@@ -24,15 +24,3 @@ deploy_production:
       - make deploiement_stable
       - sudo /etc/init.d/apache2 restart
 
-deploy_reset_test:
-  stage: deploy
-  environment: Staging
-  script:
-      - pwd && python3 --version
-      - ls /var/www/
-      - make deploiement_test
-      - rm -rf /var/www/climix-test/venv
-      - cd /var/www/climix-test && ./creer_venv.sh
-      - make deploiement-test
-      - sudo /etc/init.d/apache2 restart
-
