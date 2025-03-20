@@ -402,7 +402,7 @@ class TechnoLacs(Techno):
     # vieux
     #capacité = TechnoStep.capacité
     capacité = 5000.
-    capacité_initiale = 2500.
+    capacité_initiale = 2800.
     def __init__(self, nom='Lacs', stock=None,
                  etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax,
                  capacité=capacité, H=Techno.H):
@@ -422,17 +422,19 @@ class TechnoLacs(Techno):
         # on veut un pic verrs Aout avant de revenir au stock de janvier
         kpla = 6 * 30 * 24 # mois d'Ju
         kpic = 10 * 30 * 24 # mois d'Oct
-
+        p_moy = None
         if k>kpic :
             #Novembre à janvier on lache un peu retour à 2500
-            horizon_vidage = 24 * 30 *1  # 0 en 1 mois
+            horizon_vidage = 24 * 30 *3 # 0 en 1 mois
             objectif = self.stock[0] # revenir au stock initial
             kobj = self.H
             inflow_restante = self.recharge[k:].sum()
+            p_moy = max(0, (self.stock[k] - objectif + inflow_restante)/(self.H-k))
+
         elif k>kpla:
             #Juin à Novembre on maintien à 3500 max
             horizon_vidage = 24 * 30 *4  # 0 en 15 jours
-            objectif = 3300.
+            objectif = 3800.
             kobj = kpic
             inflow_restante = self.recharge[k:kpic].sum()
         else :
@@ -443,7 +445,7 @@ class TechnoLacs(Techno):
             else:
                 #là gros pic Fevrier on lache !
                 horizon_vidage = 24 * 5  # 0 en 15 jours
-            objectif = 3500.
+            objectif = 3800.
             kobj = kpla
             inflow_restante = self.recharge[k:kpla].sum()
 
@@ -453,15 +455,17 @@ class TechnoLacs(Techno):
         else:
             pout_obj = self.stock[k] + inflow_restante - objectif
 
-        if (k+horizon_vidage) > self.H :
-            inflow_avant_vidage  = self.recharge[k:].sum() + self.recharge[0:(k+horizon_vidage-self.H)].sum()
+        if (k+horizon_vidage) > self.H:
+            inflow_avant_vidage = self.recharge[k:].sum() + self.recharge[0:(k+horizon_vidage-self.H)].sum()
         else:
             inflow_avant_vidage = self.recharge[k:(k+horizon_vidage)].sum()
 
         # Pout pour atteindre stock 0 en temps heures
         pout_vidage = max(0, (self.stock[k]+inflow_avant_vidage)/horizon_vidage)
 
-        p_moy = min(pout_obj, pout_vidage)
+        if p_moy is None :
+            p_moy = min(pout_obj, pout_vidage)
+
         p_k = p_moy* (1.-np.cos(float(k % 24)/24.*2.*np.pi))
         return min(self.stock[k], p_k, self.PoutMax-self.décharge[k])
 
