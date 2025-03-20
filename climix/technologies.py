@@ -306,17 +306,18 @@ class TechnoGaz(Techno):
                 1.76      + 18.135         +  6.64   =   26.85
     """
     #vieux
-    capacité = 10000000.
-    init_gaz = capacité / 2.
+    #capacité = 10000000.
+    #init_gaz = capacité / 2.
     #prix = 324.6e-6  # prix de l'electricite produite à partir du
     # gaz/charbon --> moyenne des deux (35€ le MWh) Erreur ! 350 €/MWh
-    prix = 32.46e-6  # vieux prix de l'electricite produite à partir du
+    #prix = 32.46e-6  # vieux prix de l'electricite produite à partir du
     # gaz/charbon --> moyenne des deux (35€ le MWh) Corrigé
     #PoutMax = 34.44
 
 
     #suggéré PACCO
-    capacité = 132000.
+    capacité = 132000.  # PACCO
+    capacité = 1320000. # sinon à cours de stock en Décembre S4 dès 2030
     init_gaz = capacité / 2.
     prix = 39.3e-6  # MillardEuro /GWh(th PCS)
     PoutMax = 18.54 # GWe installé en france en 2019....
@@ -439,9 +440,9 @@ class TechnoLacs(Techno):
             inflow_restante = self.recharge[k:kpic].sum()
         else :
             #Janvier à Juin on lache et gère le min
-            if k<30*24 :
+            if k<30*15 :
                 # pas trop avant fevrier
-                horizon_vidage = 24 * 30 * 3  # 0 en 15 jours
+                horizon_vidage = 24 * 30 * 4  # 0 en 15 jours
             else:
                 #là gros pic Fevrier on lache !
                 horizon_vidage = 24 * 5  # 0 en 15 jours
@@ -663,15 +664,18 @@ class TechnoNucleaire(Techno):
        Induire le cout indirect (B) dans le cout du combustible (A) du tableau cereme
 
        Je propose
-       nucléaire 7,6(A) + 20,1(B) euro/MWh(élec)
+       nucléaire 7,6(A) + 20,1(B) + 0.1 (F) euro/MWh(élec) EPR2 = 27.8
+
+       Si on reagarde ancien nuke
+        Nucléare A+B+F = 43,2  €/MWh
     """
 
 
     #vieux
-    prix = 7.6e-6  # Meuro/GWh part du combustible dans le prix de l'electricite
+    #prix = 7.6e-6  # Meuro/GWh part du combustible dans le prix de l'electricite
                     # nucleaire (7.6€ le MWh)
     #suggéré PACCO
-    # prixNuc = 27.7e-6   # Meuro/GWh(élec) part du combustible dans le prix de l'electricite
+    prix = 43.2e-6   # Meuro/GWh(élec) part du combustible dans le prix de l'electricite (ancien Nuke)
 
 
     PoutMaxParUniteEPR2 = infos["EPR2"]["PoutMax"]
