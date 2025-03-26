@@ -407,7 +407,7 @@ class TechnoLacs(Techno):
 
     # vieux
     #capacité = TechnoStep.capacité
-    capacité = 5000.
+    capacité = 4000.
     capacité_initiale = 2800.
     def __init__(self, nom='Lacs', stock=None,
                  etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax,
@@ -429,7 +429,7 @@ class TechnoLacs(Techno):
         kpla = 6 * 30 * 24 # mois d'Ju
         kpic = 10 * 30 * 24 # mois d'Oct
         p_moy = None
-        if k>kpic :
+        if k > kpic:
             #Novembre à janvier on lache un peu retour à 2500
             horizon_vidage = 24 * 30 *3 # 0 en 1 mois
             objectif = self.stock[0] # revenir au stock initial
@@ -437,21 +437,21 @@ class TechnoLacs(Techno):
             inflow_restante = self.recharge[k:].sum()
             p_moy = max(0, (self.stock[k] - objectif + inflow_restante)/(self.H-k))
 
-        elif k>kpla:
+        elif k > kpla:
             #Juin à Novembre on maintien à 3500 max
             horizon_vidage = 24 * 30 *4  # 0 en 15 jours
-            objectif = 3800.
+            objectif = 3500.
             kobj = kpic
             inflow_restante = self.recharge[k:kpic].sum()
         else :
             #Janvier à Juin on lache et gère le min
-            if k<30*15 :
+            if k < 24*15:
                 # pas trop avant fevrier
                 horizon_vidage = 24 * 30 * 4  # 0 en 15 jours
             else:
                 #là gros pic Fevrier on lache !
                 horizon_vidage = 24 * 5  # 0 en 15 jours
-            objectif = 3800.
+            objectif = 3500.
             kobj = kpla
             inflow_restante = self.recharge[k:kpla].sum()
 
