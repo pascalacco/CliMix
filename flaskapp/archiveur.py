@@ -6,6 +6,15 @@ import json
 from flaskapp.journal.utils import *
 import climix.geographe.pays
 
+
+def sépare_groupe_de_equipe(nom):
+    groupe = nom[0:-1]
+    num_equipe = nom[-1]
+    if num_equipe == 'e' :
+        num_equipe = "Dumbledore"
+        groupe = nom[0:-10]
+    return groupe, num_equipe
+
 def normap(value, start1, stop1, start2, stop2):
     """
     Normalise la valeur value donnée dans les bornes 1 pour l'adapter aux bornes 2
@@ -49,19 +58,16 @@ class Parties:
                     if os.path.isdir(os.path.join(self.chemin + filename, fileteam)) == True:
 
                         # read the json file
-                        with open(self.self.chemin + filename + '/' + fileteam + '/resultats.json') as json_file:
+                        with open(self.chemin + filename + '/' + fileteam + '/resultats.json') as json_file:
                             data = json.load(json_file)
                             currentYear = 0
                             # get the first key of the json file
                             for key in data.keys():
                                 # check if it's empty
+                                currentYear = key
                                 if data[key] == {}:
-                                    # remove the empty key
-                                    currentYear = key
-                                    print(currentYear)
-                                    # exite the for loop
                                     break
-                            grouplist[filename].append({'team': fileteam, 'data': currentYear})
+                            grouplist[filename].append({'partie': fileteam, 'annee': currentYear})
                             # grouplist[filename]{'team':fileteam,'data':'data'})
 
         # grouplist = sorted(grouplist, key=lambda d: d['group']+d['team'])
@@ -69,7 +75,7 @@ class Parties:
         grouplist = dict(sorted(grouplist.items()))
         # sort the list of teams by team name
         for key in grouplist:
-            grouplist[key] = sorted(grouplist[key], key=lambda d: d['team'])
+            grouplist[key] = sorted(grouplist[key], key=lambda d: d['partie'])
 
         return grouplist
 
@@ -78,10 +84,28 @@ class Parties:
 
         for equipe in grouplist:
             for partie in grouplist[equipe]:
-                percent = normap(int(partie['data']), 2030, 2050, 0, 100)
+                percent = normap(int(partie['annee']), 2030, 2050, 0, 100)
                 partie['percent'] = percent
 
         return grouplist
+
+    def get_liste_groupes_par_parties(self):
+        grouplist = self.get_liste_equipes()
+        groupes = {}
+        for equipe in grouplist:
+            groupe, num_equipe = sépare_groupe_de_equipe(equipe)
+            if groupe not in groupes:
+                groupes[groupe]={}
+            for partie in grouplist[equipe]:
+                percent = normap(int(partie['annee']), 2030, 2050, 0, 100)
+                partie['percent'] = percent
+                partie['equipe'] = equipe
+                if partie['partie'] not in groupes[groupe]:
+                    groupes[groupe][partie['partie']] = {num_equipe: partie}
+                else:
+                    groupes[groupe][partie['partie']][num_equipe] = partie
+
+        return groupes
 
     def get_data_manager(self, equipe, partie):
         if equipe in self.data_managers:
@@ -237,7 +261,7 @@ class DataManager:
                 if data[key] == {}:
                     # remove the empty key
                     annee = key
-                    print(annee)
+                    #print(annee)
                     # exite the for loop
                     break
             return annee
@@ -394,3 +418,7 @@ def get_rol(equipe, partie):
     return data_role
 
 
+if __name__=="__main__":
+    partie = Parties()
+    #print(partie.get_group_list())
+    print(partie.get_liste_equipes())

@@ -6,7 +6,8 @@ import datetime
 import traceback
 import os
 
-dataPath = os.path.dirname(os.path.realpath(__file__)) + '/'
+from admin.resources import admin_blueprint
+#from jeu.resources import jeu_blueprint
 
 
 from flaskapp.archiveur import DataManager
@@ -16,6 +17,7 @@ from climix import visualiseur
 
 # Set up Flask:
 app = Flask(__name__)
+app.register_blueprint(admin_blueprint)
 
 # Bypass CORS at the front end:
 cors = CORS(app)
