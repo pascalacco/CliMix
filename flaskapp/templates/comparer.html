@@ -1,0 +1,43 @@
+
+{% extends 'template_base.html' %}
+
+
+{% block title %} Comparaison {% endblock %}
+
+
+{% block head %}
+{{ super() }}
+
+
+{% endblock %}
+
+{% block navlinks %}
+            <a class="navbar-brand">
+				{{ title }}
+            </a>
+
+{% endblock %}
+
+
+{% block content %}
+{{ super() }}
+
+	{{ liste }}
+
+{% endblock%}
+
+{% block endscripts %}
+
+{{ super() }}
+
+
+<script>
+
+</script>
+
+<script type="text/javascript" src="/static/tableau_de_bord.js"></script>
+
+{% endblock %}
+
+
+

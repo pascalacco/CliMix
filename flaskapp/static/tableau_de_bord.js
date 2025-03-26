@@ -22,15 +22,24 @@ function neste_les_checks() {
     }
 };
 
-function go_to_comparer(groupe)
-{
-    var checked_list={}
-    fetch("/admin/comparer/" + groupe, {
+async function go_to_comparer(groupe) {
+    var checked_list = [];
+    checkgroups = document.querySelectorAll('[id*=check-].subOption');
+    for(var j=0; j<checkgroups.length; j++)
+    {
+            if (checkgroups[j].checked)
+            {   champs = checkgroups[j].id.split('-')
+                checked_list.push(champs[1]+'_'+champs[2]+'_'+champs[3].slice(3));
+            }
+    };
+    doc = await fetch("/admin/comparer/post_liste", {
         redirect: 'follow',
         method: "POST",
         body: JSON.stringify(checked_list),
         headers: {"Content-type": "application/json; charset=UTF-8"}
-        });
+        }).then( (data) => {
+            if(data.redirected) {window.location = data.url;}
+            });
 };
 
 $(neste_les_checks());

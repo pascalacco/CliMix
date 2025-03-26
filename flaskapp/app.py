@@ -1,5 +1,5 @@
 import jinja2
-from flask import Flask, request, jsonify, render_template, redirect, make_response, send_file
+from flask import Flask, request, jsonify, render_template, redirect, make_response, send_file, session
 from flask_cors import CORS, cross_origin
 
 import datetime
@@ -17,6 +17,7 @@ from climix import visualiseur
 
 # Set up Flask:
 app = Flask(__name__)
+app.secret_key = 'fdsfds3215zez'
 app.register_blueprint(admin_blueprint)
 
 # Bypass CORS at the front end:
