@@ -27,27 +27,25 @@ function recup(actions) {
     let mesg = ''
     for (const reg in unites) {
         for (const pion in unites[reg]) {
-            var unit_fin = document.getElementById(`${reg}_${pion}_fin`);
-            if (unit_fin) {
-                if (unit_fin.checkValidity(unit_fin.value)) {
-                    for (const an in actions['regions'][reg][pion]) {
+            for (const an in actions['regions'][reg][pion]) {
+                var unit_fin = document.getElementById(`${reg}_${pion}_${an}_fin`);
+                if (unit_fin) {
+                    if (unit_fin.checkValidity(unit_fin.value)) {
                         if ((actions['regions'][reg][pion][an]['action'] == "?") || (actions['regions'][reg][pion][an]['action'] == "-")) {
                             actions['regions'][reg][pion][an]['valeur'] = Number(unit_fin.value);
                             actions['regions'][reg][pion][an]['action'] = "-";
                         }
-
-                    }
-
-                } else {
-                    if (unit_fin.value == '') {
-                        mesg += `Cliquez dans la région ${reg_convert[reg]} et sélectionnez un choix pour  l'unité ${pion_convert[pion]} en fin de vie!<br>`;
-
                     } else {
-                        mesg += `La valeur ${unit_fin.value} saisie dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} est incorrecte!<br> Débile(s) ! <br> je l'efface pour vous. <br>`;
-                        unit_fin.value = ""
-                    }
-                    err = true;
+                        if (unit_fin.value == '') {
+                            mesg += `Cliquez dans la région ${reg_convert[reg]} et sélectionnez un choix pour  l'unité ${pion_convert[pion]} en fin de vie!<br>`;
 
+                        } else {
+                            mesg += `La valeur ${unit_fin.value} saisie dans la région ${reg_convert[reg]} pour  l'unité ${pion_convert[pion]} est incorrecte!<br> Débile(s) ! <br> je l'efface pour vous. <br>`;
+                            unit_fin.value = ""
+                        }
+                        err = true;
+
+                    }
                 }
             }
             var unit_nouv = document.getElementById(`${reg}_${pion}_nouv`);

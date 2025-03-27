@@ -137,7 +137,7 @@ def get_actions(mix):
 
             nb = mix["nb"][reg][p]
             if p == "centraleNuc":
-                duree = 40
+                duree = 45
                 if 'centraleNuc' in mix['capacites'][reg]:
                     cap = mix['capacites'][reg]['centraleNuc']-nb
                 else:
@@ -148,29 +148,32 @@ def get_actions(mix):
                     cap = mix['capacites'][reg]['EPR2']
                 else:
                     cap = 20-nb
-                duree = 40
+                duree = 45
 
             elif p == "methanation":
                 duree = 100
                 cap = 40 - nb
 
             elif p == "eolienneON" or p == "eolienneOFF":
-                duree = 15
+                duree = 20
                 cap = mix["capacites"][reg][p] - nb
             else:
                 duree = 100
                 cap = mix["capacites"][reg][p] - nb
 
             for an in mix["unites"][reg][p]:
-                if int(an) == annee_int - duree:
-                    cap_fin_de_vie = min(0, cap)
-                    replace_dict[reg][p][an] = {"action": "?",
-                                                "valeur": "",
-                                                "min": -mix["unites"][reg][p][an],
-                                                "max": max(cap_fin_de_vie, -mix["unites"][reg][p][an]),
-                                                "forcee": True,
-                                                "date": annee}
-                    cap -= cap_fin_de_vie
+                if int(an) + duree <= (annee_int - 5):
+                    # unité en fin de vie
+                    if ((annee_int - 10) < int(an) + duree) or annee_int == 2030:
+                        # elle vient d'arriver en fin de vie, ou c'est le début de simu
+                        cap_fin_de_vie = min(0, cap)
+                        replace_dict[reg][p][an] = {"action": "?",
+                                                    "valeur": "",
+                                                    "min": -mix["unites"][reg][p][an],
+                                                    "max": max(cap_fin_de_vie, -mix["unites"][reg][p][an]),
+                                                    "forcee": True,
+                                                    "date": an}
+                        cap -= cap_fin_de_vie
 
             if cap > 0:
                 replace_dict[reg][p][annee] = {"action": "=",
@@ -219,11 +222,17 @@ def appliquer(actions, mix):
                     nb_vieux = new["unites"][reg][p][an]
                     act['nb_demanteles'] = -int(act['valeur'])
                     act['nb_renouveles'] = nb_vieux - act['nb_demanteles']
+
+                    unites[reg][p][act['date']] += act['valeur']
+                    if unites[reg][p][act['date']] <= 0:
+                        unites[reg][p].pop(act['date'])
+                    """
                     if act['date'] in new["unites"][reg][p]:
                         unites[reg][p][act['date']] += act['nb_renouveles']
                     elif act['nb_renouveles'] > 0:
                         unites[reg][p][act['date']] = act['nb_renouveles']
                     unites[reg][p].pop(an)
+                    """
 
                 if act["action"] == "+":
                     if p == "EPR2":

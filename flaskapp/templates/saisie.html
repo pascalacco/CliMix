@@ -204,7 +204,7 @@
                             {% if actif and (an in actions['regions'][reg][pion]) and
                             (actions['regions'][reg][pion][an]['forcee']) %}
                             <span class="badge badge-pill bg-danger">
-                                     <input id="{{ reg }}_{{ pion }}_fin"
+                                     <input id="{{ reg }}_{{ pion }}_{{ an }}_fin"
                                             value="{{ actions['regions'][reg][pion][an]['valeur'] }}"
                                             placeholder="{{ actions['regions'][reg][pion][an]['min'] }} à {{ actions['regions'][reg][pion][an]['max'] }}"
                                             min="{{ actions['regions'][reg][pion][an]['min'] }}"
