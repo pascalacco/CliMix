@@ -54,7 +54,7 @@ def set_group():
             else:
                 resp = make_response(jsonify(["log_in_error pour " + equipe + "/" + partie]))
     except:
-        with open(dataPath + 'logs.txt', 'a') as logs:
+        with open(dm.chemin_game_data + 'logs.txt', 'a') as logs:
             logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
 
         resp = ["err", traceback.format_exc()]

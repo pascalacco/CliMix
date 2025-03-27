@@ -26,7 +26,11 @@ pion_short = {
     "biomasse": "Bio"
 }
 
-PoutMaxBio = 2. * 0.1 * 0.71 * (24. * 365.)
+#vieux PoutMaxBio = 2. * 0.1 * 0.71 * (24. * 365.)
+#PACCO modif de Slachaize
+PoutMaxBio = 0.5
+
+""" VIEUX 
 #  = nbCentraleParPion * puissance * fdc * nbHeures
 infos = {
     "eolienneON":   {"PoutMax": 1.4,        "Cout" : 3.5,      "FacteurCO2": 10.},
@@ -36,8 +40,28 @@ infos = {
     "EPR2":         {"PoutMax": 1.67,       "Cout" : 8.6,      "FacteurCO2": 6.},
     "methanation":  {"PoutMax": None,       "Cout" : 4.85,     "FacteurCO2": 0.},
     "biomasse":     {"PoutMax": PoutMaxBio, "Cout" : 0.12,     "FacteurCO2": 0.},
-    "batt" :        {"PoutMax": 20.08/10.,  "Cout" : 0.8,      "FacteurCO2": 0.}
+    "batt":        {"PoutMax": 20.08/10.,  "Cout" : 0.8,      "FacteurCO2": 0.}
 }
+
+"""
+
+"""
+Donnée issues de l'ADEME
+
+
+"""
+
+infos = {
+    "eolienneON":   {"PoutMax": 1.4,        "Cout" : 3.5,      "FacteurCO2": 14.1},
+    "eolienneOFF":  {"PoutMax": 2.4,        "Cout" : 6.,        "FacteurCO2": 15.6},
+    "panneauPV":    {"PoutMax": 3.,          "Cout" : 3.6,      "FacteurCO2": 32.2},
+    "centraleNuc":  {"PoutMax": 1.08,       "Cout" : 2.,        "FacteurCO2": 6.},
+    "EPR2":         {"PoutMax": 1.67,       "Cout" : 8.6,      "FacteurCO2": 6.},
+    "methanation":  {"PoutMax": None,       "Cout" : 4.85,     "FacteurCO2": 0.},
+    "biomasse":     {"PoutMax": PoutMaxBio, "Cout" : 0.12,     "FacteurCO2": 0.},
+    "batt":        {"PoutMax": 20.08/10.,  "Cout" : 0.8,      "FacteurCO2": 0.}
+}
+
 
 
 class Techno:

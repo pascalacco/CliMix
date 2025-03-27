@@ -10,7 +10,7 @@ import climix.geographe.pays
 def sépare_groupe_de_equipe(nom):
     groupe = nom[0:-1]
     num_equipe = nom[-1]
-    if num_equipe == 'e' :
+    if num_equipe == 'e':
         num_equipe = "Dumbledore"
         groupe = nom[0:-10]
     return groupe, num_equipe
@@ -58,14 +58,14 @@ class Parties:
                     if os.path.isdir(os.path.join(self.chemin + filename, fileteam)) == True:
 
                         # read the json file
-                        with open(self.chemin + filename + '/' + fileteam + '/resultats.json') as json_file:
+                        with open(self.chemin + filename + '/' + fileteam + '/mixes.json') as json_file:
                             data = json.load(json_file)
                             currentYear = 0
                             # get the first key of the json file
                             for key in data.keys():
                                 # check if it's empty
                                 currentYear = key
-                                if data[key] == {}:
+                                if data[key]['actif']:
                                     break
                             grouplist[filename].append({'partie': fileteam, 'annee': currentYear})
                             # grouplist[filename]{'team':fileteam,'data':'data'})
@@ -79,15 +79,6 @@ class Parties:
 
         return grouplist
 
-    def get_group_list(self):
-        grouplist = self.get_liste_equipes()
-
-        for equipe in grouplist:
-            for partie in grouplist[equipe]:
-                percent = normap(int(partie['annee']), 2030, 2050, 0, 100)
-                partie['percent'] = percent
-
-        return grouplist
 
     def get_liste_groupes_par_parties(self):
         grouplist = self.get_liste_equipes()
@@ -136,7 +127,7 @@ class DataManager:
     """
     chemin_archiveur = Parties.chemin_archiveur
     chemin_game_data = Parties.chemin_game_data
-    chemin_init_partie = chemin_game_data
+    #chemin_init_partie = chemin_game_data
 
     fichiers = ["mixes", "resultats"] #"save", "mix", "inputs",  "logs"
     fichiers_init = ["mixes", "resultats"] #"save", "mix", "inputs", "logs"
@@ -152,10 +143,13 @@ class DataManager:
             self.chemin = chemin
         self.data_managers = {}
         self.pays = climix.geographe.pays.pays()
+        self.chemin_init_partie = self.pays.chemin
+
         self.results_path = self.chemin + "game_data/{}/{}/resultats.json".format(equipe, partie)
         self.scores_path = self.chemin + "game_data/{}/{}/scores.json".format(equipe, partie)
         self.mix_path = self.chemin + "game_data/{}/{}/mix.json".format(equipe, partie)
         self.initial_mix_path = self.chemin + "game_data/mix_init.json"
+
         self.aggregated_mix_path = self.chemin + "game_data/{}/{}/mix_aggregated.json".format(equipe, partie)
         self.occasions_path = self.chemin + "game_data/{}/{}/occasions.json".format(equipe, partie)
         self.roles_path = self.chemin + "game_data/{}/{}/roles.json".format(equipe, partie)
@@ -164,7 +158,7 @@ class DataManager:
         self.infos_path = self.chemin + "game_data/{}/{}/infos.json".format(equipe, partie)
 
     def init_fichier(self, fich, format=".json"):
-        with open(DataManager.chemin_init_partie + fich + "_init" + format, "r") as src:
+        with open(self.chemin_init_partie + fich + "_init" + format, "r") as src:
             dico = json.load(src)
         with open(self.chemin + fich + format, "w") as dst:
             json.dump(dico, dst, **DataManager.json_opts)
