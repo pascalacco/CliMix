@@ -1,4 +1,7 @@
-import sys
+import sys,os
 
-sys.path.insert(0, '/var/www/climix-test/flaskapp')
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
+sys.path.insert(0,dir_path)
+
 from app import app as application
