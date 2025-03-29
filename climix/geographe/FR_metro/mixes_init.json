@@ -67,7 +67,7 @@
         "eolienneOFF": {},
         "eolienneON": {"2025": 1},
         "methanation": {},
-        "panneauPV": {"2025": 1}
+        "panneauPV": {"2025": 2}
       },
       "pac": {
         "EPR2": {},
@@ -146,7 +146,7 @@
         "eolienneOFF": {},
         "eolienneON": {"2025": 1},
         "methanation": {},
-        "panneauPV": {"2025": 1}
+        "panneauPV": {}
       },
       "cor": {
         "EPR2": {},

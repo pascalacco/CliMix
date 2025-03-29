@@ -8,7 +8,7 @@ from climix.technologies import infos
 
 
 ceChemin = os.path.dirname(os.path.realpath(__file__)) + '/'
-chemin_scenarios = ceChemin + "../climix/mix_data/"
+
 #########################
 ### TOUT EST EN GW(h) ###
 #########################
@@ -287,6 +287,12 @@ def calculer_nb(mix, annee):
     return nb
 
 
+budget_ratio = {'S1': 90./120.,
+                'S2': 100./120.,
+                'S3Enr': 110./120.,
+                'S3Nuke': 110./120.
+                }
+
 def calculer(dm, annee, actions, scenario):
     try:
         mix, annee_active = recup_mix(annee=annee, dm=dm)
@@ -299,10 +305,12 @@ def calculer(dm, annee, actions, scenario):
         annee_en_cours = (mix['annee']).__str__()
 
         if scenario=="2025Plat":
-            df = pd.read_hdf(chemin_scenarios + "S1_25-50.h5", "df")
+            df = dm.pays.get_scenario("S1")
+            ##df = pd.read_hdf(chemin_scenarios + "S1_25-50.h5", "df")
             df = df.loc["2025-1-1 0:0":"2025-12-31 23:0"]
         else:
-            df = pd.read_hdf(chemin_scenarios + scenario + "_25-50.h5", "df")
+            #df = pd.read_hdf(chemin_scenarios + scenario + "_25-50.h5", "df")
+            df = dm.pays.get_scenario(scenario)
 
             if int(annee_en_cours) >= 2050:
                 df = df.loc["2050-1-1 0:0":"2050-12-31 23:0"]
@@ -314,7 +322,11 @@ def calculer(dm, annee, actions, scenario):
                                                                       mix=mix,
                                                                       pays=dm.pays)
 
+
         result = calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances)
+        if scenario in budget_ratio:
+            result["budget"] *= budget_ratio[scenario]
+        result["budget"] = round(result["budget"])
         chroniques["date"] = df.index.values
         dm.set_chroniques(chroniques, annee=annee)
         dm.set_item_fichier(fichier='resultats', item=annee, val=result)
@@ -390,7 +402,12 @@ def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
     #    cout += (10 - renouv["centraleNuc"]) * 0.5
 
     # budget à chaque tour sauf si carte evènement bouleverse les choses
-    budget = 70.
+    #VIEUX
+    #budget = 70.
+
+
+    # Voir Calculer() et budget ratio pour une variation selon les scenarios
+    budget = 120.
 
     # carte alea MEVUAPV : lance 3
     if actions['alea']['actuel'] == "MEVUAPV3":

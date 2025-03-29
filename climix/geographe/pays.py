@@ -27,6 +27,7 @@ class pays :
             self.chemin = pays.chemin + "/" + nom + "/"
         else:
             self.chemin = chemin
+        self.chemin_scenarios = self.chemin
 
         with open(self.chemin + "regions.json", "r") as f:
             self.asso_regions = json.load(f)
@@ -44,6 +45,9 @@ class pays :
         mix_init = Mix(self.nom)
         mix_init.from_json(self.chemin+self.nom+"_init.json")
         return mix_init
+
+    def get_scenario(self, scenario):
+        return pandas.read_hdf(self.chemin_scenarios + scenario + "_25-50.h5", "df")
     
     def gen_fdcs_meteo(self, annee, associe_l_annee = True) :
         """
@@ -129,7 +133,7 @@ def configurer_la_region_FR_metro():
         json.dump(asso_regions, f, **pays.json_opts)
 
 
-    asso_annees={"2025": "2004", "2030": "2018_bis", "2035": "2018_bis", "2040": "2018", "2045": "2023", "2050": "2021",
+    asso_annees={"2025": "2004", "2030": "2009", "2035": "2013", "2040": "2018", "2045": "2018_bis", "2050": "2021",
                  "2055": "2021", "2060": "2021", "2065": "2021"}
     with open(pays.chemin + "/FR_metro/association_annees.json", "w") as f:
         json.dump(asso_annees, f, **pays.json_opts)

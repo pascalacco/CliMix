@@ -48,17 +48,32 @@ infos = {
 """
 Donnée issues de l'ADEME
 
+Cout du néclaire en divisant le parc par 56 réacteurs :
+https://www.sortirdunucleaire.org/Prolongation-des-reacteurs-risques-et-couts
 
+Nucléaire pion moyen 1139 
+ 16 arret complet en 2025. 
+ Une moyenne de 6 réacteurs en révision décénale de 6 mais  par an.
+ Donc facteur de charge décennal = (55-3)/55 
+ 
+ Indisponibilité de 13 réacteurs (fissures et retard de maintenance covid)
+ facteur de charge pessimiste de (55-3-13)/55 
+ 
+ Bilan GES
+ https://analysesetdonnees.rte-france.com/emissions/emission-ges
+ 
+ 
+ 
 """
 
 infos = {
-    "eolienneON":   {"PoutMax": 1.4,        "Cout" : 3.5,      "FacteurCO2": 14.1},
-    "eolienneOFF":  {"PoutMax": 2.4,        "Cout" : 6.,        "FacteurCO2": 15.6},
-    "panneauPV":    {"PoutMax": 3.,          "Cout" : 3.6,      "FacteurCO2": 32.2},
-    "centraleNuc":  {"PoutMax": 1.08,       "Cout" : 2.,        "FacteurCO2": 6.},
-    "EPR2":         {"PoutMax": 1.67,       "Cout" : 8.6,      "FacteurCO2": 6.},
+    "eolienneON":   {"PoutMax": 1.4,        "Cout" : 3.5,      "FacteurCO2": 16.},
+    "eolienneOFF":  {"PoutMax": 2.4,        "Cout" : 6.,        "FacteurCO2": 17.},
+    "panneauPV":    {"PoutMax": 3.,          "Cout" : 3.6,      "FacteurCO2": 44.},
+    "centraleNuc":  {"PoutMax": 1.139*(55-3-13)/55,       "Cout" : 1.8,        "FacteurCO2": 7.},
+    "EPR2":         {"PoutMax": 1.67,       "Cout" : 3.6,      "FacteurCO2": 6.},
     "methanation":  {"PoutMax": None,       "Cout" : 4.85,     "FacteurCO2": 0.},
-    "biomasse":     {"PoutMax": PoutMaxBio, "Cout" : 0.12,     "FacteurCO2": 0.},
+    "biomasse":     {"PoutMax": PoutMaxBio, "Cout" : 0.12,     "FacteurCO2": 107.},
     "batt":        {"PoutMax": 20.08/10.,  "Cout" : 0.8,      "FacteurCO2": 0.}
 }
 
@@ -341,7 +356,7 @@ class TechnoGaz(Techno):
 
     #suggéré PACCO
     capacité = 132000.  # PACCO
-    capacité = 1320000. # sinon à cours de stock en Décembre S4 dès 2030
+    capacité = 13200000. # sinon à cours de stock en Décembre S4 dès 2030
     init_gaz = capacité / 2.
     prix = 39.3e-6  # MillardEuro /GWh(th PCS)
     PoutMax = 18.54 # GWe installé en france en 2019....
@@ -445,59 +460,80 @@ class TechnoLacs(Techno):
         if stock is None:
             self.set_stock_et_cons_from_csv()
 
+        self.Pout_Regulation = True
+
     def Pout(self, k):
         """Renvoie la puissance maximum de décharge à l'heure k """
 
+        if self.Pout_Regulation:
+            # on veut un pic verrs Aout avant de revenir au stock de janvier
+            kpla = 6 * 30 * 24 # mois d'Ju
+            kpic = 10 * 30 * 24 # mois d'Oct
+            p_moy = None
+            if k > kpic:
+                #Novembre à janvier on lache un peu retour à 2500
+                horizon_vidage = 24 * 30 *3 # 0 en 1 mois
+                objectif = self.capacité_initiale # revenir au stock initial
+                kobj = self.H
+                inflow_restante = self.recharge[k:].sum()
+                p_moy = max(0, (self.stock[k] - objectif + inflow_restante)/(self.H-k))
+                """if self.stock[k] + inflow_restante > objectif:
+                    p_obj = self.PoutMax
+                else:
+                    p_obj = 0"""
 
-        # on veut un pic verrs Aout avant de revenir au stock de janvier
-        kpla = 6 * 30 * 24 # mois d'Ju
-        kpic = 10 * 30 * 24 # mois d'Oct
-        p_moy = None
-        if k > kpic:
-            #Novembre à janvier on lache un peu retour à 2500
-            horizon_vidage = 24 * 30 *3 # 0 en 1 mois
-            objectif = self.stock[0] # revenir au stock initial
-            kobj = self.H
-            inflow_restante = self.recharge[k:].sum()
-            p_moy = max(0, (self.stock[k] - objectif + inflow_restante)/(self.H-k))
+            elif k > kpla:
+                #Juin à Novembre on maintien à 3500 max
+                horizon_vidage = 24 * 30 *4  # 0 en 15 jours
+                objectif = 3500.
+                kobj = kpic
+                inflow_restante = self.recharge[k:kpic].sum()
+            else :
+                #Janvier à Juin on lache et gère le min
+                if k < 24*30:
+                    # pas trop avant fevrier
+                    horizon_vidage = 24 * 30 * 3  # 0 en 15 jours
+                else:
+                    #là gros pic Fevrier on lache !
+                    horizon_vidage = 24 * 10  # 0 en 15 jours
+                objectif = 3500.
+                kobj = kpla
+                inflow_restante = self.recharge[k:kpla].sum()
 
-        elif k > kpla:
-            #Juin à Novembre on maintien à 3500 max
-            horizon_vidage = 24 * 30 *4  # 0 en 15 jours
-            objectif = 3500.
-            kobj = kpic
-            inflow_restante = self.recharge[k:kpic].sum()
-        else :
-            #Janvier à Juin on lache et gère le min
-            if k < 24*15:
-                # pas trop avant fevrier
-                horizon_vidage = 24 * 30 * 4  # 0 en 15 jours
+            # marge stock : est-il possible de revenir au stock initial en fin d'année
+            if self.stock[k] + inflow_restante < objectif :
+                pout_obj = 0
             else:
-                #là gros pic Fevrier on lache !
-                horizon_vidage = 24 * 5  # 0 en 15 jours
-            objectif = 3500.
-            kobj = kpla
-            inflow_restante = self.recharge[k:kpla].sum()
+                pout_obj = (self.stock[k] - objectif + inflow_restante)
 
-        # marge stock : est-il possible de revenir au stock initial en fin d'année
-        if self.stock[k] + inflow_restante < objectif :
-            pout_obj = 0
+            if (k+horizon_vidage) > self.H:
+                inflow_avant_vidage = self.recharge[k:].sum() + self.recharge[0:(k+horizon_vidage-self.H)].sum()
+            else:
+                inflow_avant_vidage = self.recharge[k:(k+horizon_vidage)].sum()
+
+            # Pout pour atteindre stock 0 en temps heures
+            pout_vidage = max(0, (self.stock[k]+inflow_avant_vidage)/horizon_vidage)
+
+            if p_moy is None:
+                p_moy = min(pout_obj, pout_vidage)
+
+                if p_moy >= self.PoutMax:
+                    p_k = self.PoutMax
+                else:
+                    p_k = p_moy - min(p_moy, self.PoutMax - p_moy) * np.cos(float(k % 24)/24.*2.*np.pi)
+                    #p_k = p_moy * (1-np.cos(float(k % 24)/24.*2.*np.pi))
+            else:
+                p_k = p_moy
+
+            return min(self.stock[k], p_k, self.PoutMax-self.décharge[k])
         else:
-            pout_obj = self.stock[k] + inflow_restante - objectif
+            return min(self.stock[k], self.PoutMax-self.décharge[k])
 
-        if (k+horizon_vidage) > self.H:
-            inflow_avant_vidage = self.recharge[k:].sum() + self.recharge[0:(k+horizon_vidage-self.H)].sum()
-        else:
-            inflow_avant_vidage = self.recharge[k:(k+horizon_vidage)].sum()
+    def set_Pout_urgent(self):
+        self.Pout_Regulation = False
 
-        # Pout pour atteindre stock 0 en temps heures
-        pout_vidage = max(0, (self.stock[k]+inflow_avant_vidage)/horizon_vidage)
-
-        if p_moy is None :
-            p_moy = min(pout_obj, pout_vidage)
-
-        p_k = p_moy* (1.-np.cos(float(k % 24)/24.*2.*np.pi))
-        return min(self.stock[k], p_k, self.PoutMax-self.décharge[k])
+    def set_Pout_regulation(self):
+        self.Pout_Regulation = True
 
     def set_stock_et_cons_from_csv(self, fichier=chemin_donnees + "/lake_inflows.csv"):
         lake = pd.read_csv(fichier, header=None)
@@ -513,17 +549,26 @@ class TechnoLacs(Techno):
             k = ksuiv
 
     def recharger(self, k):
-        max_charge = self.capacité - self.stock[k]
-        recharge = min(max_charge, self.recharge[k])
-        self.stock[k:] += recharge
-        self.recharge[k] -= recharge
-        return self.recharge[k]
+        self.stock[k:] += self.recharge[k]
+        if self.stock[k]  > self.capacité:
+            surplus = self.stock[k] - self.capacité
+        else:
+            surplus = 0
+        self.recharge[k] = 0
+        return surplus
 
     def produire_minimum(self, k):
-        self.stock[k:] += self.recharge[k]
-        #produit = self.décharger(k, self.recharge[k])
-        #self.recharge[k] -= produit
-        produit = 0
+        surplus = self.recharger(k)
+        produit = self.décharger(k, surplus)
+
+        kpic = 10 * 30 * 24 # mois d'Oct
+        if k > kpic:
+            objectif = self.capacité_initiale # revenir au stock initial
+            kobj = self.H
+            inflow_restante = self.recharge[k:].sum()
+            p_moy = max(0, (self.stock[k] - objectif + inflow_restante)/(self.H-k))
+            produit += self.décharger(k, p_moy)
+
         return produit
 
     def décharger(self, k, aproduire):
@@ -545,75 +590,6 @@ class TechnoLacs(Techno):
 
             self.stock[k:] = self.stock[k] - vaproduire/self.etaout
             self.décharge[k] += vaproduire
-
-            out = vaproduire
-
-        return out
-
-class OldTechnoLacs(Techno):
-    # Puissance centrales territoire : 18.54 GWe repartis sur 24 centrales (EDF)
-    # Rendement meca (inutile ici) : ~35% generalement (Wiki)
-
-    horlake = np.array(
-        [0, 31,
-         31 + 28,
-         31 + 28 + 31,
-         31 + 28 + 31 + 30,
-         31 + 28 + 31 + 30 + 31,
-         31 + 28 + 31 + 30 + 31 + 30,
-         31 + 28 + 31 + 30 + 31 + 30 + 31 ,
-         31 + 28 + 31 + 30 + 31 + 30 + 31 + 31,
-         31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30,
-         31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 ,
-         31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30,
-         31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31]) * 24
-
-
-    def __init__(self, nom='Lacs', stock=None,
-                 etain=1, etaout=1, PoutMax=10, PinMax=10,
-                 capacité=2000, H=Techno.H):
-
-        self.endmonthlake = np.zeros(H)
-        for k in range(12):
-            self.endmonthlake[TechnoLacs.horlake[k]:TechnoLacs.horlake[k + 1]] = int(TechnoLacs.horlake[k + 1])
-
-        super().__init__(nom=nom, stock=stock,
-                         etain=etain, etaout=etaout, PoutMax=PoutMax, PinMax=PinMax,
-                         capacité=capacité, H=H)
-
-        if stock is None:
-            self.set_stock_from_csv()
-
-    def set_stock_from_csv(self, fichier=chemin_donnees+"/lake_inflows.csv"):
-        lake = pd.read_csv(fichier, header=None)
-        lake.columns = ["month", "prod2"]
-        lakeprod = np.array(lake.prod2)
-
-        # Calcul de ce qui est stocke dans les lacs pour chaque mois
-        self.stock = np.zeros(self.H)
-        for k in range(12):
-            self.stock[TechnoLacs.horlake[k]:TechnoLacs.horlake[k + 1]] = 1000. * lakeprod[k]
-
-
-    def décharger(self, k, aproduire):
-        """ Decharge les moyens de stockage quand on a besoin d'energie
-
-        Args:
-            self : technologie de stockage a utiliser pour la production (batterie, phs, ...)
-            k (int) : heure courante
-            aproduire (float) : qte d'energie a fournir
-            endmonthlake (array) : qte d'energie restante dans les lacs jusqu'a la fin du mois
-            executer (boolean) : indique si l'energie dechargee est a prendre en compte pour la production globale (faux pour les echanges internes)
-        """
-        if aproduire <= 0:
-            out = 0
-
-        else:
-
-            vaproduire = min(aproduire, self.Pout(k))
-
-            self.stock[k:int(self.endmonthlake[k])] = self.stock[k] - vaproduire/self.etaout
-            self.décharge[k] = vaproduire
 
             out = vaproduire
 

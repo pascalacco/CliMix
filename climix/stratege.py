@@ -25,14 +25,14 @@ class PredicteurGlissant():
 
     def set_somme_init(self, start, stop):
         self.somme = 0
-        for k in range(start,stop-1):
+        for k in range(start, stop-1):
             self.somme += self.méthode(k)
 
     def __next__(self):
         self.somme -= self.trainard
         self.trainard = self.méthode(self.k)
         self.somme += self.méthode((self.k+self.horizon-1)%self.cyclique)
-        self.k = (self.k + 1)%self.cyclique
+        self.k = (self.k + 1) % self.cyclique
         return self.somme
 
 
@@ -74,7 +74,7 @@ def strat_stockage(prodres, Step, Battery, Gas, Lake, Nuclear):
         nuke24min = pred_nuke24_min.__next__()
         nuke24max = pred_muke24_max.__next__()
         prodres24 = pred_prodres24.__next__()
-        Lake.recharger(k)
+
         if prodres24 + nuke24max < 0:
             état = "pénurie"
             consigne_SB = cap_sb_pénurie
@@ -90,8 +90,7 @@ def strat_stockage(prodres, Step, Battery, Gas, Lake, Nuclear):
         sb_écart = consigne_SB - cap_sb_milieu
 
         prodres_k = prodres[k]
-
-        #prodres_k += Lake.produire_minimum(k)
+        prodres_k += Lake.produire_minimum(k)
 
         stock_SB = Step.stock[k] + Battery.stock[k]
         a_decharger_SB = stock_SB - consigne_SB
@@ -114,6 +113,7 @@ def strat_stockage(prodres, Step, Battery, Gas, Lake, Nuclear):
                 else:
                     aproduire_k -= decharge_plusieur_techs(k, liste=[Lake, Step, Battery, Gas], aproduire=aproduire_k)
                 manque[k] = aproduire_k
+
 
         elif état == "abondance":
             # nuke au min
@@ -168,10 +168,18 @@ def strat_stockage(prodres, Step, Battery, Gas, Lake, Nuclear):
                 surplus[k] = prodres_k
             else:
                 # risque de pénurie
+
                 prodres_k += decharge_plusieur_techs(k, liste=[Lake, Step, Battery, Gas],
                                                      aproduire=-prodres_k)
+
+
                 manque[k] = -prodres_k
-        pass
+
+        if manque[k] > 0:
+            Lake.set_Pout_urgent()
+            manque[k] -= decharge_plusieur_techs(k, liste=[Step, Battery, Lake, Gas],
+                                                 aproduire=manque[k])
+            Lake.set_Pout_regulation()
 
 
 
