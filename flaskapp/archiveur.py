@@ -55,19 +55,24 @@ class Parties:
                 # add key to the dictionary
                 grouplist[filename] = []
                 for fileteam in os.listdir(self.chemin + filename):
-                    if os.path.isdir(os.path.join(self.chemin + filename, fileteam)) == True:
+                    if os.path.isdir(os.path.join(self.chemin + filename, fileteam)):
 
+                        dm, msg = self.get_data_manager(filename, fileteam)
+                        if dm is not None:
+                            currentYear = dm.get_annee_courante()
+                        else:
+                            currentYear = "-1"
                         # read the json file
-                        with open(self.chemin + filename + '/' + fileteam + '/mixes.json') as json_file:
-                            data = json.load(json_file)
-                            currentYear = 0
-                            # get the first key of the json file
-                            for key in data.keys():
-                                # check if it's empty
-                                currentYear = key
-                                if data[key]['actif']:
-                                    break
-                            grouplist[filename].append({'partie': fileteam, 'annee': currentYear})
+                        #with open(self.chemin + filename + '/' + fileteam + '/mixes.json') as json_file:
+                        #    data = json.load(json_file)
+                        #    currentYear = 0
+                        #    # get the first key of the json file
+                        #    for key in data.keys():
+                        #        # check if it's empty
+                        #        currentYear = key
+                        #        if data[key]['actif']:
+                        #            break
+                        grouplist[filename].append({'partie': fileteam, 'annee': currentYear})
                             # grouplist[filename]{'team':fileteam,'data':'data'})
 
         # grouplist = sorted(grouplist, key=lambda d: d['group']+d['team'])
@@ -86,7 +91,7 @@ class Parties:
         for equipe in grouplist:
             groupe, num_equipe = sépare_groupe_de_equipe(equipe)
             if groupe not in groupes:
-                groupes[groupe]={}
+                groupes[groupe] = {}
             for partie in grouplist[equipe]:
                 percent = normap(int(partie['annee']), 2030, 2050, 0, 100)
                 partie['percent'] = percent
@@ -97,6 +102,17 @@ class Parties:
                     groupes[groupe][partie['partie']][num_equipe] = partie
 
         return groupes
+
+    def effacer(self, liste):
+        for etiquette in liste:
+            [promo, td, scenario, num] = etiquette.split("_")
+            equipe = promo+"_"+td+num
+            partie = scenario
+            dm, mesg = self.get_data_manager(equipe, partie)
+            dm.reset()
+
+
+
 
     def get_data_manager(self, equipe, partie):
         if equipe in self.data_managers:
@@ -113,7 +129,7 @@ class Parties:
 
             return self.data_managers[equipe][partie], "init"
         else:
-            return None, "Mauvais fichiers dans " + dm.chemin
+            return None, "Mauvais ou pas de fichiers dans " + dm.chemin
 
 
 
@@ -173,9 +189,9 @@ class DataManager:
         for f in filesToRemove:
             os.remove(f)
         os.rmdir(self.chemin)
-        os.makedirs(self.chemin, exist_ok=True)
-        for fich in DataManager.fichiers_init:
-            self.init_fichier(fich)
+        #os.makedirs(self.chemin, exist_ok=True)
+        #for fich in DataManager.fichiers_init:
+        #    self.init_fichier(fich)
 
     def verif_fichier(self, fich, format=".json"):
         ok = True
@@ -191,6 +207,13 @@ class DataManager:
         for file in DataManager.fichiers:
             ok = ok and self.verif_fichier(fich=file)
         return ok
+
+    def get_annee_courante(self):
+        if self.est_ok:
+            annee = self.get_annee()
+        else:
+            annee = "-1"
+        return annee
 
     def get_fichier(self, fichier, ext=".json"):
         with open(self.chemin+fichier+ext, "r") as f:

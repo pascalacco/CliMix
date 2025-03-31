@@ -116,7 +116,7 @@ def nouv_capacite_alea(mix, alea):
 
     if alea == "MECS3":
         for k in capmax_info:
-            capmax_info[k]["EPR2"]=0
+            capmax_info[k]["EPR2"] = 0
             capmax_info[k]["centraleNuc"] = 0
 
     # carte alea MEGDT (lance 2)

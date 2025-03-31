@@ -156,7 +156,6 @@ def calculer(equipe, partie, annee):
         with open(dataPath + 'logs.txt', 'a') as logs:
             logs.write("[{}] {} \n".format(datetime.datetime.now(), traceback.format_exc()))
         resp = ["err", traceback.format_exc()]
-    resp = jsonify(resp)
 
     return resp
 

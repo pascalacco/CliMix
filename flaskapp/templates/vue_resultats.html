@@ -2,6 +2,13 @@
 
 {% block title %} {{ super() }} - Général {% endblock %}
 
+{% block header %}
+{{ super() }}
+.fixed{
+    width: 800px;
+}
+{% endblock %}
+
 {% block content %}
 {{ super() }}
 <!--h1 id="titre" class="container-fluid pt-2 pb-1 text-center">Visualisation du mix</h1-->
@@ -23,7 +30,10 @@
     <div class="col-auto">
         <div class="row">
             <div class="col-auto" id="Combine_div" style="border: 1px solid #ccc"></div>
-            <div class="col-auto" id="Chart_div" style="border: 1px solid #ccc"></div>
+
+            <div class="col-auto">
+            <div class="fixed" id="Chart_div" style="border: 1px solid #ccc" width="100px"></div>
+            </div>
         </div>
     </div>
     <div class="col-auto" id="Bar_div" style="border: 1px solid #ccc"></div>
