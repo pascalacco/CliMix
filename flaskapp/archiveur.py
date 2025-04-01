@@ -5,7 +5,7 @@ import json
 
 from flaskapp.journal.utils import *
 import climix.geographe.pays
-
+import datetime
 
 def sépare_groupe_de_equipe(nom):
     groupe = nom[0:-1]
@@ -115,7 +115,9 @@ class Parties:
         else:
             return None, "Mauvais fichiers dans " + dm.chemin
 
-
+    def log(self, trace):
+        with open(self.chemin_game_data + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), trace))
 
 class DataManager:
     """

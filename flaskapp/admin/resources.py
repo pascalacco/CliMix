@@ -11,7 +11,7 @@ from flaskapp.archiveur import Parties
 # Creation du Blueprint l'administration
 admin_blueprint = Blueprint('admin', __name__)
 
-partie = Parties()
+parties = Parties()
 
 def normap(value, start1, stop1, start2, stop2):
     OldRange = (stop1 - start1)
@@ -63,7 +63,7 @@ def comparer(etiquette):
 
 @admin_blueprint.route('/admin/tableau_de_bord')
 def tableau_de_bord(method=['GET']):
-    grouplist = partie.get_liste_groupes_par_parties()
+    grouplist = parties.get_liste_groupes_par_parties()
     print(grouplist)
     return render_template('tableau_de_bord.html',
                            username="Admin",
