@@ -337,8 +337,20 @@ function creerLegende(couleurs, min, coeff) {
         let finIntervalle = Math.round(debutIntervalle + coeff);
         let couleur = couleurs[i];
 
-        divStr += `<span class="badge-pill" style="background-color: ${couleur};">
-                        de ${debutIntervalle}  à ${finIntervalle} GWh/an </br></span>`
+        if (i==0){
+            divStr += `<span class="badge-pill" style="background-color: ${couleur};">
+                        Moins de ${finIntervalle}  %</br></span>`
+                        }
+        else{
+            if (i == couleur.length-2){
+                divStr += `<span class="badge-pill" style="background-color: ${couleur};">
+                        ${debutIntervalle}% et plus</br></span>`
+                        }
+            else{
+                divStr += `<span class="badge-pill" style="background-color: ${couleur};">
+                        de ${debutIntervalle}  à ${finIntervalle}  </br></span>`
+                }
+        }
     }
     $("#legendeItem").html(divStr);
 }
@@ -362,6 +374,29 @@ function fillPage() {
     google.charts.setOnLoadCallback(conso);
     //google.charts.setOnLoadCallback(Sol);
     */
+
+
+    let listeTransfert = [];
+    //let couleurs = ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#5ace7d", "#5b8615"];
+    let couleurs = ["#2944ad", "#2980b9",  "#58d68d", "#f1c40f ","#eb984e", "#e74c3c"];
+
+    let annee_ref = "2025"
+    if (resultsHistory[annee_ref] === undefined){
+        annee_ref = annee
+    }
+    let transfert_ref = resultsHistory[annee_ref].transfert
+
+
+    for (const k in resultsData.transfert) {
+        listeTransfert[k]=(resultsData.transfert[k]-transfert_ref[k])/transfert_ref[k]*100.;
+    }
+    let min = Math.min(...Object.values(listeTransfert));
+    let max = Math.max(...Object.values(listeTransfert));
+    min= -150.
+    max= 150.
+    let coeff = 60;
+
+
     let map = document.querySelector('#map')
 
     let paths = map.querySelectorAll('.map__image a')
@@ -385,9 +420,29 @@ function fillPage() {
     }
 
     paths.forEach(function (path) {
+        let v = listeTransfert[path.id];
+        let p = resultsData.transfert[path.id];
+        path.setAttribute("data-toggle", "tooltip")
+        path.setAttribute("data-bs-html", "true")
+        path.setAttribute("title", "De " + Math.round(transfert_ref[path.id]*10000.)/10. + " MWh/hab (en 2025) <br>  à " + Math.round(p*10000.)/10. + " MWh/hab <br>" + (v<0?"":"+")+ Math.round(v) + "%")
+
         path.addEventListener('mouseenter', function () {
             activeArea(this.id);
+
         });
+
+
+        for (let i = 0; i < couleurs.length; i++) {
+            if (v >= min + i * coeff && v <= min + (i + 1) * coeff) {
+                path.style.fill = couleurs[i];
+            }
+            if (v < min ) {
+                path.style.fill = couleurs[0];
+            }
+            if (v > max ) {
+                path.style.fill = couleurs[couleurs.length-1];
+            }
+        }
     });
 
 
@@ -395,21 +450,9 @@ function fillPage() {
         activeArea();
     });
 
-
-    let listeTransfert = [];
-    //let couleurs = ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#5ace7d", "#5b8615"];
-    let couleurs = ["#2980b9", "#58d68d", "#f1c40f ", "#eb984e", "#e74c3c", "#8e44ad"];
-
-    for (const k in resultsData.transfert) {
-        listeTransfert.push(resultsData.transfert[k]);
-    }
-    let min = Math.min(...listeTransfert);
-    let max = Math.max(...listeTransfert);
-    let coeff = (max - min) / 6. * 1.001;
-
-
-    for (const k in resultsData.transfert) {
-        let v = resultsData.transfert[k];
+    /*
+    for (const k in listeTransfert) {
+        let v = listeTransfert[k];
 
         for (let i = 0; i < couleurs.length; i++) {
             if (v >= min + i * coeff && v <= min + (i + 1) * coeff) {
@@ -417,6 +460,7 @@ function fillPage() {
             }
         }
     }
+    */
 
     creerLegende(couleurs, min, coeff);
 

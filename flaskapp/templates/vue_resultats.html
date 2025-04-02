@@ -76,8 +76,8 @@
 
 
     <div class="map row" id="map">
-        <div class="map__image col-6">
-            <h2>Équilibre du réseau</h2>
+        <div class="map__image col-8">
+            <h3>Production 7,63 MWh par hab en 2025</h3>
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:amcharts="http://amcharts.com/ammap"
                  xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 612 583">
 
@@ -138,9 +138,9 @@
         </div>
 
 
-        <div id="legende" class="col-auto">
-            <h2>Légende</h2>
-            <p>Production - consommation électrique </p>
+        <div id="legende" class="col-4">
+            <h3>Légende</h3>
+            <p>Variation de la production <br> par habitants par rapport à 2025 </p>
             <!--contenu de la légende en javascript-->
             <div id="legendeItem"></div>
         </div>
@@ -186,7 +186,7 @@
     fillPage()
 
     $("#results").fadeIn();
-
+    $('[data-toggle="tooltip"]').tooltip()
 
 });
 

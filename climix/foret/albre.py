@@ -84,10 +84,11 @@ class Albre(dict):
 
         return succes
 
-    def from_json(self, fichier):
+    def from_json(self, fichier, item=None):
         with open(fichier, "r") as f:
             prearbre = json.load(f)
-
+            if item is not None:
+                prearbre = prearbre[item]
         return self.from_dict(prearbre)
 
     def to_json(self, fichier, dump_non_arbre=True):
@@ -175,7 +176,7 @@ if __name__ == "__main__":
     print(Eu)
     Fr = tree("FR")
     metro = tree("metro")
-    metro.from_json(chemin+"mix_init.json")
+    metro.from_json(chemin+"mixes_init.json")
     metro.to_json(chemin+"FR_metro_init.json")
     metro.from_json(chemin+"FR_metro_init.json")
     Fr &= metro
