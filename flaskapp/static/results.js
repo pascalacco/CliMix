@@ -142,20 +142,13 @@ function Prod() {
 function EmCO2() {
     let co2Array = [];
     let i = 0
+    co2Array.push(['Année', 'Emissions CO2', {role: "style"}]);
+    co2Array.push(['2017', 26.6, 'color : green']);
     for (let year in resultsHistory) {
-        co2Array.push(resultsHistory[year].co2);
+        co2Array.push([year, resultsHistory[year].co2/1e6, 'color : green']);
     }
 
-    let result3 = google.visualization.arrayToDataTable([
-        ['Année', 'Emissions CO2', {role: "style"}],
-        ['2017', 26.6, 'color : green'],
-        ['2024', 16.3, 'color : green'],
-        ['2030', co2Array[0]/1e6, 'color : green'],
-        ['2035', co2Array[1]/1e6, 'color : green'],
-        ['2040', co2Array[2]/1e6, 'color : green'],
-        ['2045', co2Array[3]/1e6, 'color : green'],
-        ['2050', co2Array[4]/1e6, 'color : green']
-    ]);
+    let result3 = google.visualization.arrayToDataTable(co2Array);
 
     let options = {
         title: 'Emissions de CO2 (en Millions de tonnes de CO2)',
