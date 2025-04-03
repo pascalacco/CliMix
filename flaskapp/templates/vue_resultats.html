@@ -12,7 +12,7 @@
     var annee_int  = {{ annee | safe }};
     const resultats  = JSON.parse({{ resultats | tojson }});
     const resultsHistory = resultats;
-    const resultsData = resultats[annee];
+    var resultsData = resultats[annee];
 </script>
 
 <script type="text/javascript" src="/static/constantes.js"></script>

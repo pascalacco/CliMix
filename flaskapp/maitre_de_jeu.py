@@ -348,21 +348,30 @@ def calculer(dm, annee, actions, scenario):
 def calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances):
     result = {}
     annuel = {item: sum(val) for item, val in chroniques.items()}
-    renouv = appliquer_a_dict(actions['regions'], lambda dic: sum(
-        [act['nb_renouveles'] for an, act in dic.items() if 'nb_renouveles' in act]))
-    nouv = appliquer_a_dict(actions['regions'],
-                            lambda dic: sum([act['nb_nouvelles'] for an, act in dic.items() if 'nb_nouvelles' in act]))
-    renouv = sommer_dict(renouv)
-    nouv = sommer_dict(nouv)
+
 
     result = result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances)
-    result.update(result_couts(actions, annuel, renouv, nouv, result['prodGazFossile']))
+    result.update(result_couts(actions, annuel, result['prodGazFossile']))
+
 
     # result.update(result_ressources(mix, save, nbPions, nvPions))
     return result
 
 
-def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
+def result_couts(actions, annuel, prodGazFossile):
+
+    renouv = appliquer_a_dict(actions['regions'], lambda dic: sum(
+        [act['nb_renouveles'] for an, act in dic.items() if 'nb_renouveles' in act]))
+    renouv = sommer_dict(renouv)
+
+    nouv = appliquer_a_dict(actions['regions'],
+                            lambda dic: sum([act['nb_nouvelles'] for an, act in dic.items() if 'nb_nouvelles' in act]))
+    nouv = sommer_dict(nouv)
+
+    demantele = appliquer_a_dict(actions['regions'], lambda dic: sum(
+        [act['nb_demanteles'] for an, act in dic.items() if 'nb_demanteles' in act]))
+    demantele = sommer_dict(demantele)
+
 
     prixGaz = technologies.TechnoGaz.prix
     prixNuc = technologies.TechnoNucleaire.prix
@@ -381,19 +390,21 @@ def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
         prixNuc *= 1.2
 
     # PACCO ajout *5 car 5 ans
+    # Le cout du démentèlement nuke n'est pas pris en compte !"
     cout_gaz = prodGazFossile * prixGaz * 5.      #car 5 années
     cout_uranium = annuel['Nprod'] * prixNuc * 5. # car 5 années
-    cout = ((nouv["eolienneON"] + renouv["eolienneON"]) * infos["eolienneON"]["Cout"] +
-            (nouv["eolienneOFF"] + renouv["eolienneOFF"]) * infos["eolienneOFF"]["Cout"] +
-            nouv["panneauPV"] * infos["panneauPV"]["Cout"] +
-            nouv["EPR2"] * infos["EPR2"]["Cout"] +
-            renouv["centraleNuc"] * infos["centraleNuc"]["Cout"] +
-            nouv["biomasse"] * infos["biomasse"]["Cout"] +
-            nouv["methanation"] *infos["methanation"]["Cout"] +
-            ((actions['stock']['nouv'] - actions['stock']['actuel']) *infos["batt"]["Cout"]) +
-            # formule BIZARE  (B.PoutMax * 0.0012) / 0.003
-            cout_uranium +
-            cout_gaz)
+    cout_construction = (
+        (nouv["eolienneON"] + renouv["eolienneON"]) * infos["eolienneON"]["Cout"] +
+        (nouv["eolienneOFF"] + renouv["eolienneOFF"]) * infos["eolienneOFF"]["Cout"] +
+        (nouv["panneauPV"] + renouv["panneauPV"]) * infos["panneauPV"]["Cout"] +
+        nouv["EPR2"] * infos["EPR2"]["Cout"] +
+        renouv["centraleNuc"] * infos["centraleNuc"]["CoutRenouv"] +
+        demantele["centraleNuc"] * infos["centraleNuc"]["CoutDemantele"] +
+        nouv["biomasse"] * infos["biomasse"]["Cout"] +
+        nouv["methanation"] *infos["methanation"]["Cout"] +
+        (actions['stock']['nouv'] - actions['stock']['actuel']) *infos["batt"]["Cout"]
+    )
+
 
     # (S.PoutMax * 0.455) / 0.91 +
 
@@ -419,22 +430,24 @@ def result_couts(actions, annuel, renouv, nouv, prodGazFossile):
         budget += 3.11625  # BIZARE
 
     if actions['alea']['actuel'] == "MEMDA2" or actions['alea']['actuel'] == "MEMDA3":
-        cout -= 1.445  # BIZARE
+        cout_construction -= 1.445  # BIZARE
 
     # carte MEGDT : lance 1 / 3
     if actions['alea']['actuel'] == "MEGDT1" or actions['alea']['actuel'] == "MEGDT2" or actions['alea'][
         'actuel'] == "MEGDT3":
-        cout += 1. / 3. * nouv["pac"]["panneauPV"] * 3.6
+        cout_construction += 1. / 3. * nouv["pac"]["panneauPV"] * 3.6
 
     if actions['alea']['actuel'] == "MEGDT3":
         # cout += nouv["pll"]["eolienneOFF"]*1.2
         # d'après le rapport de stage, un pion d'éolienneOFF devrait coûter 6 Mds et non 1.2 Mds
-        cout += nouv["pll"]["eolienneOFF"] * 6
+        cout_construction += nouv["pll"]["eolienneOFF"] * 6
 
+    cout = cout_construction + cout_uranium + cout_gaz
     result = {"cout": round(cout*10.)/10.,
               "budget": round(budget*10.)/10.,
               "cout_gaz": round(cout_gaz*10.)/10.,
-              "cout_uranium": round(cout_uranium*10.)/10.
+              "cout_uranium": round(cout_uranium*10.)/10.,
+              "cout_construction": round(cout_construction*10.)/10.
               }
 
     return result

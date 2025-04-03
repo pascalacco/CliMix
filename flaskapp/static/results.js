@@ -253,11 +253,11 @@ function Resultats() {
     let result6 = new google.visualization.arrayToDataTable([]);
     result6.addColumn('string', 'Bilan');
     result6.addColumn('number', '');
-    const cout_construction = Number((resultsData.cout - resultsData.cout_gaz -resultsData.cout_uranium).toFixed(1));
+    //const cout_construction = Number((resultsData.cout - resultsData.cout_gaz -resultsData.cout_uranium).toFixed(1));
     result6.addRows([
         ['Budget disponible', {v: resultsData.budget, f: resultsData.budget + ' Md€'}],
         ['Dépense totale', {v: resultsData.cout, f: resultsData.cout + ' Md€'}],
-        ['-> Coût constructions', {v: cout_construction, f: cout_construction + ' Md€'}],
+        ['-> Coût constructions', {v: resultsData.cout_construction, f: resultsData.cout_construction + ' Md€'}],
         ['-> Coût Gaz', {v: resultsData.cout_gaz, f: resultsData.cout_gaz + ' Md€'}],
         ['-> Coût Uranium', {v: resultsData.cout_uranium, f: resultsData.cout_uranium + ' Md€'}],
         ['_____________Bilan électrique______________', {v: 0, f: ''}],
@@ -348,28 +348,8 @@ function creerLegende(couleurs, min, coeff) {
     $("#legendeItem").html(divStr);
 }
 
-
-function fillPage() {
-    // Load the Visualization API and the piechart package.
-    /*donut();
-    google.load('visualization', '1.0', {'packages':['corechart']});
-    google.charts.load('current', {'packages': ['table']});
-    google.charts.load('current', {'packages': ['corechart']});
-    google.charts.load('current', {'packages': ['geochart']}, {mapsApiKey: 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'});
-
-    google.charts.setOnLoadCallback(PuissanceInst);
-    google.charts.setOnLoadCallback(Prod);
-    google.charts.setOnLoadCallback(EmCO2);
-    google.charts.setOnLoadCallback(PenSurBar1);
-    google.charts.setOnLoadCallback(PenSurBar2);
-    google.charts.setOnLoadCallback(Resultats);
-    //google.charts.setOnLoadCallback(Score);
-    google.charts.setOnLoadCallback(conso);
-    //google.charts.setOnLoadCallback(Sol);
-    */
-
-
-    let listeTransfert = [];
+function Carte_Equilibre(){
+   let listeTransfert = [];
     //let couleurs = ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#5ace7d", "#5b8615"];
     let couleurs = ["#2944ad", "#2980b9",  "#58d68d", "#f1c40f ","#eb984e", "#e74c3c"];
 
@@ -456,6 +436,23 @@ function fillPage() {
     */
 
     creerLegende(couleurs, min, coeff);
+
+
+}
+function fillPage() {
+
+    PuissanceInst();
+    Prod();
+    EmCO2();
+    PenSurBar1();
+    PenSurBar2();
+    Resultats();
+    //Score();
+    conso();
+    //(Sol);
+
+    Carte_Equilibre();
+
 
 
     $("#turn").text(`Tour ${(resultsData.annee.toString() - 2030) / 5 + 1} : Année ${(resultsData.annee.toString())}`);
