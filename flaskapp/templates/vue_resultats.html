@@ -24,16 +24,8 @@
     google.charts.load('current', {'packages': ['table']});
     google.charts.load('current', {'packages': ['corechart']});
     google.charts.load('current', {'packages': ['geochart']}, {mapsApiKey: 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'});
-
-    google.charts.setOnLoadCallback(PuissanceInst);
-    google.charts.setOnLoadCallback(Prod);
-    google.charts.setOnLoadCallback(EmCO2);
-    google.charts.setOnLoadCallback(PenSurBar1);
-    google.charts.setOnLoadCallback(PenSurBar2);
-    google.charts.setOnLoadCallback(Resultats);
-    //google.charts.setOnLoadCallback(Score);
-    google.charts.setOnLoadCallback(conso);
-    //google.charts.setOnLoadCallback(Sol);
+    google.charts.setOnLoadCallback(fillPage);
+    google.charts.setOnLoadCallback(() => $('[data-toggle="tooltip"]').tooltip());
 
 </script>
 
@@ -180,12 +172,11 @@
     });
 
 
-    fillPage();
+
 
     $("#results").fadeIn();
-    $('[data-toggle="tooltip"]').tooltip()
 
-});
+    });
 
 </script>
 {% endblock %}
