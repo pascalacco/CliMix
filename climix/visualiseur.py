@@ -8,6 +8,9 @@ import numpy as np
 import pandas as pd
 
 from bokeh.resources import INLINE
+
+from flask import json
+
 import flaskapp.journal.journal as jr
 
 
@@ -66,8 +69,7 @@ colonnes, couleurs, noms = init_couleur_et_noms()
 
 class Visualiseur:
 
-    def __init__(self, dm, annee, vue, data_mix="./data_mix/"):
-        self.data_mix = data_mix
+    def __init__(self, dm, annee, vue):
         self.dm = dm
         self.annee = annee
         self.vue = vue
@@ -85,8 +87,8 @@ class Visualiseur:
 
 class VisualiseurBokeh(Visualiseur):
 
-    def __init__(self, dm, annee, vue, data_mix="./data_mix/"):
-        super().__init__(dm, annee, vue, data_mix)
+    def __init__(self, dm, annee, vue):
+        super().__init__(dm, annee, vue)
         self.figs = {}
         self.chroniques = dm.get_chroniques(annee)
         self.chroniques.apply(lambda col : col.repeat(2))
@@ -290,9 +292,17 @@ class vJournal(Visualiseur):
 
         self.jinja_params.update({"article": jr.exemple(datas)
                             })
-   
 
-vuesClasses = {"resultats": Visualiseur,
+class vResults(Visualiseur):
+    def genere_jinja_parameters(self):
+
+        resultats = self.dm.get_results()
+
+        self.jinja_params.update(
+            {"resultats": json.dumps(resultats)}
+        )
+
+vuesClasses = {"resultats": vResults,
                "journal": vJournal,
                "scenario": vScenario,
                "production": vProduction

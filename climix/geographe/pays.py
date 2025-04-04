@@ -132,8 +132,7 @@ def configurer_la_region_FR_metro():
     with open(pays.chemin + "/FR_metro/regions.json", "w") as f:
         json.dump(asso_regions, f, **pays.json_opts)
 
-
-    asso_annees={"2025": "2004", "2030": "2009", "2035": "2013", "2040": "2018", "2045": "2018_bis", "2050": "2021",
+    asso_annees={"2025": "2004", "2030": "2009", "2035": "2013", "2040": "2019", "2045": "2018_bis", "2050": "2021",
                  "2055": "2021", "2060": "2021", "2065": "2021"}
     with open(pays.chemin + "/FR_metro/association_annees.json", "w") as f:
         json.dump(asso_annees, f, **pays.json_opts)

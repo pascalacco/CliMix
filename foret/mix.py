@@ -11,6 +11,9 @@ class Mix(Albre):
 
 if __name__ == "__main__":
 
+    """
+    A REVOIR car mixes albre non compatible mixes initiaux !
+    """
     Eu = Mix("EU")
     Fr = Mix("FR")
     metro = Mix("metro")

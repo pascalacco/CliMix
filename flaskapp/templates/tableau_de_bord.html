@@ -72,7 +72,7 @@
 							title="Sélectionner toutes les équipes de ce scénario.">
 							<button class="btn btn-sm btn-danger"
 								type="button"
-								onclick="effacer('{{ groupe }}-{{ partie }}')"
+								onclick="effacer_sur('{{ groupe }}-{{ partie }}')"
 								id="reset{{ groupe }}"
 								data-bs-toggle="tooltip"
 								data-bs-placement="top"
@@ -104,9 +104,10 @@
 								<div class="col-10">
 									<div class="progress" id="progress-{{ groupe }}-{{ partie }}-{{num}}">
 										<div class="progress-bar progress-bar-striped"
+											 id="progressbar-{{ groupe }}-{{ partie }}-{{num}}"
 											 role="progressbar"
-											 aria-valuenow="{{ datas['annee'] }}"
-											 aria-valuemin="2030" aria-valuemax="2050"
+											 aria-valuenow="{{ datas['annee'][:4] }}"
+											 aria-valuemin="2020" aria-valuemax="2050"
 											 style="width:{{ datas['percent'] }}%">
 											{{ datas['annee'] }}
 										</div>
@@ -116,7 +117,6 @@
 									</label>
 								</div>
 								<div class="col-2" align="left">
-									{% if datas['annee'] != "-1" %}
 									<div calss="row">
 										<input type="checkbox"
 										   class="subOption"
@@ -124,15 +124,24 @@
 										   data-bs-toggle="tooltip"
 										   data-bs-placement="top"
 										   title="Sélectionner/délectionner cette équipe.">
-										<a href="/saisie/{{ datas['equipe'] }}/{{ partie }}/{{ datas['annee'] }}"
+										<a href="/saisie/{{ datas['equipe'] }}/{{ partie }}/{{ datas['annee'][0:4] }}"
+										   id="join-{{ groupe }}-{{ partie }}-sub{{num}}"
 										   class="btn btn-info btn-sm"
 										   data-bs-toggle="tooltip"
 										   data-bs-placement="top"
 										   title="Rejoindre la partie en cours.">
-										<i class="fa fa-eye"></i>
+										<i class="fa fa-right-to-bracket"></i>
 										</a>
+										<button class="btn btn-sm btn-primary"
+											type="button"
+											onclick='creer_sur("{{ groupe }}","{{ partie }}","{{ num }}")'
+											id="creer-{{ groupe }}-{{ partie }}-sub{{num}}"
+											data-bs-toggle="tooltip"
+											data-bs-placement="top"
+											title="Créer cette partie">
+										<i class="fa fa-gear"></i>
+										</button>
 									</div>
-									{% endif %}
 								</div>
 							</div>
 							</ul>

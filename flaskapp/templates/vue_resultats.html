@@ -2,18 +2,50 @@
 
 {% block title %} {{ super() }} - Général {% endblock %}
 
-{% block header %}
+
+{% block head %}
 {{ super() }}
-.fixed{
-    width: 800px;
-}
+<script>
+    const equipe  = '{{ equipe | safe }}';
+    const partie  = '{{ partie | safe }}';
+    var annee  = '{{ annee | safe }}';
+    var annee_int  = {{ annee | safe }};
+    const resultats  = JSON.parse({{ resultats | tojson }});
+    const resultsHistory = resultats;
+    var resultsData = resultats[annee];
+</script>
+
+<script type="text/javascript" src="/static/constantes.js"></script>
+<script type="text/javascript" src="/static/results.js"></script>
+
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+    google.load('visualization', 'current', {'packages':['corechart']});
+    google.charts.load('current', {'packages': ['table']});
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.load('current', {'packages': ['geochart']}, {mapsApiKey: 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'});
+
+    google.charts.setOnLoadCallback(PuissanceInst);
+    google.charts.setOnLoadCallback(Prod);
+    google.charts.setOnLoadCallback(EmCO2);
+    google.charts.setOnLoadCallback(PenSurBar1);
+    google.charts.setOnLoadCallback(PenSurBar2);
+    google.charts.setOnLoadCallback(Resultats);
+    //google.charts.setOnLoadCallback(Score);
+    google.charts.setOnLoadCallback(conso);
+    //google.charts.setOnLoadCallback(Sol);
+
+</script>
+
+
 {% endblock %}
+
 
 {% block content %}
 {{ super() }}
 <!--h1 id="titre" class="container-fluid pt-2 pb-1 text-center">Visualisation du mix</h1-->
 
-<div id="results" class="container pt-5" style="display: none;">
+<div id="results" class="container" style="display: none;">
 
 
     <div id="changeYear" class="row justify-content-between mb-5">
@@ -23,17 +55,12 @@
     </div>
 
 
-
-
     <div class="col-auto" id="table_div" style="border: 1px solid #ccc"></div>
     <div class="col-auto" id="line_div" style="border: 1px solid #ccc"></div>
     <div class="col-auto">
         <div class="row">
             <div class="col-auto" id="Combine_div" style="border: 1px solid #ccc"></div>
-
-            <div class="col-auto">
-            <div class="fixed" id="Chart_div" style="border: 1px solid #ccc" width="100px"></div>
-            </div>
+            <div class="col-auto" id="Chart_div" style="border: 1px solid #ccc"></div>
         </div>
     </div>
     <div class="col-auto" id="Bar_div" style="border: 1px solid #ccc"></div>
@@ -41,13 +68,13 @@
     <div class="col-auto" id="chartcolumn_div" style="border: 1px solid #ccc"></div>
     <div class="col-auto" id="chartcolumn2_div" style="border: 1px solid #ccc"></div>
 
-    <div class="col-auto" id="Score_div" style="border: 1px solid #ccc"></div>
-    <div class="col-auto" id="Sol_div" style="border: 1px solid #ccc"></div>
+    <!--div class="col-auto" id="Score_div" style="border: 1px solid #ccc"></div-->
+    <!--div class="col-auto" id="Sol_div" style="border: 1px solid #ccc"></div-->
 
 
     <div class="map row" id="map">
-        <div class="map__image col-auto">
-            <h2>Équilibre du réseau</h2>
+        <div class="map__image col-8">
+            <h3>Production 7,63 MWh par hab en 2025</h3>
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:amcharts="http://amcharts.com/ammap"
                  xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 612 583">
 
@@ -108,9 +135,9 @@
         </div>
 
 
-        <div id="legende" class="col-auto">
-            <h2>Légende</h2>
-            <p>Production - consommation électrique </p>
+        <div id="legende" class="col-4">
+            <h3>Légende</h3>
+            <p>Variation de la production <br> par habitants par rapport à 2025 </p>
             <!--contenu de la légende en javascript-->
             <div id="legendeItem"></div>
         </div>
@@ -121,18 +148,44 @@
 
 {% endblock %}
 
+{% block constantes %}
+{% endblock %}
+
 {% block endscripts %}
 {{ super() }}
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script type="text/javascript">
-Array.prototype.reduce=function(fun){var len=this.length>>>0;if(typeof fun!="function")throw
-new TypeError;if(len==0&&arguments.length==1)throw new TypeError;var i=0;if(arguments.length>=2)var
-rv=arguments[1];else{do{if(i in this){var rv=this[i++];break}if(++i>=len)throw new
-TypeError;}while(true)}for(;i<len;i++)if(i in this)rv=fun.call(undefined,rv,this[i],i,this);return
-rv};
-</script>
-<script type="text/javascript" src="/static/constantes.js"></script>
-<script type="text/javascript" src="/static/results.js"></script>
+<script>
+    $(function () {
 
+    $('#previousYear').click(() => {
+        annee_int = annee_int - 5;
+        annee = annee_int.toString();
+        resultsData = resultsHistory[annee];
+        fillPage();
+    });
+
+    $('#nextYear').click(() => {
+        annee_int = annee_int + 5;
+        annee = annee_int.toString();
+        resultsData = resultsHistory[annee];
+        fillPage();
+    });
+
+    $('#commitResults').click(() => {
+        location.href = "/commit";
+    });
+
+    $('#retourResults').click(() => {
+        location.href = "/manual";
+    });
+
+
+    fillPage();
+
+    $("#results").fadeIn();
+    $('[data-toggle="tooltip"]').tooltip()
+
+});
+
+</script>
 {% endblock %}

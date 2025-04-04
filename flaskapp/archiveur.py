@@ -5,7 +5,7 @@ import json
 
 from flaskapp.journal.utils import *
 import climix.geographe.pays
-
+import datetime
 
 def sépare_groupe_de_equipe(nom):
     groupe = nom[0:-1]
@@ -58,7 +58,7 @@ class Parties:
                     if os.path.isdir(os.path.join(self.chemin + filename, fileteam)):
 
                         dm, msg = self.get_data_manager(filename, fileteam)
-                        if dm is not None:
+                        if dm is not None and dm.est_ok():
                             currentYear = dm.get_annee_courante()
                         else:
                             currentYear = "-1"
@@ -93,7 +93,7 @@ class Parties:
             if groupe not in groupes:
                 groupes[groupe] = {}
             for partie in grouplist[equipe]:
-                percent = normap(int(partie['annee']), 2030, 2050, 0, 100)
+                percent = normap(int(partie['annee'][:4]), 2020, 2050, 0, 100)
                 partie['percent'] = percent
                 partie['equipe'] = equipe
                 if partie['partie'] not in groupes[groupe]:
@@ -104,15 +104,19 @@ class Parties:
         return groupes
 
     def effacer(self, liste):
+        messages = ""
         for etiquette in liste:
             [promo, td, scenario, num] = etiquette.split("_")
             equipe = promo+"_"+td+num
             partie = scenario
+
             dm, mesg = self.get_data_manager(equipe, partie)
-            dm.reset()
-
-
-
+            if dm is not None:
+                dm.reset()
+                messages += "OK - " + dm.chemin + " effacé\n"
+            else:
+                messages += mesg
+        return messages
 
     def get_data_manager(self, equipe, partie):
         if equipe in self.data_managers:
@@ -131,6 +135,9 @@ class Parties:
         else:
             return None, "Mauvais ou pas de fichiers dans " + dm.chemin
 
+    def log(self, trace):
+        with open(self.chemin_game_data + 'logs.txt', 'a') as logs:
+            logs.write("[{}] {} \n".format(datetime.datetime.now(), trace))
 
 
 class DataManager:
@@ -186,12 +193,16 @@ class DataManager:
 
     def reset(self):
         filesToRemove = [os.path.join(self.chemin, f) for f in os.listdir(self.chemin)]
-        for f in filesToRemove:
-            os.remove(f)
-        os.rmdir(self.chemin)
-        #os.makedirs(self.chemin, exist_ok=True)
-        #for fich in DataManager.fichiers_init:
-        #    self.init_fichier(fich)
+        #for f in filesToRemove:
+        #    os.remove(f)
+        #os.rmdir(self.chemin)
+        os.makedirs(self.chemin, exist_ok=True)
+        for filename in os.listdir(self.chemin):
+            file_path = os.path.join(self.chemin, filename)
+            try:
+                os.unlink(file_path)
+            except  Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
 
     def verif_fichier(self, fich, format=".json"):
         ok = True
@@ -209,7 +220,7 @@ class DataManager:
         return ok
 
     def get_annee_courante(self):
-        if self.est_ok:
+        if self.est_ok():
             annee = self.get_annee()
         else:
             annee = "-1"
@@ -246,7 +257,6 @@ class DataManager:
 
         return dico[item]
 
-
     def set_item_enfouis_dans_fichier(self, fichier, items, val, ext=".json"):
 
         dico = self.get_fichier(fichier)
@@ -269,23 +279,32 @@ class DataManager:
 
     def get_annee(self):
         # read the json file
-        with open(self.chemin+'resultats.json') as json_file:
-            data = json.load(json_file)
-            annee = 2050
-            # get the first key of the json file
-            for key in data.keys():
-                # check if it's empty
-                if data[key] == {}:
-                    # remove the empty key
-                    annee = key
-                    #print(annee)
-                    # exite the for loop
+        try:
+            mixes = self.get_mixes()
+            results = self.get_results()
+
+            annee = -1
+            for key in results:
+                if results[key] == {}:
                     break
+                else:
+                    if key in mixes:
+                        if mixes[key]["actif"]:
+                            annee = key+"-"
+                        else:
+                            annee = key
+                    else:
+                        return -2
             return annee
 
-    def get_results(self):
+        except:
+            return -1
 
+    def get_results(self):
         return self.get_fichier(fichier="resultats")
+
+    def get_mixes(self):
+        return self.get_fichier(fichier="mixes")
 
     def get_mix(self):
         return self.get_fichier(fichier="mix")
