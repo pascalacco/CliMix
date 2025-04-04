@@ -172,8 +172,11 @@
                 <h3 class="row mt-1  ps-3 bg-primary rounded bg-opacity-50 "> {{reg_convert[reg]}} </h3>
                 {% for pion in nb[reg] %}
                 <div class="row align-items-top">
-                    <div class="col-auto">{{pion_convert[pion]}} [{{nb[reg][pion]}}]:</div>
-
+                    {% if capacites[reg][pion] %}
+                    <div class="col-4">{{pion_convert[pion]}} [{{nb[reg][pion]}} sur {{capacites[reg][pion]}}]:</div>
+                    {% else %}
+                    <div class="col-4">{{pion_convert[pion]}} [{{nb[reg][pion]}}]:</div>
+                    {% endif %}
                     <div class="col-auto">
                         <div class="btn-group">
                             {% for an in unites[reg][pion] %}

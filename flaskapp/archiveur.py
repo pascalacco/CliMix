@@ -36,11 +36,12 @@ class Parties:
     """
 
     chemin_archiveur = os.path.dirname(os.path.realpath(__file__))
-    chemin_game_data_relatif = "game_data/"
+    chemin_game_data_relatif = "game_data_2025/"
     chemin_game_data = chemin_archiveur + "/" + chemin_game_data_relatif
     def __init__(self, chemin=None):
         if chemin is None:
             self.chemin = Parties.chemin_game_data
+            os.makedirs(self.chemin, exist_ok=True)
         else:
             self.chemin = chemin
         self.data_managers = {}
