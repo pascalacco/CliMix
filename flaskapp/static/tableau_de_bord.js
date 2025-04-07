@@ -261,6 +261,22 @@ function creer(groupe, partie, num)
     });
 };
 
+function promoChange()
+{
+    let promo = $("#poInput")[0].value;
+    if (promo == "default") promo="";
+
+    let td = $("#tdInput")[0].value;
+    if (td != "default") td="-"+td;
+    else    td="";
+
+    let accordions = document.querySelectorAll('[id*=accordion-'+promo+td+']');
+    //let acordions = $('#accordion-'+promo);
+    for(let j=0; j<accordions.length; j++)
+    {
+        accordions[j].classList.remove("d-none");
+    };
+};
 
 $(function () {
     var infos;
@@ -270,6 +286,8 @@ $(function () {
     document.querySelectorAll(".accordion-collapse").forEach((elm) => {
 	    elm.addEventListener("shown.bs.collapse", () => raffraichir_les_groupes());
         });
+
+
 });
 
 

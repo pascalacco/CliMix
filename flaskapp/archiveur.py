@@ -34,14 +34,25 @@ class Parties:
         Gère la vision globale de toutes les parties
 
     """
-
+    promos = ["IMACS", "MIC", "IC", "ICBE", "POUDLARD"]
+    tds = ["A", "B", "C", "D", "E", "Serpentar"]
+    equipe = ["1", "2", "3", "4", "5", "Dumbledore"]
+    scenarios = ["S1","S2", "S3Enr", "S3Nuke", "S4", "2025Plat"]
     chemin_archiveur = os.path.dirname(os.path.realpath(__file__))
     chemin_game_data_relatif = "game_data_2025/"
     chemin_game_data = chemin_archiveur + "/" + chemin_game_data_relatif
+
     def __init__(self, chemin=None):
         if chemin is None:
             self.chemin = Parties.chemin_game_data
             os.makedirs(self.chemin, exist_ok=True)
+            for promo in Parties.promos:
+                for td in Parties.tds:
+                    for equipe in Parties.equipe:
+                        os.makedirs(self.chemin + promo + '_' + td + equipe, exist_ok=True)
+                        for scenario in Parties.scenarios:
+                            os.makedirs(self.chemin + promo + '_' + td + equipe+'/'+scenario, exist_ok=True)
+
         else:
             self.chemin = chemin
         self.data_managers = {}
