@@ -42,7 +42,7 @@ class Parties:
     chemin_game_data_relatif = "game_data_2025/"
     chemin_game_data = chemin_archiveur + "/" + chemin_game_data_relatif
 
-    def __init__(self, chemin=None):
+    def __init__(self, chemin=None, pays=None):
         if chemin is None:
             self.chemin = Parties.chemin_game_data
             os.makedirs(self.chemin, exist_ok=True)
@@ -55,6 +55,12 @@ class Parties:
 
         else:
             self.chemin = chemin
+        
+        if pays is None:
+            self.pays = climix.geographe.pays.pays()
+        else:
+            self.pays = pays
+        
         self.data_managers = {}
 
     def get_liste_equipes(self):
@@ -135,7 +141,7 @@ class Parties:
             if partie in self.data_managers[equipe]:
                 return self.data_managers[equipe][partie], "ok"
 
-        dm = DataManager(equipe, partie)
+        dm = DataManager(equipe, partie, pays=self.pays)
 
         if dm.est_ok():
             if equipe in self.data_managers:
@@ -146,6 +152,29 @@ class Parties:
             return self.data_managers[equipe][partie], "init"
         else:
             return None, "Mauvais ou pas de fichiers dans " + dm.chemin
+
+
+    def compiler_resultats(self, liste):
+        res_init = self.pays.get_init_fichier("resultats")
+        annees =[ int(annee) for annee in res_init]
+        items = [ item for item in res_init["2025"] if isinstance(res_init["2025"][item], int) or isinstance(res_init["2025"][item], float)]        
+        compilation = {item : {} for item in items}
+
+        for etiquette in liste:
+            [promo, td, scenario, num] = etiquette.split("_")
+            equipe = promo+"_"+td+num
+            partie = scenario
+            
+
+            dm, mesg = self.get_data_manager(equipe, partie)
+            if dm is not None:
+                resultats = dm.get_results()
+                for item in items:
+                    compilation[item][etiquette] = [resultats[year][item] if item in resultats[year] else float('nan') for year in resultats ]                
+            else:
+                compilation[item][etiquette+" Erreur !"] = [float('nan') for year in res_init ] 
+
+        return compilation
 
     def log(self, trace):
         with open(self.chemin_game_data + 'logs.txt', 'a') as logs:
@@ -168,7 +197,7 @@ class DataManager:
     fichiers_init = ["mixes", "resultats"] #"save", "mix", "inputs", "logs"
     json_opts = {"indent": 4, "sort_keys": False}
 
-    def __init__(self, equipe, partie, chemin=None):
+    def __init__(self, equipe, partie, chemin=None, pays=None):
 
         self.equipe = equipe
         self.partie = partie
@@ -176,9 +205,17 @@ class DataManager:
             self.chemin = DataManager.chemin_game_data+"{}/{}/".format(equipe, partie)
         else:
             self.chemin = chemin
-        self.data_managers = {}
+        
+        if pays is None:
+            self.pays = climix.geographe.pays.pays()
+        else:
+            self.pays = pays
+
         self.pays = climix.geographe.pays.pays()
         self.chemin_init_partie = self.pays.chemin
+        
+        self.data_managers = {}
+
 
         self.results_path = self.chemin + "game_data/{}/{}/resultats.json".format(equipe, partie)
         self.scores_path = self.chemin + "game_data/{}/{}/scores.json".format(equipe, partie)
@@ -192,9 +229,10 @@ class DataManager:
         self.title_path = self.chemin + "game_data/{}/{}/annee.txt".format(equipe, partie)
         self.infos_path = self.chemin + "game_data/{}/{}/infos.json".format(equipe, partie)
 
+
     def init_fichier(self, fich, format=".json"):
-        with open(self.chemin_init_partie + fich + "_init" + format, "r") as src:
-            dico = json.load(src)
+        dico = self.pays.get_init_fichier(fich)
+
         with open(self.chemin + fich + format, "w") as dst:
             json.dump(dico, dst, **DataManager.json_opts)
 
@@ -296,6 +334,7 @@ class DataManager:
             results = self.get_results()
 
             annee = -1
+
             for key in results:
                 if results[key] == {}:
                     break
@@ -305,6 +344,7 @@ class DataManager:
                             annee = key+"-"
                         else:
                             annee = key
+
                     else:
                         return -2
             return annee

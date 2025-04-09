@@ -7,6 +7,10 @@
 
 {% block head %}
 {{ super() }}
+<script>
+    const liste  = {{ liste | safe }};
+    const compilation  = {{ compilation | tojson }};
+</script>
 
 
 {% endblock %}
@@ -24,18 +28,26 @@
 
 	{{ liste }}
 
+   <div id="resultats" class="container" style="display: none;">
+
 {% endblock%}
 
 {% block endscripts %}
 
 {{ super() }}
-
+<script src="/static/d3.v7.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/comparer.js"></script>
 
 <script>
+   $(function () {
+
+   fillPage();
+
+   $("#resultats").fadeIn();
+
+   });
 
 </script>
-
-<script type="text/javascript" src="/static/tableau_de_bord.js"></script>
 
 {% endblock %}
 

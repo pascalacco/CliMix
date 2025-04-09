@@ -43,7 +43,8 @@ def comparer_post_list():
 @admin_blueprint.route('/admin/comparer/<etiquette>')
 def comparer(etiquette):
     liste = session.get("groups_list")[etiquette]
-    return(make_response(render_template('comparer.html', liste=liste)))
+    compilation_resultats = parties.compiler_resultats(liste)
+    return(make_response(render_template('comparer.html', liste=liste, compilation=compilation_resultats)))
 
 @admin_blueprint.route('/admin/view/<equipe>/<partie>')
 def view(equipe, partie):

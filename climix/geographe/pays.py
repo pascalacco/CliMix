@@ -40,6 +40,11 @@ class pays :
         with open(self.chemin + fichier + ext, "r") as f:
             obj = json.load(f)
             return obj
+    
+    def get_init_fichier(self, fichier, ext=".json"):
+        with open(self.chemin + fichier + "_init" + ext, "r") as src:
+            dico = json.load(src)
+        return dico
 
     def get_mix_init(self):
         mix_init = Mix(self.nom)

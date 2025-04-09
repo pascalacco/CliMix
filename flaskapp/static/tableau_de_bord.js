@@ -23,31 +23,43 @@ function displayError(reason, details) {
     modal.toggle();
 }
 
-function neste_les_checks() {
-
-    let checkgroups = document.querySelectorAll('[id*=check-].Option');
-    for(let j=0; j<checkgroups.length; j++) {
-        let checkgroup = checkgroups[j]
-        checkgroup.checkFils = document.querySelectorAll('[id*='+checkgroup.id+'].subOption')
-        checkgroup.onclick = function() {
-            for(let i=0; i<this.checkFils.length; i++) {
-                this.checkFils[i].checked = this.checked;
-
-            }
-            raffraichir_les_groupes();
-        }
-        for(let i=0; i<checkgroup.checkFils.length; i++)
+function neste_les_checks(div_accordion) {
+    let items = jQuery(">.accordion-item",div_accordion);
+    
+    for (let nitem=0; nitem<items.length; nitem++) {
+        let est_feuille = true;
+        let child_accordions =jQuery(".accordion-collapse>.accordion-body>.accordion", items[nitem]);
+        if (child_accordions.length > 0)
         {
-            checkgroup.checkFils[i].checkPere = checkgroup
-            checkgroup.checkFils[i].onclick = function() {
-                this.checkPere.checkedCount = document.querySelectorAll('[id*='+this.checkPere.id+'].subOption:checked').length;
-                this.checkPere.checked = this.checkPere.checkedCount > 0;
-                this.checkPere.indeterminate = this.checkPere.checkedCount > 0 && this.checkPere.checkedCount < this.checkPere.checkFils.length;
-                 raffraichir_les_groupes();
-                 }
-
+            neste_les_checks(child_accordions);
+            est_feuille = false;
         }
-    }
+        if (est_feuille)
+        {
+            let checkgroup = items[nitem].querySelector(".accordion-header").querySelector("input[type=checkbox]");
+            let child_checks = items[nitem].querySelector('.accordion-collapse').querySelectorAll('input[type=checkbox]');
+            checkgroup.checkFils = child_checks;
+            checkgroup.onclick = function() {
+                for(let i=0; i<this.checkFils.length; i++) {
+                    this.checkFils[i].checked = this.checked;
+
+                };
+                raffraichir_les_groupes();
+            };
+            for (let i=0; i<checkgroup.checkFils.length; i++)
+            {
+                checkgroup.checkFils[i].checkPere = checkgroup;
+                checkgroup.checkFils[i].onclick = function() {
+                    this.checkPere.checkedCount = document.querySelectorAll('[id*='+this.checkPere.id+'].subOption:checked').length;
+                    this.checkPere.checked = this.checkPere.checkedCount > 0;
+                    this.checkPere.indeterminate = this.checkPere.checkedCount > 0 &&
+                                                (this.checkPere.checkedCount < this.checkPere.checkFils.length);
+                    raffraichir_les_groupes();
+
+                };
+            };
+        };
+    };
 };
 
 function get_checked(groupe){
@@ -78,6 +90,9 @@ function get_info_puis(callback)
         }
     });
 };
+
+
+
 
 function rafraichir_barres()
 {
@@ -110,8 +125,10 @@ function rafraichir_barres()
                         bar.removeClass("bg-success");
                         bar.removeClass("bg-info");
                         $('#check-'+groupe+'-'+partie+'-sub'+num).prop("disabled", true);
+
                         $('#creer-'+groupe+'-'+partie+'-sub'+num).prop("disabled", false);
                         $('#join-'+groupe+'-'+partie+'-sub'+num).addClass("disabled");
+
                     }
                     else
                     {
@@ -160,6 +177,7 @@ function rafraichir_barres()
 
 
                 };
+
             };
 
         };
@@ -199,9 +217,10 @@ function fuckoff(msg)
     alert("L'état de "+msg+" a changé !\n Vérifiez et refaites l'action svp.");
 };
 
-function effacer_sur(groupe)
+function effacer_sur(groupe, e)
 {
-    verifier_nouveau_puis(() => effacer(groupe), (msg) => fuckoff(msg));
+    if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey)
+        verifier_nouveau_puis(() => effacer(groupe), (msg) => fuckoff(msg));
 };
 
 async function effacer(groupe) {
@@ -281,7 +300,7 @@ function promoChange()
 $(function () {
     var infos;
     $('[data-bs-toggle="tooltip"]').tooltip();
-    neste_les_checks();
+    neste_les_checks($('#accordionGroupes')[0]);
 
     document.querySelectorAll(".accordion-collapse").forEach((elm) => {
 	    elm.addEventListener("shown.bs.collapse", () => raffraichir_les_groupes());
