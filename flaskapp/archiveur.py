@@ -7,6 +7,7 @@ from flaskapp.journal.utils import *
 import climix.geographe.pays
 import datetime
 
+
 def sépare_groupe_de_equipe(nom):
     groupe = nom[0:-1]
     num_equipe = nom[-1]
@@ -14,6 +15,7 @@ def sépare_groupe_de_equipe(nom):
         num_equipe = "Dumbledore"
         groupe = nom[0:-10]
     return groupe, num_equipe
+
 
 def normap(value, start1, stop1, start2, stop2):
     """
@@ -37,7 +39,7 @@ class Parties:
     promos = ["IMACS", "MIC", "IC", "ICBE", "POUDLARD"]
     tds = ["A", "B", "C", "D", "E", "Serpentar"]
     equipe = ["1", "2", "3", "4", "5", "Dumbledore"]
-    scenarios = ["S1","S2", "S3Enr", "S3Nuke", "S4", "2025Plat"]
+    scenarios = ["S1", "S2", "S3Enr", "S3Nuke", "S4", "2025Plat"]
     chemin_archiveur = os.path.dirname(os.path.realpath(__file__))
     chemin_game_data_relatif = "game_data_2025/"
     chemin_game_data = chemin_archiveur + "/" + chemin_game_data_relatif
@@ -51,16 +53,16 @@ class Parties:
                     for equipe in Parties.equipe:
                         os.makedirs(self.chemin + promo + '_' + td + equipe, exist_ok=True)
                         for scenario in Parties.scenarios:
-                            os.makedirs(self.chemin + promo + '_' + td + equipe+'/'+scenario, exist_ok=True)
+                            os.makedirs(self.chemin + promo + '_' + td + equipe + '/' + scenario, exist_ok=True)
 
         else:
             self.chemin = chemin
-        
+
         if pays is None:
             self.pays = climix.geographe.pays.pays()
         else:
             self.pays = pays
-        
+
         self.data_managers = {}
 
     def get_liste_equipes(self):
@@ -81,7 +83,7 @@ class Parties:
                         else:
                             currentYear = "-1"
                         # read the json file
-                        #with open(self.chemin + filename + '/' + fileteam + '/mixes.json') as json_file:
+                        # with open(self.chemin + filename + '/' + fileteam + '/mixes.json') as json_file:
                         #    data = json.load(json_file)
                         #    currentYear = 0
                         #    # get the first key of the json file
@@ -91,7 +93,7 @@ class Parties:
                         #        if data[key]['actif']:
                         #            break
                         grouplist[filename].append({'partie': fileteam, 'annee': currentYear})
-                            # grouplist[filename]{'team':fileteam,'data':'data'})
+                        # grouplist[filename]{'team':fileteam,'data':'data'})
 
         # grouplist = sorted(grouplist, key=lambda d: d['group']+d['team'])
         # sort the dictionary by key
@@ -101,7 +103,6 @@ class Parties:
             grouplist[key] = sorted(grouplist[key], key=lambda d: d['partie'])
 
         return grouplist
-
 
     def get_liste_groupes_par_parties(self):
         grouplist = self.get_liste_equipes()
@@ -125,7 +126,7 @@ class Parties:
         messages = ""
         for etiquette in liste:
             [promo, td, scenario, num] = etiquette.split("_")
-            equipe = promo+"_"+td+num
+            equipe = promo + "_" + td + num
             partie = scenario
 
             dm, mesg = self.get_data_manager(equipe, partie)
@@ -147,34 +148,34 @@ class Parties:
             if equipe in self.data_managers:
                 self.data_managers[equipe][partie] = dm
             else:
-                self.data_managers[equipe] = {partie:  dm}
+                self.data_managers[equipe] = {partie: dm}
 
             return self.data_managers[equipe][partie], "init"
         else:
             return None, "Mauvais ou pas de fichiers dans " + dm.chemin
 
-
     def compiler_resultats(self, liste):
         res_init = self.pays.get_init_fichier("resultats")
-        annees =[ int(annee) for annee in res_init]
-        items = [ item for item in res_init["2025"] if isinstance(res_init["2025"][item], int) or isinstance(res_init["2025"][item], float)]        
-        compilation = {item : {} for item in items}
+        annees = [int(annee) for annee in res_init]
+        items = [item for item in res_init["2025"] if
+                 isinstance(res_init["2025"][item], int) or isinstance(res_init["2025"][item], float)]
+        compilation = {item: {} for item in items}
 
         for etiquette in liste:
             [promo, td, scenario, num] = etiquette.split("_")
-            equipe = promo+"_"+td+num
+            equipe = promo + "_" + td + num
             partie = scenario
-            
 
             dm, mesg = self.get_data_manager(equipe, partie)
             if dm is not None:
                 resultats = dm.get_results()
                 for item in items:
-                    compilation[item][etiquette] = [resultats[year][item] if item in resultats[year] else float('nan') for year in resultats ]                
+                    compilation[item][etiquette] = [resultats[year][item] if item in resultats[year] else None
+                                                    for year in resultats]
             else:
-                compilation[item][etiquette+" Erreur !"] = [float('nan') for year in res_init ] 
+                compilation[item][etiquette + " Erreur !"] = [None for year in res_init]
 
-        return compilation
+        return compilation, annees
 
     def log(self, trace):
         with open(self.chemin_game_data + 'logs.txt', 'a') as logs:
@@ -191,10 +192,10 @@ class DataManager:
     """
     chemin_archiveur = Parties.chemin_archiveur
     chemin_game_data = Parties.chemin_game_data
-    #chemin_init_partie = chemin_game_data
+    # chemin_init_partie = chemin_game_data
 
-    fichiers = ["mixes", "resultats"] #"save", "mix", "inputs",  "logs"
-    fichiers_init = ["mixes", "resultats"] #"save", "mix", "inputs", "logs"
+    fichiers = ["mixes", "resultats"]  # "save", "mix", "inputs",  "logs"
+    fichiers_init = ["mixes", "resultats"]  # "save", "mix", "inputs", "logs"
     json_opts = {"indent": 4, "sort_keys": False}
 
     def __init__(self, equipe, partie, chemin=None, pays=None):
@@ -202,10 +203,10 @@ class DataManager:
         self.equipe = equipe
         self.partie = partie
         if chemin is None:
-            self.chemin = DataManager.chemin_game_data+"{}/{}/".format(equipe, partie)
+            self.chemin = DataManager.chemin_game_data + "{}/{}/".format(equipe, partie)
         else:
             self.chemin = chemin
-        
+
         if pays is None:
             self.pays = climix.geographe.pays.pays()
         else:
@@ -213,9 +214,8 @@ class DataManager:
 
         self.pays = climix.geographe.pays.pays()
         self.chemin_init_partie = self.pays.chemin
-        
-        self.data_managers = {}
 
+        self.data_managers = {}
 
         self.results_path = self.chemin + "game_data/{}/{}/resultats.json".format(equipe, partie)
         self.scores_path = self.chemin + "game_data/{}/{}/scores.json".format(equipe, partie)
@@ -228,7 +228,6 @@ class DataManager:
         self.round_path = self.chemin + "game_data/{}/{}/current_round.pkl".format(equipe, partie)
         self.title_path = self.chemin + "game_data/{}/{}/annee.txt".format(equipe, partie)
         self.infos_path = self.chemin + "game_data/{}/{}/infos.json".format(equipe, partie)
-
 
     def init_fichier(self, fich, format=".json"):
         dico = self.pays.get_init_fichier(fich)
@@ -243,9 +242,9 @@ class DataManager:
 
     def reset(self):
         filesToRemove = [os.path.join(self.chemin, f) for f in os.listdir(self.chemin)]
-        #for f in filesToRemove:
+        # for f in filesToRemove:
         #    os.remove(f)
-        #os.rmdir(self.chemin)
+        # os.rmdir(self.chemin)
         os.makedirs(self.chemin, exist_ok=True)
         for filename in os.listdir(self.chemin):
             file_path = os.path.join(self.chemin, filename)
@@ -277,18 +276,18 @@ class DataManager:
         return annee
 
     def get_fichier(self, fichier, ext=".json"):
-        with open(self.chemin+fichier+ext, "r") as f:
+        with open(self.chemin + fichier + ext, "r") as f:
             obj = json.load(f)
             return obj
 
     def set_fichier(self, fichier, dico, ext=".json"):
-        with open(self.chemin+fichier+ext, "w") as f:
+        with open(self.chemin + fichier + ext, "w") as f:
             json.dump(dico, f, **DataManager.json_opts)
 
     def cp_fichier(self, src, dst, ext=".json"):
-        with open(self.chemin+src+ext, "r") as src:
+        with open(self.chemin + src + ext, "r") as src:
             dico = json.load(src)
-            with open(self.chemin+dst+ext, "w") as dst:
+            with open(self.chemin + dst + ext, "w") as dst:
                 json.dump(dico, dst, **DataManager.json_opts)
         return dico
 
@@ -310,21 +309,21 @@ class DataManager:
     def set_item_enfouis_dans_fichier(self, fichier, items, val, ext=".json"):
 
         dico = self.get_fichier(fichier)
-        dicit=dico
+        dicit = dico
         for un_item in items[:-1]:
             dicit = dicit[un_item]
-        dicit[items[-1]]= val
+        dicit[items[-1]] = val
 
         self.set_fichier(fichier, dico)
         return dico
 
     def set_chroniques(self, chroniques, annee):
         df = pandas.DataFrame(chroniques)
-        df.to_hdf(path_or_buf=self.chemin+"chroniques_"+annee+".hdf5", key='df', mode='w')
-        #np.savez_compressed(self.chemin+"chroniques.npz", **chroniques)
+        df.to_hdf(path_or_buf=self.chemin + "chroniques_" + annee + ".hdf5", key='df', mode='w')
+        # np.savez_compressed(self.chemin+"chroniques.npz", **chroniques)
 
     def get_chroniques(self, annee):
-        df = pandas.read_hdf(path_or_buf=self.chemin+"chroniques_"+annee+".hdf5", key='df')
+        df = pandas.read_hdf(path_or_buf=self.chemin + "chroniques_" + annee + ".hdf5", key='df')
         return df
 
     def get_annee(self):
@@ -341,7 +340,7 @@ class DataManager:
                 else:
                     if key in mixes:
                         if mixes[key]["actif"]:
-                            annee = key+"-"
+                            annee = key + "-"
                         else:
                             annee = key
 
@@ -365,21 +364,23 @@ class DataManager:
         import shutil
         from datetime import datetime
         date = datetime.today().strftime('%Y_%m_%d_%Hh_%Mmn')
-        fichier = self.equipe + '_' + self.partie + '_' + annee +'_du_' + date
-        shutil.make_archive(self.chemin+'../'+fichier, 'zip', self.chemin)
-        return fichier+'.zip'
+        fichier = self.equipe + '_' + self.partie + '_' + annee + '_du_' + date
+        shutil.make_archive(self.chemin + '../' + fichier, 'zip', self.chemin)
+        return fichier + '.zip'
 
         ###____________________________________________________________________________________
         ### Pas à jour
+
     def get_mdp(self):
         ## Aller chercher dans le bon fichier self.chemin/infos.json le mot de passe
         ## et return None si pas de fichier ou autre
         return None
+
     def get_info(self):
         with open(self.infos_path, 'r') as json_file:
             infos = json.load(json_file)
         return infos
-        
+
     def set_round(self):
         current_round = -1
         with open(self.round_path, 'wb') as file:
@@ -454,7 +455,6 @@ class DataManager:
             mix_dict = json.load(file)
         return mix_dict
 
-
     def update_mix(self, data):
         with open(self.mix_path, "w") as dst:  #
             json.dump(data, dst)
@@ -465,7 +465,6 @@ class DataManager:
         mix_dict[year] = data
         with open(self.aggregated_mix_path, "w") as dst:
             json.dump(mix_dict, dst)
-
 
     def get_occasions(self):
         with open(self.occasions_path, "r") as f:
@@ -478,7 +477,8 @@ class DataManager:
         return scores
 
     def update_gpt_text(self, character_number, text):
-        file_path = dataPath + "game_data/{}/{}/perso{}.txt".format(self.equipe, self.partie, character_number)
+        file_path = self.chemin_game_data + "game_data/{}/{}/perso{}.txt".format(self.equipe, self.partie,
+                                                                                 character_number)
         with open(file_path, 'w') as file:
             file.write(text)
 
@@ -486,8 +486,6 @@ class DataManager:
         with open(self.scores_path, "r") as f:
             scores = json.load(f)
         return scores[role][theme][1]
-
-
 
 
 """
@@ -501,12 +499,13 @@ def creer_dossier(chemin_dossier):
     if not os.path.exists(chemin_dossier):
         os.makedirs(chemin_dossier)
 
+
 def get_rol(equipe, partie):
-    data_role = DataManager(equipe=equipe, partie=partie, chemin=dataPath).get_roles()
+    data_role = DataManager(equipe=equipe, partie=partie).get_roles()
     return data_role
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     partie = Parties()
-    #print(partie.get_group_list())
+    # print(partie.get_group_list())
     print(partie.get_liste_equipes())
