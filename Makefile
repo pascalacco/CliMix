@@ -40,7 +40,7 @@ deploiement_public :
 
 venv_reset :
 	rm -rf venv
-	mdir venv
+	mkdir venv
 	./creer_venv.sh
 
 .PHONY : venv deploiement_test deploiement_stable  exec_locale doc
