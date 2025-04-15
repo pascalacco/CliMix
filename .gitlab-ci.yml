@@ -25,3 +25,14 @@ deploy_production:
       - make deploiement_stable
       - sudo /etc/init.d/apache2 restart
 
+deploy_public:
+  stage: public
+  environment: Production
+  only:
+    - public
+  script:
+      - ls /var/www/climix-public/flaskapp/game_data
+      - rm flaskapp/static/logo.png
+      - mv flaskapp/static/logoPublic.png flaskapp/static/logo.png
+      - make deploiement_public
+      - sudo /etc/init.d/apache2 restart

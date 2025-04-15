@@ -33,6 +33,10 @@ deploiement_test :
 deploiement_stable :
 	source ./deploiement.sh && redeplois . /var/www/climix
 
+deploiement_public :
+	source ./deploiement.sh && redeplois . /var/www/climix-public
+
+
 
 venv_reset :
 	rm -rf venv
