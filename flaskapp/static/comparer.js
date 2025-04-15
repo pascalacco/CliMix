@@ -49,16 +49,14 @@ function lignes(div) {
         for (let i = 0; i < item[key].length; i++) {
             let val = item[key][i];
             if (val != null){
-                data.values.push({
-                    //"time": annees[i],
-                    "value": val
-                });
+                data.values.push( val
+                );
                 if (val<y_domain[0]) y_domain[0]=val;
                 if (val>y_domain[1]) y_domain[1]=val;
-            };
-        };
+            }
+        }
         datas.push(data);
-    };
+    }
 
     /* Reformat the data: we need an array of arrays of {x, y} tuples
     let datas = allGroup.map(function (grpName) { // .map allows to do something for each element of the list
@@ -104,7 +102,7 @@ function lignes(div) {
     // Add the lines
     let line = d3.line()
         .x(function (d,i) { return xScale(years[i]) })
-        .y(function (d) { return yScale(+d.value) });
+        .y(function (d) { return yScale(+d) });
     svg.selectAll("myLines")
         .data(datas)
         .enter()
@@ -130,7 +128,7 @@ function lignes(div) {
         .enter()
         .append("circle")
         .attr("cx", function (d, i) { return xScale(years[i]) })
-        .attr("cy", function (d) { return yScale(+d.value) })
+        .attr("cy", function (d) { return yScale(+d) })
         .attr("r", 5)
         .attr("stroke", "white");
 
@@ -143,13 +141,13 @@ function lignes(div) {
         .append("text")
         .attr("class", function (d) { return d.name })
         .datum(function (d) { return { name: d.name, value: d.values[d.values.length - 1] }; }) // keep only the last value of each time series
-        .attr("transform", function (d, i) { return "translate(" + xScale(years[i]) + "," + yScale(d.value.value) + ")"; }) // Put the text at the position of the last point
+        .attr("transform", function (d, i) { return "translate(" + xScale(years[i]) + "," + yScale(d.value) + ")"; }) // Put the text at the position of the last point
         .attr("x", 12) // shift the text a bit more right
         .text(function (d) { return d.name; })
         .style("fill", function (d) { return myColor(d.name) })
         .style("font-size", 15);
 
-    // Add a legend (interactive)
+    /*/ Add a legend (interactive)
     
     svg
         .selectAll("myLegend")
@@ -167,9 +165,8 @@ function lignes(div) {
             currentOpacity = d3.selectAll("." + d.name).style("opacity")
             // Change the opacity: from 0 to 1 or from 1 to 0
             d3.selectAll("." + d.name).transition().style("opacity", currentOpacity == 1 ? 0 : 1)
-
         });
-        
+        */
 };
 
 
