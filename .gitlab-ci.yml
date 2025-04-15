@@ -5,6 +5,8 @@ before_script:
  
 deploy_stage:
     environment: Staging
+    only:
+      - master
     script:
       - ls /var/www/climix-test/flaskapp/game_data
       - rm flaskapp/static/logo.png
