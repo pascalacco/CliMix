@@ -4,7 +4,6 @@ before_script:
   - pwd
  
 deploy_stage:
-    stage: deploy
     environment: Staging
     script:
       - ls /var/www/climix-test/flaskapp/game_data
@@ -14,7 +13,6 @@ deploy_stage:
       - sudo /etc/init.d/apache2 restart
 
 deploy_production:
-  stage: deploy
   environment: Production
   only:
     - tags
@@ -26,7 +24,6 @@ deploy_production:
       - sudo /etc/init.d/apache2 restart
 
 deploy_public:
-  stage: public
   environment: Production
   only:
     - public
