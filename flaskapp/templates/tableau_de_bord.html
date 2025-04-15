@@ -26,30 +26,47 @@
 <div class="pt-3 row justify-content-center gy-4">
 	<div class="form-outline col-md-3">
 		<form>
-			<select name="grpInput" id="poInput" class="form-select form-select-md"
-			        onchange="promoChange()">
+			<select name="grpInput" id="poInput" class="form-select form-select-md">
 				<option value="default">Choisir une PO...</option>
 				<option value="IMACS">IMACS</option>
 				<option value="MIC">MIC</option>
 				<option value="IC">IC</option>
 				<option value="ICBE">ICBE</option>
-				<option value="Poudlard">Poudlard</option>
+				<option value="POUDLARD">Poudlard</option>
 			</select>
 		</form>
 	</div>
 	<div class="form-outline col-md-3">
 		<form>
-			<select name="grpInput" id="tdInput" class="form-select form-select-md">
-				<option value="default">Choisir un groupe de td...</option>
-				<option value="A">A</option>
-				<option value="B">B</option>
-				<option value="C">C</option>
-				<option value="D">D</option>
-				<option value="E">E</option>
-				<option value="Serpentar">Serpentar</option>
+			<select name="filtreInput" id="Filtre" class="form-select form-select-md">
+				<option value="default">Tout</option>
+				<option value="checked">Selectionnées</option>
 			</select>
 		</form>
 	</div>
+	<div class="form-outline col-md-1">
+		<button class="btn btn-sm btn-info" 
+		type="button" 
+		onclick="selectionne('add')" 
+		id="selectionne" 
+		data-bs-toggle="tooltip" 
+		data-bs-placement="top" 
+		data-bs-title="Appliquer les filtres">
+		<i class="fa fa-eye"> </i>
+		</button>
+	</div>
+	<div class="form-outline col-md-1">
+		<button class="btn btn-sm btn-info" 
+		type="button" 
+		onclick="selectionne('remove')" 
+		id="selectionne" 
+		data-bs-toggle="tooltip" 
+		data-bs-placement="top" 
+		data-bs-title="Appliquer les filtres">
+		<i class="fa fa-trash"> </i>
+		</button>
+	</div>	
+	
 </div>
 
 
@@ -59,23 +76,38 @@
 		<h2 class="accordion-header" id="heading{{ groupe }}">
 			<div class="row">
 				
-				<div class="col-11">
+				<div class="col-10">
 					<button class="accordion-button collapsed" type="button"
 					        data-bs-toggle="collapse" data-bs-target="#collapse{{ groupe }}"
 					        aria-expanded="false" aria-controls="collapse{{ groupe }}">
 						Groupe : {{ groupe }}
 					</button>
 				</div>
-				<div class="col-1">
+				<div class="col-2">
+					<input type="checkbox" id="check-{{ groupe }}" class="Option"
+										       data-bs-toggle="tooltip"
+										       data-bs-placement="top"
+										       title="Sélectionner tous les scenars et équipes.">
+					
 					<button class="btn btn-sm btn-info"
-					        type="button"
-					        onclick="go_to_comparer('{{ groupe }}')"
-					        id="comparer{{ groupe }}"
-					        data-bs-toggle="tooltip"
-					        data-bs-placement="top"
-					        title="Comparer les parties sélectionnées de ce groupe"
+						type="button"
+						onclick="go_to_comparer('{{ groupe }}')"
+						id="comparer{{ groupe }}"
+						data-bs-toggle="tooltip"
+						data-bs-placement="top"
+						title="Comparer les parties sélectionnées de ce groupe"
 					>
 						<i class="fa fa-chart-line"> </i>
+					</button>
+					<button class="btn btn-sm btn-secondary"
+										        type="button"
+										        onclick="download('{{ groupe }}')"
+										        id="download{{ groupe }}"
+										        data-bs-toggle="tooltip"
+										        data-bs-placement="right"
+										        title="Télécharger un zip des parties sélectionnées"
+										>
+						<i class="fa fa-file-archive"></i>
 					</button>
 				</div>
 			</div>
@@ -111,15 +143,15 @@
 										        title="Effacer les parties sélectionnées !">
 											<i class="fa fa-trash-can"></i>
 										</button>
-										<button class="btn btn-sm btn-secondary"
-										        type="button"
-										        onclick="download('{{ groupe }}')"
-										        id="download{{ groupe }}"
-										        data-bs-toggle="tooltip"
-										        data-bs-placement="right"
-										        title="Télécharger un zip des parties sélectionnées"
+										<button class="btn btn-sm btn-info"
+											type="button"
+											onclick="go_to_comparer('{{ groupe }}-{{ partie }}')"
+											id="comparer{{ groupe }}-{{ partie }}"
+											data-bs-toggle="tooltip"
+											data-bs-placement="top"
+											title="Comparer les parties sélectionnées de ce scénario"
 										>
-											<i class="fa fa-file-archive"></i>
+											<i class="fa fa-chart-line"> </i>
 										</button>
 									</row>
 								</div>
@@ -144,7 +176,7 @@
 													{{ datas['annee'] }}
 												</div>
 											</div>
-											<label for="progress-{{ groupe }}-{{ partie }}-{{num}}">
+											<label >
 												Equipe {{ num }}
 											</label>
 										</div>

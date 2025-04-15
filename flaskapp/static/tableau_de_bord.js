@@ -30,7 +30,9 @@ function neste_les_checks(div_accordion) {
         let est_feuille = true;
         let child_accordions =jQuery(".accordion-collapse>.accordion-body>.accordion", items[nitem]);
         if (child_accordions.length > 0)
-        {
+        {   
+            checker = jQuery(">.accordion-header .Option", items[nitem])[0];
+            checker.remonter = function (val) {return checker.checked = val;} ;
             neste_les_checks(child_accordions);
             est_feuille = false;
         }
@@ -40,10 +42,19 @@ function neste_les_checks(div_accordion) {
             let child_checks = items[nitem].querySelector('.accordion-collapse').querySelectorAll('input[type=checkbox]');
             checkgroup.checkFils = child_checks;
             checkgroup.onclick = function() {
+                let compteur = 0;
                 for(let i=0; i<this.checkFils.length; i++) {
-                    this.checkFils[i].checked = this.checked;
-
+                    if ( ! this.checkFils[i].disabled){
+                        this.checkFils[i].checked = this.checked ;
+                        compteur ++;
+                    }
                 };
+
+                if (this.checked && (compteur!=this.checkFils.length)){
+                    this.indeterminate=true;
+                }
+                else this.indeterminate=false;
+
                 raffraichir_les_groupes();
             };
             for (let i=0; i<checkgroup.checkFils.length; i++)
@@ -51,6 +62,7 @@ function neste_les_checks(div_accordion) {
                 checkgroup.checkFils[i].checkPere = checkgroup;
                 checkgroup.checkFils[i].onclick = function() {
                     this.checkPere.checkedCount = document.querySelectorAll('[id*='+this.checkPere.id+'].subOption:checked').length;
+                    if (this.checkPere.checked != (this.checkPere.checkedCount > 0) ) this.checkPere.remonter(this.checkPere.checkedCount > 0);
                     this.checkPere.checked = this.checkPere.checkedCount > 0;
                     this.checkPere.indeterminate = this.checkPere.checkedCount > 0 &&
                                                 (this.checkPere.checkedCount < this.checkPere.checkFils.length);
@@ -280,21 +292,32 @@ function creer(groupe, partie, num)
     });
 };
 
-function promoChange()
+function selectionne(action)
 {
     let promo = $("#poInput")[0].value;
     if (promo == "default") promo="";
 
-    let td = $("#tdInput")[0].value;
-    if (td != "default") td="-"+td;
-    else    td="";
+    let est_valide = true;
+    if (document.querySelector("#Filtre").value == "checked"){
+        list = get_checked();
 
-    let accordions = document.querySelectorAll('[id*=accordion-'+promo+td+']');
+    };
+
+    let accordions = document.querySelectorAll('[id*=accordion-'+promo+']');
     //let acordions = $('#accordion-'+promo);
     for(let j=0; j<accordions.length; j++)
-    {
-        accordions[j].classList.remove("d-none");
-    };
+    {      
+        if (est_valide){
+            if (action=="add"){
+                accordions[j].classList.remove("d-none");
+            }
+            else
+            {
+                accordions[j].classList.add("d-none");
+            }
+        }
+    }   
+    
 };
 
 $(function () {
