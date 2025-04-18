@@ -23,23 +23,28 @@ function displayError(reason, details) {
     modal.toggle();
 }
 
-function neste_les_checks(div_accordion) {
+function neste_les_checks(div_accordion, pere = null) {
     let items = jQuery(">.accordion-item",div_accordion);
     
     for (let nitem=0; nitem<items.length; nitem++) {
         let est_feuille = true;
-        let child_accordions =jQuery(".accordion-collapse>.accordion-body>.accordion", items[nitem]);
+        item = items[nitem];
+        let child_accordions =jQuery(".accordion-collapse>.accordion-body>.accordion", item);
         if (child_accordions.length > 0)
         {   
-            checker = jQuery(">.accordion-header .Option", items[nitem])[0];
-            checker.remonter = function (val) {return checker.checked = val;} ;
-            neste_les_checks(child_accordions);
+            checker = jQuery(">.accordion-header .Option", item)[0];
+            if (pere == null){
+                checker.remonter = function (val) {return checker.checked = val;} ;
+            } else {
+                checker.remonter = function (val) {pere.remonter(val); return checker.checked = val;} ;
+            }   
+            neste_les_checks(div_accordion=child_accordions, pere=checker);
             est_feuille = false;
         }
         if (est_feuille)
         {
-            let checkgroup = items[nitem].querySelector(".accordion-header").querySelector("input[type=checkbox]");
-            let child_checks = items[nitem].querySelector('.accordion-collapse').querySelectorAll('input[type=checkbox]');
+            let checkgroup = item.querySelector(".accordion-header").querySelector("input[type=checkbox]");
+            let child_checks = item.querySelector('.accordion-collapse').querySelectorAll('input[type=checkbox]');
             checkgroup.checkFils = child_checks;
             checkgroup.onclick = function() {
                 let compteur = 0;
@@ -54,6 +59,7 @@ function neste_les_checks(div_accordion) {
                     this.indeterminate=true;
                 }
                 else this.indeterminate=false;
+                
 
                 raffraichir_les_groupes();
             };
