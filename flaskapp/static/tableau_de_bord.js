@@ -26,58 +26,109 @@ function displayError(reason, details) {
 function neste_les_checks(div_accordion, pere = null) {
     let items = jQuery(">.accordion-item",div_accordion);
     
+
     for (let nitem=0; nitem<items.length; nitem++) {
-        let est_feuille = true;
         item = items[nitem];
-        let child_accordions =jQuery(".accordion-collapse>.accordion-body>.accordion", item);
-        if (child_accordions.length > 0)
-        {   
-            checker = jQuery(">.accordion-header .Option", item)[0];
-            if (pere == null){
-                checker.remonter = function (val) {return checker.checked = val;} ;
-            } else {
-                checker.remonter = function (val) {pere.remonter(val); return checker.checked = val;} ;
-            }   
-            neste_les_checks(div_accordion=child_accordions, pere=checker);
-            est_feuille = false;
+        
+        checker = jQuery(">.accordion-header .Option", item)[0];
+        checker.pere = pere;
+        checker.fils = [];
+        checker.filsChecked = 0;
+        checker.filsDisabled = 0;
+
+        if (pere != null){
+            checker.remonter = function (val) {
+                val(checker);
+                checker.pere.remonter(val);
+            } ;
+            pere.fils.push(checker);
+            if (checker.checked) pere.filsChecked += 1;
+            if (checker.disabled) pere.filsDisabled += 1;
+
+        } else {
+            checker.remonter = function (val) {       
+                val(checker);
+            } ;
+        } 
+
+        let child_accordion =jQuery(".accordion-collapse>.accordion-body>.accordion", item);
+        if (child_accordion.length >0){
+            neste_les_checks(div_accordion=child_accordion[0], pere=checker); 
+        }else{
+            checker.fils = item.querySelector('.accordion-collapse>.accordion-body').querySelectorAll('input[type=checkbox]');
         }
-        if (est_feuille)
-        {
-            let checkgroup = item.querySelector(".accordion-header").querySelector("input[type=checkbox]");
-            let child_checks = item.querySelector('.accordion-collapse').querySelectorAll('input[type=checkbox]');
-            checkgroup.checkFils = child_checks;
-            checkgroup.onclick = function() {
+
+        
+        checker.onclick = function() {
                 let compteur = 0;
-                for(let i=0; i<this.checkFils.length; i++) {
-                    if ( ! this.checkFils[i].disabled){
-                        this.checkFils[i].checked = this.checked ;
+                for(let i=0; i<this.fils.length; i++) {
+                    if ( ! this.fils[i].disabled){
+                        this.fils[i].checked = this.checked ;
+                        if (this.fils[i].onclick != null) this.fils[i].onclick();
                         compteur ++;
                     }
                 };
-
-                if (this.checked && (compteur!=this.checkFils.length)){
+                if (this.checked && (compteur!=this.fils.length)){
                     this.indeterminate=true;
                 }
                 else this.indeterminate=false;
                 
-
-                raffraichir_les_groupes();
-            };
-            for (let i=0; i<checkgroup.checkFils.length; i++)
-            {
-                checkgroup.checkFils[i].checkPere = checkgroup;
-                checkgroup.checkFils[i].onclick = function() {
-                    this.checkPere.checkedCount = document.querySelectorAll('[id*='+this.checkPere.id+'].subOption:checked').length;
-                    if (this.checkPere.checked != (this.checkPere.checkedCount > 0) ) this.checkPere.remonter(this.checkPere.checkedCount > 0);
-                    this.checkPere.checked = this.checkPere.checkedCount > 0;
-                    this.checkPere.indeterminate = this.checkPere.checkedCount > 0 &&
-                                                (this.checkPere.checkedCount < this.checkPere.checkFils.length);
+                if (this.pere == null){
                     raffraichir_les_groupes();
-
-                };
+                }else{
+                    checker.remonter((moi) => moi.pere.checked = moi.checked);
+                }
             };
+        
+        for (let i=0; i<checker.fils.length; i++)
+        {
+            checker.fils[i].pere = checker;
+            checker.fils[i].onclick = function() {
+                this.pere.checkedCount = document.querySelectorAll('[id*='+this.pere.id+'].subOption:checked').length;
+                if (this.pere.checked != (this.pere.checkedCount > 0) ) this.pere.remonter(this.pere.checkedCount > 0);
+                this.pere.checked = this.pere.checkedCount > 0;
+                this.pere.indeterminate = this.pere.checkedCount > 0 &&
+                                            (this.pere.checkedCount < this.pere.fils.length);
+            }
+        }
+        
+        /*
+
+        checker.onclick = function() {
+            let compteur = 0;
+            for(let i=0; i<this.fils.length; i++) {
+                if ( ! this.fils[i].disabled){
+                    this.fils[i].checked = this.checked ;
+                    compteur ++;
+                }
+            };
+            if (compteur == 0){
+
+            }
+            if (this.checked && (compteur!=this.fils.length)){
+                this.indeterminate=true;
+            }
+            else this.indeterminate=false;
+            
+            if (pere == null){
+                raffraichir_les_groupes();
+            }else{
+                
+            }
         };
-    };
+        for (let i=0; i<checker.fils.length; i++)
+        {
+            checker.fils[i].pere = checker;
+            checker.fils[i].onclick = function() {
+                this.pere.checkedCount = document.querySelectorAll('[id*='+this.pere.id+'].subOption:checked').length;
+                if (this.pere.checked != (this.pere.checkedCount > 0) ) this.pere.remonter(this.pere.checkedCount > 0);
+                this.pere.checked = this.pere.checkedCount > 0;
+                this.pere.indeterminate = this.pere.checkedCount > 0 &&
+                                            (this.pere.checkedCount < this.pere.fils.length);
+            }
+        }*/
+    }   
+        
 };
 
 function get_checked(groupe){
