@@ -72,8 +72,9 @@
 
 <div class="accordion" id="accordionGroupes">
 	{% for groupe, parties in grouplist.items() %}
-	<div class="accordion-item d-none" id="accordion-{{groupe}}">
-		<h2 class="accordion-header" id="heading{{ groupe }}">
+	<!--div class="accordion-item d-none" id="accordion-{{groupe}}"-->
+	<div class="accordion-item " id="accordion-{{groupe}}">
+			<h2 class="accordion-header" id="heading{{ groupe }}">
 			<div class="row">				
 				<div class="col-10">
 					<button class="accordion-button collapsed" type="button"
@@ -111,7 +112,8 @@
 				</div>
 			</div>
 		</h2>
-		<div id="collapse{{ groupe }}" class="accordion-collapse collapse"
+		<!--div id="collapse{{ groupe }}" class="accordion-collapse collapse" -->
+		<div id="collapse{{ groupe }}" class="accordion-collapse" 
 		     aria-labelledby="heading{{ groupe }}" data-bs-parent="#accordionGroupes">
 			<div class="accordion-body">
 				
@@ -132,11 +134,12 @@
 										<input type="checkbox" id="check-{{ groupe }}-{{ partie }}" class="Option"
 										       data-bs-toggle="tooltip"
 										       data-bs-placement="top"
+											   aria-controls="reset{{ groupe }}-{{ partie }}"
 										       title="Sélectionner toutes les équipes de ce scénario.">
 										<button class="btn btn-sm btn-danger"
 										        type="button"
 										        onclick="effacer_sur('{{ groupe }}-{{ partie }}')"
-										        id="reset{{ groupe }}"
+										        id="reset{{ groupe }}-{{ partie }}"
 										        data-bs-toggle="tooltip"
 										        data-bs-placement="top"
 										        title="Effacer les parties sélectionnées !">
@@ -156,8 +159,11 @@
 								</div>
 							</div>
 						</h3>
+						<!--div id="sub-collapse{{ groupe }}{{ partie}}"
+						     class="accordion-collapse collapse"-->
 						<div id="sub-collapse{{ groupe }}{{ partie}}"
-						     class="accordion-collapse collapse"
+						     class="accordion-collapse"
+						
 						     aria-labelledby="sub-heading{{ groupe }}{{ partie }}"
 						     data-bs-parent="#sub{{ groupe }}">
 							<div class="accordion-body">

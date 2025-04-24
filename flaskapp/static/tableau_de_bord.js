@@ -24,110 +24,118 @@ function displayError(reason, details) {
 }
 
 function neste_les_checks(div_accordion, pere = null) {
-    let items = jQuery(">.accordion-item",div_accordion);
-    
 
+    let items = jQuery(">.accordion-item",div_accordion);
+    let get_checker = (items, nitem) => {return jQuery(">.accordion-header .Option", items[nitem])[0];};
+    let fin_de_recursion = false;
+
+    if (items.length==0){
+        items = div_accordion.querySelector('.accordion-collapse>.accordion-body').querySelectorAll('input[type=checkbox]');
+        get_checker = (items, nitem) => {return items[nitem]};
+        fin_de_recursion = true;
+    }
+    
     for (let nitem=0; nitem<items.length; nitem++) {
-        item = items[nitem];
         
-        checker = jQuery(">.accordion-header .Option", item)[0];
+        let checker = get_checker(items, nitem);
         checker.pere = pere;
         checker.fils = [];
         checker.filsChecked = 0;
         checker.filsDisabled = 0;
 
         if (pere != null){
-            checker.remonter = function (val) {
-                val(checker);
-                checker.pere.remonter(val);
-            } ;
             pere.fils.push(checker);
-            if (checker.checked) pere.filsChecked += 1;
-            if (checker.disabled) pere.filsDisabled += 1;
-
-        } else {
-            checker.remonter = function (val) {       
-                val(checker);
-            } ;
-        } 
-
-        let child_accordion =jQuery(".accordion-collapse>.accordion-body>.accordion", item);
-        if (child_accordion.length >0){
-            neste_les_checks(div_accordion=child_accordion[0], pere=checker); 
-        }else{
-            checker.fils = item.querySelector('.accordion-collapse>.accordion-body').querySelectorAll('input[type=checkbox]');
+            if (checker.disabled) 
+                pere.modifier_disabled(1);
+            else 
+                pere.modifier_disabled(0);
+            if (checker.checked) 
+                pere.modifier_checked(1); 
         }
 
-        
-        checker.onclick = function() {
-                let compteur = 0;
-                for(let i=0; i<this.fils.length; i++) {
-                    if ( ! this.fils[i].disabled){
-                        this.fils[i].checked = this.checked ;
-                        if (this.fils[i].onclick != null) this.fils[i].onclick();
-                        compteur ++;
-                    }
-                };
-                if (this.checked && (compteur!=this.fils.length)){
-                    this.indeterminate=true;
-                }
-                else this.indeterminate=false;
-                
-                if (this.pere == null){
-                    raffraichir_les_groupes();
-                }else{
-                    checker.remonter((moi) => moi.pere.checked = moi.checked);
-                }
-            };
-        
-        for (let i=0; i<checker.fils.length; i++)
-        {
-            checker.fils[i].pere = checker;
-            checker.fils[i].onclick = function() {
-                this.pere.checkedCount = document.querySelectorAll('[id*='+this.pere.id+'].subOption:checked').length;
-                if (this.pere.checked != (this.pere.checkedCount > 0) ) this.pere.remonter(this.pere.checkedCount > 0);
-                this.pere.checked = this.pere.checkedCount > 0;
-                this.pere.indeterminate = this.pere.checkedCount > 0 &&
-                                            (this.pere.checkedCount < this.pere.fils.length);
-            }
-        }
-        
-        /*
+        checker.modifier_disabled = function(val){
+            this.filsDisabled += val;
 
-        checker.onclick = function() {
-            let compteur = 0;
-            for(let i=0; i<this.fils.length; i++) {
-                if ( ! this.fils[i].disabled){
-                    this.fils[i].checked = this.checked ;
-                    compteur ++;
-                }
-            };
-            if (compteur == 0){
-
+            if ((this.filsDisabled >= this.fils.length)  && ( ! this.disabled))
+            {
+                this.disabled = true;
+                if (this.pere != null) this.pere.modifier_disabled(1);
             }
-            if (this.checked && (compteur!=this.fils.length)){
+
+            if ((this.filsDisabled < this.fils.length)  && (this.disabled))
+            {
+                this.disabled = false;
+                if (this.pere != null) this.pere.modifier_disabled(-1);
+            }
+            if (this.fils.length==0) this.filsDisabled = 0;
+        };
+
+        checker.modifier_checked = function(val){
+            this.filsChecked += val;
+        
+            if (this.filsChecked>0  && ! this.checked) {
+                this.checked = true;
+                if (this.pere != null) 
+                    this.pere.modifier_checked(1);
+            } 
+            if (this.filsChecked<=0  && this.checked) {
+                this.checked = false;
+                if (this.pere != null) 
+                    this.pere.modifier_checked(-1);
+            }
+            if (this.fils.length==0) this.filsChecked = 0;
+
+            if (this.checked && (this.filsChecked < this.fils.length)){
                 this.indeterminate=true;
             }
             else this.indeterminate=false;
-            
-            if (pere == null){
-                raffraichir_les_groupes();
+
+        };
+
+        if (! fin_de_recursion){
+            let child_accordion =jQuery(".accordion-collapse>.accordion-body>.accordion", items[nitem]);
+            if (child_accordion.length >0){
+                neste_les_checks(child_accordion[0], checker); 
             }else{
-                
+                neste_les_checks(items[nitem], checker);
+                //checker.fils = item.querySelector('.accordion-collapse>.accordion-body').querySelectorAll('input[type=checkbox]');
+            }
+        }
+        
+        checker.downclick = function (val){
+            if (this.fils.length ==0)
+                this.checked = val;
+            else {
+                let compteur = 0;
+                let compteur_checked = 0;
+                for(let i=0; i<this.fils.length; i++) {
+                    if ( ! this.fils[i].disabled){
+                        this.fils[i].downclick(val);
+                        if (this.fils[i].checked) compteur_checked ++;
+                        compteur ++;
+                    }
+                }
+                this.filsDisabled=this.fils.length - compteur;
+                this.filsChecked=compteur_checked;
+                this.checked = compteur_checked > 0;
+                if (this.checked && (this.filsChecked != this.fils.length)){
+                    this.indeterminate=true;
+                }
+                else this.indeterminate=false;
             }
         };
-        for (let i=0; i<checker.fils.length; i++)
-        {
-            checker.fils[i].pere = checker;
-            checker.fils[i].onclick = function() {
-                this.pere.checkedCount = document.querySelectorAll('[id*='+this.pere.id+'].subOption:checked').length;
-                if (this.pere.checked != (this.pere.checkedCount > 0) ) this.pere.remonter(this.pere.checkedCount > 0);
-                this.pere.checked = this.pere.checkedCount > 0;
-                this.pere.indeterminate = this.pere.checkedCount > 0 &&
-                                            (this.pere.checkedCount < this.pere.fils.length);
-            }
-        }*/
-    }   
+
+        checker.onclick = function (){
+            let nouv = this.checked;
+            raffraichir_les_groupes_puis((modifies) => {
+                this.downclick(this.checked);
+                if (this.checked && nouv && this.pere!=null) 
+                    this.pere.modifier_checked(1);
+                if (!this.checked && !nouv && this.pere!=null) 
+                    this.pere.modifier_checked(-1);
+                });
+        }; 
+    };   
         
 };
 
@@ -144,7 +152,7 @@ function get_checked(groupe){
     return checked_list;
 };
 
-function get_info_puis(callback)
+function get_info_puis(promesse=null)
 {
         $.ajax({
         url: "/admin/get_infos_parties",
@@ -152,7 +160,7 @@ function get_info_puis(callback)
         dataType: "json",
         success: function (datas, textStatus, jqXHR) {
             infos = datas;
-            callback();
+            if (promesse != null) promesse();
         },
         error: function (jqXHR, textStatus, errorThrown) {
             displayError("http");
@@ -160,12 +168,15 @@ function get_info_puis(callback)
     });
 };
 
-
-
-
 function rafraichir_barres()
 {
-    let checked_modifies = []
+    let checked_modifies = {
+        "unchecked": [], 
+        "checked" : [], 
+        "now_disabled" : [], 
+        "now_enabled" : []
+    };
+    
     for (let groupe in infos)
         {
             let parties = infos[groupe];
@@ -178,13 +189,14 @@ function rafraichir_barres()
                         annee="Libre" ;
                     }
                     let bar = $('#progressbar-'+groupe+'-'+partie+'-'+num);
-                    if ($('#check-'+groupe+'-'+partie+'-sub'+num).prop("checked"))
+                    if (bar.attr('aria-valuenow') != annee)
                     {
-                        if (bar.attr('aria-valuenow') != annee)
-                        {
-                            checked_modifies.push(groupe+'-'+partie+'-'+num);
-                        };
+                        if ($('#check-'+groupe+'-'+partie+'-sub'+num).prop("checked"))
+                            checked_modifies["checked"].push(groupe+'-'+partie+'-'+num);
+                        else
+                            checked_modifies["unchecked"].push(groupe+'-'+partie+'-'+num);
                     };
+                
 
                     if (annee=="Libre")
                     {
@@ -193,7 +205,12 @@ function rafraichir_barres()
                         bar.addClass("bg-secondary");
                         bar.removeClass("bg-success");
                         bar.removeClass("bg-info");
-                        $('#check-'+groupe+'-'+partie+'-sub'+num).prop("disabled", true);
+
+                        let checker = $('#check-'+groupe+'-'+partie+'-sub'+num)[0];
+                        if (!checker.disabled){
+                            checker.disabled=true;
+                            checked_modifies["now_disabled"].push(checker);
+                        }
 
                         $('#creer-'+groupe+'-'+partie+'-sub'+num).prop("disabled", false);
                         $('#join-'+groupe+'-'+partie+'-sub'+num).addClass("disabled");
@@ -201,6 +218,15 @@ function rafraichir_barres()
                     }
                     else
                     {
+                        let checker = $('#check-'+groupe+'-'+partie+'-sub'+num)[0];
+                        if (checker.disabled){
+                            checker.disabled=false;
+                            checked_modifies["now_enabled"].push(checker);
+                        }
+
+                        $('#creer-'+groupe+'-'+partie+'-sub'+num).prop("disabled", true);
+                        $('#join-'+groupe+'-'+partie+'-sub'+num).removeClass("disabled");
+                        
                         if (annee[4]=="-")
                         {
                             bar.addClass("progress-bar-animated");
@@ -208,10 +234,6 @@ function rafraichir_barres()
                             bar.addClass("bg-info");
                             bar.removeClass("bg-success");
                             bar.removeClass("bg-secondary");
-                            $('#check-'+groupe+'-'+partie+'-sub'+num).prop("disabled", false);
-                            $('#creer-'+groupe+'-'+partie+'-sub'+num).prop("disabled", true);
-                            //$('#join-'+groupe+'-'+partie+'-sub'+num).addClass("enabled");
-                            $('#join-'+groupe+'-'+partie+'-sub'+num).removeClass("disabled");
                             if (annee == "2025-")
                                 $('#join-'+groupe+'-'+partie+'-sub'+num).prop("href",
                                 "/vues/"+groupe+num+"/"+partie+"/2030");
@@ -227,11 +249,6 @@ function rafraichir_barres()
                             bar.addClass("bg-success");
                             bar.removeClass("bg-secondary");
                             bar.removeClass("bg-info");
-                            //annee = annee.slice(0,4)
-                            $('#check-'+groupe+'-'+partie+'-sub'+num).prop("disabled", false);
-                            $('#creer-'+groupe+'-'+partie+'-sub'+num).prop("disabled", true);
-                            //$('#join-'+groupe+'-'+partie+'-sub'+num).addClass("enabled");
-                            $('#join-'+groupe+'-'+partie+'-sub'+num).removeClass("disabled");
                             if (annee == "2025")  $('#join-'+groupe+'-'+partie+'-sub'+num).prop("href",
                                 "/saisie/"+groupe+num+"/"+partie+"/2030");
                             else
@@ -253,14 +270,26 @@ function rafraichir_barres()
     return checked_modifies;
 };
 
-function raffraichir_les_groupes() {
-    get_info_puis(() => {rafraichir_barres();});
+function raffraichir_les_groupes_puis(promesse = null) {
+    get_info_puis(() => {
+        let modifies = rafraichir_barres();
+        for (let i =0; i<modifies["now_disabled"].length; i++){
+            modifies["now_disabled"][i].modifier_checked(-1);
+            modifies["now_disabled"][i].disabled=false; // s'assurer de la propagation            
+            modifies["now_disabled"][i].modifier_disabled(1);
+        }
+        for (let i =0; i<modifies["now_enabled"].length; i++){
+            modifies["now_enabled"][i].disabled=true; // s'assurer de la propagation            
+            modifies["now_enabled"][i].modifier_disabled(-1);
+        }
+        if (promesse != null) promesse(modifies);
+    });
  };
 
 function verifier_nouveau_puis(callback_ok, callback_pas_bon) {
     get_info_puis(() => {
         let modifie = rafraichir_barres();
-        if (modifie.length==0) callback_ok();
+        if (modifie["checked"].length==0) callback_ok();
         else    callback_pas_bon(modifie);
     });
  };
@@ -286,9 +315,9 @@ function fuckoff(msg)
     alert("L'état de "+msg+" a changé !\n Vérifiez et refaites l'action svp.");
 };
 
-function effacer_sur(groupe, e)
+function effacer_sur(groupe)
 {
-    if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey)
+    if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey)
         verifier_nouveau_puis(() => effacer(groupe), (msg) => fuckoff(msg));
 };
 
@@ -307,11 +336,11 @@ async function effacer(groupe) {
                 } else {
                     displayError(data[0], data[1]);
                 }
-                raffraichir_les_groupes();
+                raffraichir_les_groupes_puis();
             } ,
             error: function (jqXHR, textStatus, errorThrown) {
                 displayError("http", [errorThrown, jqXHR.responseText]);
-                raffraichir_les_groupes();
+                raffraichir_les_groupes_puis();
                 }
         });
     }
@@ -380,13 +409,15 @@ function selectionne(action)
 $(function () {
     var infos;
     $('[data-bs-toggle="tooltip"]').tooltip();
-    neste_les_checks($('#accordionGroupes')[0]);
-
+    
     document.querySelectorAll(".accordion-collapse").forEach((elm) => {
-	    elm.addEventListener("shown.bs.collapse", () => raffraichir_les_groupes());
+	    elm.addEventListener("shown.bs.collapse", () => raffraichir_les_groupes_puis());
         });
-
-
+    
+    get_info_puis( () => {    
+        let modifies = rafraichir_barres();
+        neste_les_checks($('#accordionGroupes')[0]);
+    });
 });
 
 
