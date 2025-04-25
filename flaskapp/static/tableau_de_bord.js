@@ -23,6 +23,13 @@ function displayError(reason, details) {
     modal.toggle();
 }
 
+function appliquer_aux_freres_de_classe(moi, classe, fonction){
+    let freres = moi.parentElement.getElementsByClassName(classe);
+    for (let i=0; i<freres.length; i++) 
+        fonction(freres[i]);
+}
+
+
 function neste_les_checks(div_accordion, pere = null) {
 
     let items = jQuery(">.accordion-item",div_accordion);
@@ -42,6 +49,8 @@ function neste_les_checks(div_accordion, pere = null) {
         checker.fils = [];
         checker.filsChecked = 0;
         checker.filsDisabled = 0;
+        appliquer_aux_freres_de_classe(checker, "valide_si_checked", moi => moi.disabled=! checker.checked);
+
 
         if (pere != null){
             pere.fils.push(checker);
@@ -59,6 +68,7 @@ function neste_les_checks(div_accordion, pere = null) {
             if ((this.filsDisabled >= this.fils.length)  && ( ! this.disabled))
             {
                 this.disabled = true;
+ 
                 if (this.pere != null) this.pere.modifier_disabled(1);
             }
 
@@ -68,6 +78,7 @@ function neste_les_checks(div_accordion, pere = null) {
                 if (this.pere != null) this.pere.modifier_disabled(-1);
             }
             if (this.fils.length==0) this.filsDisabled = 0;
+
         };
 
         checker.modifier_checked = function(val){
@@ -75,11 +86,15 @@ function neste_les_checks(div_accordion, pere = null) {
         
             if (this.filsChecked>0  && ! this.checked) {
                 this.checked = true;
+                appliquer_aux_freres_de_classe(this, "valide_si_checked", moi => moi.disabled=false);
+
                 if (this.pere != null) 
                     this.pere.modifier_checked(1);
             } 
             if (this.filsChecked<=0  && this.checked) {
                 this.checked = false;
+                appliquer_aux_freres_de_classe(this, "valide_si_checked", moi => moi.disabled=true);
+ 
                 if (this.pere != null) 
                     this.pere.modifier_checked(-1);
             }
@@ -118,6 +133,8 @@ function neste_les_checks(div_accordion, pere = null) {
                 this.filsDisabled=this.fils.length - compteur;
                 this.filsChecked=compteur_checked;
                 this.checked = compteur_checked > 0;
+                appliquer_aux_freres_de_classe(this, "valide_si_checked", moi => moi.disabled= !this.checked);
+
                 if (this.checked && (this.filsChecked != this.fils.length)){
                     this.indeterminate=true;
                 }
@@ -126,6 +143,7 @@ function neste_les_checks(div_accordion, pere = null) {
         };
 
         checker.onclick = function (){
+            this.style.cursor = 'wait';
             let nouv = this.checked;
             raffraichir_les_groupes_puis((modifies) => {
                 this.downclick(this.checked);
@@ -133,7 +151,8 @@ function neste_les_checks(div_accordion, pere = null) {
                     this.pere.modifier_checked(1);
                 if (!this.checked && !nouv && this.pere!=null) 
                     this.pere.modifier_checked(-1);
-                });
+                this.style.cursor = 'default';    
+            });
         }; 
     };   
         
@@ -286,7 +305,7 @@ function raffraichir_les_groupes_puis(promesse = null) {
     });
  };
 
-function verifier_nouveau_puis(callback_ok, callback_pas_bon) {
+function verifier_nouveau_puis(callback_ok, callback_pas_bon) {  
     get_info_puis(() => {
         let modifie = rafraichir_barres();
         if (modifie["checked"].length==0) callback_ok();
@@ -350,9 +369,11 @@ async function effacer(groupe) {
     };
 };
 
-function creer_sur(groupe, partie, num)
+function creer_sur(groupe, partie, num, bouton)
 {
+    bouton.style.cursor='wait';
     verifier_nouveau_puis(() => creer(groupe, partie, num), (msg) => fuckoff(msg));
+    bouton.style.cursor='default';
 };
 
 function creer(groupe, partie, num)
@@ -367,7 +388,6 @@ function creer(groupe, partie, num)
         success: function (data, textStatus, jqXHR) {
             if (data[0] == "log_in_success") {
                 location.href = "/saisie/"+groupe+num+"/"+partie+"/";
-
             } else {
                 displayError("http", data);
             }
@@ -381,25 +401,65 @@ function creer(groupe, partie, num)
 function selectionne(action)
 {
     let promo = $("#poInput")[0].value;
-    if (promo == "default") promo="";
+    let scenario = $("#scenarioInput")[0].value;
 
-    let est_valide = true;
+    let est_valide = accordion => true;
     if (document.querySelector("#Filtre").value == "checked"){
+        est_valide = accordion => {
+            return jQuery(".Option", accordion)[0].checked;
+        };
+    };
+    if (document.querySelector("#Filtre").value == "encours"){
         list = get_checked();
-
+        est_valide = accordion => {
+            return ! jQuery(".Option", accordion)[0].disabled;
+        };
     };
 
-    let accordions = document.querySelectorAll('[id*=accordion-'+promo+']');
-    //let acordions = $('#accordion-'+promo);
-    for(let j=0; j<accordions.length; j++)
-    {      
-        if (est_valide){
-            if (action=="add"){
-                accordions[j].classList.remove("d-none");
-            }
+    if (document.querySelector("#Filtre").value == "libres"){
+        list = get_checked();
+        est_valide = accordion => {
+            let checker = jQuery(".Option", accordion)[0];
+            if (checker.fils[0].fils.length==0)
+                return checker.filsDisabled > 0;
             else
-            {
-                accordions[j].classList.add("d-none");
+                return true;
+        };
+    };
+
+    //let accordions = document.querySelectorAll('[id*=accordion-'+promo+']');
+    //let acordions = $('#accordion-'+promo);   
+    let accordions = $('.accordion-item');
+
+    let groupe_pere = null;
+    let propager;
+
+    for(let j=  0; j<accordions.length; j++)
+    {   
+        let groupe_scenar = accordions[j].id.split('-')[1].split('_')
+        let promo_ok = promo=="default" || groupe_scenar[0]==promo;
+        let scenario_ok;
+   
+        if (groupe_scenar.length>2){
+            scenario_ok = scenario=="default" || groupe_scenar[2]==scenario ;
+            propager = groupe_pere != null;
+        }
+        else
+        {   
+            groupe_pere = accordions[j];
+            propager=false;
+            scenario_ok =true;  
+        }
+        if (promo_ok && scenario_ok){
+            if (est_valide(accordions[j])){
+                if (action=="add"){
+                    accordions[j].classList.remove("d-none");
+                    //if (propager) groupe_pere.classList.remove("d-none"); 
+                }
+                else
+                {
+                    accordions[j].classList.add("d-none");
+                }
             }
         }
     }   
@@ -408,15 +468,21 @@ function selectionne(action)
 
 $(function () {
     var infos;
+    document.body.style.cursor = 'wait'; 
     $('[data-bs-toggle="tooltip"]').tooltip();
     
     document.querySelectorAll(".accordion-collapse").forEach((elm) => {
-	    elm.addEventListener("shown.bs.collapse", () => raffraichir_les_groupes_puis());
+	    elm.addEventListener("shown.bs.collapse", function () { 
+            this.style.cursor="wait"; 
+            raffraichir_les_groupes_puis();
+            this.style.cursor="default";
         });
+    });
     
     get_info_puis( () => {    
         let modifies = rafraichir_barres();
         neste_les_checks($('#accordionGroupes')[0]);
+        document.body.style.cursor = 'default';
     });
 });
 

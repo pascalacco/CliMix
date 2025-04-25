@@ -21,7 +21,7 @@ cors = CORS(app)
 CORS(app, support_credentials=True)
 
 
-@app.route('/')
+@app.route('/index')
 @cross_origin(support_credentials=True)
 def home_html():
     return render_template("index.html")
