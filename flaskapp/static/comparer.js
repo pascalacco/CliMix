@@ -34,25 +34,25 @@ function lignes(div) {
 
     let allGroup = liste;
 
-    
+
     let parseTime = d3.timeParse("%Y");
     let years = annees.map((e) => parseTime(e));
 
     let datas = [];
-    let time_domain=[years[0], years.slice(-1)[0]];
+    let time_domain = [years[0], years.slice(-1)[0]];
     let item = compilation['cout'];
     let groupes = Object.keys(item);
     let first_key = groupes[0];
-    y_domain=[item[first_key][0], item[first_key][0]];
+    y_domain = [item[first_key][0], item[first_key][0]];
     for (let key in item) {
-        data={"name" :key, "values" : []};
+        data = { "name": key, "values": [] };
         for (let i = 0; i < item[key].length; i++) {
             let val = item[key][i];
-            if (val != null){
-                data.values.push( val
+            if (val != null) {
+                data.values.push(val
                 );
-                if (val<y_domain[0]) y_domain[0]=val;
-                if (val>y_domain[1]) y_domain[1]=val;
+                if (val < y_domain[0]) y_domain[0] = val;
+                if (val > y_domain[1]) y_domain[1] = val;
             }
         }
         datas.push(data);
@@ -101,7 +101,7 @@ function lignes(div) {
 
     // Add the lines
     let line = d3.line()
-        .x(function (d,i) { return xScale(years[i]) })
+        .x(function (d, i) { return xScale(years[i]) })
         .y(function (d) { return yScale(+d) });
     svg.selectAll("myLines")
         .data(datas)
