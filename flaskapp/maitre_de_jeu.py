@@ -287,10 +287,11 @@ def calculer_nb(mix, annee):
     return nb
 
 
-budget_ratio = {'S1': 90./120.,
-                'S2': 100./120.,
-                'S3Enr': 110./120.,
-                'S3Nuke': 110./120.
+budget_ratio = {'S1': 110./120.,
+                'S2': 130./120.,
+                'S3Enr': 160./120.,
+                'S3Nuke': 160./120.,
+                'S4': 190./120.
                 }
 
 def calculer(dm, annee, actions, scenario):

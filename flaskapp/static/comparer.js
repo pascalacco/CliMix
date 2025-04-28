@@ -15,10 +15,10 @@ function displayError(reason, details) {
     modal.toggle();
 }
 
-function lignes(div) {
+function lignes(div, champs) {
 
     // set the dimensions and margins of the graph
-    let margin = { top: 10, right: 100, bottom: 30, left: 30 },
+    let margin = { top: 50, right: 100, bottom: 50, left: 100 },
         width = 860 - margin.left - margin.right,
         height = 600 - margin.top - margin.bottom;
 
@@ -40,7 +40,7 @@ function lignes(div) {
 
     let datas = [];
     let time_domain = [years[0], years.slice(-1)[0]];
-    let item = compilation['cout'];
+    let item = compilation[champs];
     let groupes = Object.keys(item);
     let first_key = groupes[0];
     y_domain = [item[first_key][0], item[first_key][0]];
@@ -172,7 +172,13 @@ function lignes(div) {
 
 
 function fillPage() {
-    lignes(d3.select("#resultats"));
+
+    lignes(d3.select("#graphe_couts"),"cout");
+    lignes(d3.select("#graphe_co2"),"co2");
+    lignes(d3.select("#graphe_gaz"),"consoGaz");
+    lignes(d3.select("#graphe_nuke"),"puissanceNucleaire");
+    lignes(d3.select("#graphe_renouv"),"puissanceEolienneON");
+    lignes(d3.select("#graphe_penuries"),"nbPenuries");
 }
 
 

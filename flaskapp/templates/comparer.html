@@ -7,12 +7,7 @@
 {% block head %}
 {{ super() }}
 <link rel="stylesheet" href="/static/comparer.css">
-<script>
-   const liste = {{ liste | safe }};
-   const compilation = {{ compilation | tojson }};
-   const annees = {{ annees | safe }};
 
-</script>
 
 <!--meta name="viewport" content="width=device-width, initial-scale=1.0"-->
 <!--script src="https://d3js.org/d3.v6.min.js"></script-->
@@ -47,22 +42,32 @@
    <ul>
       <li>
          <span onmouseenter="hoverEnter(0)">
-            <i class="fa fa-home"></i>
+            <i class="fa fa-euro-sign"></i>
          </span>
       </li>
       <li>
          <span onmouseenter="hoverEnter(1)">
-            <i class="fa fa-edit"></i>
+            <i class="fa fa-temperature-high"></i>
          </span>
       </li>
       <li>
          <span onmouseenter="hoverEnter(2)">
-            <i class="fa fa-laptop"></i>
+            <i class="fa fa-gas-pump"></i>
          </span>
       </li>
       <li>
          <span onmouseenter="hoverEnter(3)">
-            <i class="fa fa-tag"></i>
+            <i class="fa fa-radiation"></i>
+         </span>
+      </li>
+      <li>
+         <span onmouseenter="hoverEnter(4)">
+            <i class="fa fa-wind"></i>
+         </span>
+      </li>
+      <li>
+         <span onmouseenter="hoverEnter(5)">
+            <i class="fa fa-minus"></i>
          </span>
       </li>
       <span class="goo-index" id="goo-index"></span>
@@ -71,48 +76,39 @@
 
 <div class="content-wrapper">
    <div id="screen_0" class="screen visible">
-      <h2>keep calm and happy</h2>
-      <div id="resultats" class="container" style="display: none;">
+      <h2>Coûts</h2>
+      <div id="graphe_couts" class="container" style="display: none;">
       </div>
    </div>
 
    <div id="screen_1" class="screen">
-      <h2>keep travelling</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-         dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-         ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-         nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-         anim id est laborum.</p>
-      <div class="image"
-         style="background-image:url(https://images.unsplash.com/photo-1506773090264-ac0b07293a64?ixlib=rb-1.2.1&auto=format&fit=crop&w=376&q=80)">
-      </div>
+      <h2>Gaz à effet de serre</h2>
+      <div id="graphe_co2" class="container">   </div>
+
    </div>
 
 
    <div id="screen_2" class="screen">
-      <h2>World in 30 Days</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-         dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-         ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-         nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-         anim id est laborum.</p>
-      <div class="image"
-         style="background-image:url(https://images.unsplash.com/photo-1514282401047-d79a71a590e8?ixlib=rb-1.2.1&auto=format&fit=crop&w=401&q=80)">
-      </div>
+      <h2>Consommation de Gaz</h2>
+      <div id="graphe_gaz" class="container">   </div>
    </div>
 
 
    <div id="screen_3" class="screen">
-      <h2>Help Other To Get The Same</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-         dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-         ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-         nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-         anim id est laborum.</p>
-      <div class="image"
-         style="background-image:url(https://images.unsplash.com/photo-1467269204594-9661b134dd2b?ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80)">
-      </div>
+      <h2>Nucléaire installé</h2>
+      <div id="graphe_nuke" class="container">   </div>
    </div>
+
+   <div id="screen_4" class="screen">
+      <h2>Eolien Onshore</h2>
+      <div id="graphe_renouv" class="container">   </div>
+   </div>
+
+   <div id="screen_5" class="screen">
+      <h2>Penuries</h2>
+      <div id="graphe_penuries" class="container">   </div>
+   </div>
+
 </div>
 
 <!--div class="container">
@@ -158,6 +154,11 @@
 
 {{ super() }}
 <script src="/static/d3.v7.min.js" charset="utf-8"></script>
+<script>
+   const liste = {{ liste | safe }};
+   const compilation = {{ compilation | tojson }};
+   const annees = {{ annees | safe }};   
+</script>
 <script type="text/javascript" src="/static/comparer.js"></script>
 
 <script>
@@ -173,11 +174,11 @@
    }
 
    $(function () {
-
+      
 
       fillPage();
 
-      $("#resultats").fadeIn();
+      $("#graphe_couts").fadeIn();
 
    });
 
