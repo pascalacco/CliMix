@@ -14,16 +14,7 @@
 <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"-->
 
 <!--script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script-->
-<style>
-   .tab-pane {
-      position: relative;
-      height: 0;
-   }
 
-   .chart-container {
-      height: 100%;
-   }
-</style>
 {% endblock %}
 
 {% block navlinks %}
@@ -47,27 +38,37 @@
       </li>
       <li>
          <span onmouseenter="hoverEnter(1)">
-            <i class="fa fa-temperature-high"></i>
+            <i class="fa fa-minus"></i>
          </span>
       </li>
       <li>
          <span onmouseenter="hoverEnter(2)">
-            <i class="fa fa-gas-pump"></i>
+            <i class="fa fa-temperature-high"></i>
          </span>
       </li>
       <li>
          <span onmouseenter="hoverEnter(3)">
-            <i class="fa fa-radiation"></i>
+            <i class="fa fa-gas-pump"></i>
          </span>
       </li>
       <li>
          <span onmouseenter="hoverEnter(4)">
-            <i class="fa fa-wind"></i>
+            <i class="fa fa-scale-balanced"></i>
          </span>
       </li>
       <li>
          <span onmouseenter="hoverEnter(5)">
-            <i class="fa fa-minus"></i>
+            <i class="fa fa-radiation"></i>
+         </span>
+      </li>
+      <li>
+         <span onmouseenter="hoverEnter(6)">
+            <i class="fa fa-wind"></i>
+         </span>
+      </li>
+      <li>
+         <span onmouseenter="hoverEnter(7)">
+            <i class="fa-regular fa-sun"></i>
          </span>
       </li>
       <span class="goo-index" id="goo-index"></span>
@@ -76,38 +77,46 @@
 
 <div class="content-wrapper">
    <div id="screen_0" class="screen visible">
-      <h2>Coûts</h2>
+      <h2>Coûts (Milliards d'euro)</h2>
       <div id="graphe_couts" class="container" style="display: none;">
       </div>
    </div>
 
    <div id="screen_1" class="screen">
-      <h2>Gaz à effet de serre</h2>
+      <h2>Penuries (nb d'heures)</h2>
+      <div id="graphe_penuries" class="container">   </div>
+   </div>
+
+   <div id="screen_2" class="screen">
+      <h2>Gaz à effet de serre (Million de tonnes eCO2)</h2>
       <div id="graphe_co2" class="container">   </div>
 
    </div>
 
-
-   <div id="screen_2" class="screen">
-      <h2>Consommation de Gaz</h2>
+   <div id="screen_3" class="screen">
+      <h2>Consommation de Gaz Fossile (GWh)</h2>
       <div id="graphe_gaz" class="container">   </div>
    </div>
 
-
-   <div id="screen_3" class="screen">
-      <h2>Nucléaire installé</h2>
+   <div id="screen_4" class="screen">
+      <h2>Equilibre ENR/nucleaire (%)</h2>
+      <div id="graphe_equilibre" class="container">   </div>
+   </div>
+   <div id="screen_5" class="screen">
+      <h2>Nucléaire installé (GWc)</h2>
       <div id="graphe_nuke" class="container">   </div>
    </div>
 
-   <div id="screen_4" class="screen">
-      <h2>Eolien Onshore</h2>
-      <div id="graphe_renouv" class="container">   </div>
+   <div id="screen_6" class="screen">
+      <h2>Eolien installé On et Off (GWc)</h2>
+      <div id="graphe_eolien" class="container">   </div>
    </div>
 
-   <div id="screen_5" class="screen">
-      <h2>Penuries</h2>
-      <div id="graphe_penuries" class="container">   </div>
+   <div id="screen_7" class="screen">
+      <h2>Photo Voltaïque installé (GWc)</h2>
+      <div id="graphe_pv" class="container">   </div>
    </div>
+
 
 </div>
 
@@ -157,31 +166,8 @@
 <script>
    const liste = {{ liste | safe }};
    const compilation = {{ compilation | tojson }};
-   const annees = {{ annees | safe }};   
+   const annees = {{ annees | safe }};      
 </script>
 <script type="text/javascript" src="/static/comparer.js"></script>
-
-<script>
-   var gooIndex = document.getElementById('goo-index');
-   var hoverEnter = index => {
-      gooIndex.style.top = 100 * index + 'px';
-      let allScreens = document.querySelectorAll('.screen');
-      allScreens.forEach(e => {
-         e.classList.remove('visible')
-      })
-      let nowVisible = document.getElementById('screen_' + index);
-      nowVisible.classList.add('visible');
-   }
-
-   $(function () {
-      
-
-      fillPage();
-
-      $("#graphe_couts").fadeIn();
-
-   });
-
-</script>
 
 {% endblock %}

@@ -353,10 +353,24 @@ def calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances)
 
     result = result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances)
     result.update(result_couts(actions, annuel, result['prodGazFossile']))
-
+    result.update(calculer_stats(result))
 
     # result.update(result_ressources(mix, save, nbPions, nvPions))
     return result
+
+
+def calculer_stats(resultats):
+    results = {}
+    results["puissanceEolienneTotale"] = resultats["puissanceEolienneOFF"] + resultats["puissanceEolienneOFF"]
+    results["equilibreEnrNucleaire"] = int(resultats["prodNucleaire"] / 
+                                                (   resultats["prodNucleaire"] +
+                                                    resultats["prodOnshore"] + 
+                                                    resultats["prodOffshore"] +
+                                                    resultats["prodPv"] + 
+                                                    resultats["prodEau"]
+                                                )* 100.
+                                            )    
+    return resultats
 
 
 def result_couts(actions, annuel, prodGazFossile):

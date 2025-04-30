@@ -1,3 +1,6 @@
+var gooIndex = document.getElementById('goo-index');
+
+
 function displayError(reason, details) {
     let msg;
     const modal = new bootstrap.Modal($("#errModal"));
@@ -140,8 +143,12 @@ function lignes(div, champs) {
         .append('g')
         .append("text")
         .attr("class", function (d) { return d.name })
-        .datum(function (d) { return { name: d.name, value: d.values[d.values.length - 1] }; }) // keep only the last value of each time series
-        .attr("transform", function (d, i) { return "translate(" + xScale(years[i]) + "," + yScale(d.value) + ")"; }) // Put the text at the position of the last point
+        .datum(function (d) { return { 
+            name: d.name, 
+            year: years[d.values.length - 1], 
+            value: d.values[d.values.length - 1] }; }) // keep only the last value of each time series
+        .attr("transform", function (d, i) { 
+            return "translate(" + xScale(d.year) + "," + yScale(d.value) + ")"; }) // Put the text at the position of the last point
         .attr("x", 12) // shift the text a bit more right
         .text(function (d) { return d.name; })
         .style("fill", function (d) { return myColor(d.name) })
@@ -169,18 +176,37 @@ function lignes(div, champs) {
         */
 };
 
-
+function hoverEnter(index){
+    let nowVisible = document.getElementById('screen_' + index);
+    gooIndex.style.top = 60  * index + 'px';
+    let allScreens = document.querySelectorAll('.screen');
+    allScreens.forEach(e => {
+        e.classList.remove('visible')
+    })
+    
+    nowVisible.classList.add('visible');
+}
 
 function fillPage() {
 
     lignes(d3.select("#graphe_couts"),"cout");
     lignes(d3.select("#graphe_co2"),"co2");
-    lignes(d3.select("#graphe_gaz"),"consoGaz");
+    lignes(d3.select("#graphe_gaz"),"prodGazFossile");
     lignes(d3.select("#graphe_nuke"),"puissanceNucleaire");
-    lignes(d3.select("#graphe_renouv"),"puissanceEolienneON");
+    if ("puissanceEolienneTotale" in compilation) lignes(d3.select("#graphe_eole"),"puissanceEolienneTotale");
+    lignes(d3.select("#graphe_pv"),"puissancePV");
+    if ("equilibreEnrNucleaire" in compilation) lignes(d3.select("#graphe_equilibre"),"equilibreEnrNucleaire");
     lignes(d3.select("#graphe_penuries"),"nbPenuries");
+
 }
 
+ $(function () {
+      
 
+      fillPage();
+
+      $("#graphe_couts").fadeIn();
+
+   });
 
 

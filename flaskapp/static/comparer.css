@@ -14,10 +14,12 @@ body {
 }
 
 .menu {
-    position: fixed;
+    --taille :60px;
+    position: absolute;
     left: 0;
     top: auto;
-    width: 100px;
+    font-size: 20pt;
+    width: var(--taille);
     background: #b0bdd6;
     height: 100%;
     display: flex;
@@ -29,7 +31,8 @@ body {
 .menu ul {
     list-style: none;
     margin: 0px;
-    width: 100%;
+    width: calc(var(--taille)*0.75);
+    height:100%;
     position: relative;
     padding: 0px;
     filter: url(#goo);
@@ -38,6 +41,7 @@ body {
 
 .menu ul li {
     width: 100%;
+    height: var(--taille);
     margin: 0;
     padding: 0;
     display: flex;
@@ -47,11 +51,10 @@ body {
 
 .menu ul span {
     background: white;
-    border-radius: 50px;
-    font-size: 25pt;
-    width: 80px;
-    height: 80px;
-    margin: 10px 0;
+    border-radius: 50%;
+    width: calc(var(--taille)*0.75);
+    height: calc(var(--taille)*0.75);
+    margin: calc(var(--taille)*0.25*0.5) 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -62,37 +65,35 @@ body {
 }
 
 .menu ul .goo-index {
-    width: 160px;
-    height: 80px;
+    width: calc(var(--taille));
+    height: calc(var(--taille)*0.75);
     background: white;
     position: absolute;
-    left: 10px;
+    left: 0px;
     top: 0;
     z-index: -1;
-    border-radius: 100px 0 0 100px;
+    border-radius: calc(var(--taille)*0.75) 0 0 calc(var(--taille)*0.75);
     transition: all 1s ease;
 }
 
 .menu ul .goo-index:before {
     content: '';
     position: absolute;
-    width: 30px;
-    height: 20px;
-    border-radius: 20px 0 0 20px;
-    background-image: radial-gradient(circle at 10px 0, transparent 0, transparent 20px, white 20px);
-    top: -20px;
-    left: 60px;
+    width: calc(var(--taille)*0.5);
+    height: calc(var(--taille)*0.5);
+    background-image: radial-gradient(circle at 0px 0px, transparent 0, transparent calc(var(--taille)*0.25), white calc(var(--taille)*0.25));
+    top: calc(var(--taille)*0.25*-1);
+    left: calc(var(--taille)*0.625);
 }
 
 .menu ul .goo-index:after {
     content: '';
     position: absolute;
-    width: 30px;
-    height: 20px;
-    border-radius: 20px 0 0 20px;
-    background-image: radial-gradient(circle at 10px 20px, transparent 0, transparent 20px, white 20px);
-    bottom: -20px;
-    left: 60px;
+    width: calc(var(--taille)*0.5);
+    height: calc(var(--taille)*0.5);
+    background-image: radial-gradient(circle at 0px calc(var(--taille)*0.5), transparent 0, transparent calc(var(--taille)*0.25), white calc(var(--taille)*0.25));
+    bottom: calc(var(--taille)*0.25*-1);
+    left: calc(var(--taille)*0.625);
 }
 
 .content-wrapper {
@@ -123,7 +124,7 @@ body {
 }
 
 .screen.visible {
-    top: 50px;
+    top: 15px ;
     opacity: 1;
     transition: all 1.5s ease;
     transition-delay: 0.8s ease;
