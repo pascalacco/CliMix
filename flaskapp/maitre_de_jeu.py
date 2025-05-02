@@ -361,7 +361,7 @@ def calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances)
 
 def calculer_stats(resultats):
     results = {}
-    results["puissanceEolienneTotale"] = resultats["puissanceEolienneOFF"] + resultats["puissanceEolienneOFF"]
+    results["puissanceEolienneTotale"] = resultats["puissanceEolienneOFF"] + resultats["puissanceEolienneON"]
     results["equilibreEnrNucleaire"] = int(resultats["prodNucleaire"] / 
                                                 (   resultats["prodNucleaire"] +
                                                     resultats["prodOnshore"] + 
@@ -370,7 +370,7 @@ def calculer_stats(resultats):
                                                     resultats["prodEau"]
                                                 )* 100.
                                             )    
-    return resultats
+    return results
 
 
 def result_couts(actions, annuel, prodGazFossile):

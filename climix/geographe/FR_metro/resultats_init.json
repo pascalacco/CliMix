@@ -831,12 +831,15 @@
             "pac": 0.001154421155070567,
             "pll": 0.0019250887987443896
         },
-        "cout": 99.6,
+        "cout": 101.8,
         "budget": 120,
         "cout_gaz": 5.8,
-        "cout_uranium": 74.0
+        "cout_uranium": 74.0,
+        "cout_construction": 22.0,
+        "puissanceEolienneTotale": 25.2,
+        "equilibreEnrNucleaire": 68
     },
-
+   
     "2030": {},
 
     "2035": {},

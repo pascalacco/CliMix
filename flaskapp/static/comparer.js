@@ -193,7 +193,7 @@ function fillPage() {
     lignes(d3.select("#graphe_co2"),"co2");
     lignes(d3.select("#graphe_gaz"),"prodGazFossile");
     lignes(d3.select("#graphe_nuke"),"puissanceNucleaire");
-    if ("puissanceEolienneTotale" in compilation) lignes(d3.select("#graphe_eole"),"puissanceEolienneTotale");
+    if ("puissanceEolienneTotale" in compilation) lignes(d3.select("#graphe_eolien"),"puissanceEolienneTotale");
     lignes(d3.select("#graphe_pv"),"puissancePV");
     if ("equilibreEnrNucleaire" in compilation) lignes(d3.select("#graphe_equilibre"),"equilibreEnrNucleaire");
     lignes(d3.select("#graphe_penuries"),"nbPenuries");
