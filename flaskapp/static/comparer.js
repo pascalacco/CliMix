@@ -21,7 +21,7 @@ function displayError(reason, details) {
 function lignes(div, champs) {
 
     // set the dimensions and margins of the graph
-    let margin = { top: 50, right: 100, bottom: 50, left: 100 },
+    let margin = { top: 100, right: 100, bottom: 50, left: 100 },
         width = 860 - margin.left - margin.right,
         height = 600 - margin.top - margin.bottom;
 
@@ -34,23 +34,18 @@ function lignes(div, champs) {
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
 
-
-    let allGroup = liste;
-
-
     let parseTime = d3.timeParse("%Y");
     let years = annees.map((e) => parseTime(e));
 
     let datas = [];
     let time_domain = [years[0], years.slice(-1)[0]];
     let item = compilation[champs];
-    let groupes = Object.keys(item);
-    let first_key = groupes[0];
+    let first_key = liste[0];
     y_domain = [item[first_key][0], item[first_key][0]];
-    for (let key in item) {
-        data = { "name": key, "values": [] };
-        for (let i = 0; i < item[key].length; i++) {
-            let val = item[key][i];
+    for (let k=0; k<liste_court.length; k++) {
+        data = { "name": liste_court[k], "values": [] };
+        for (let i = 0; i < item[liste[k]].length; i++) {
+            let val = item[liste[k]][i];
             if (val != null) {
                 data.values.push(val
                 );
@@ -59,28 +54,15 @@ function lignes(div, champs) {
             }
         }
         datas.push(data);
-    }
-
-    /* Reformat the data: we need an array of arrays of {x, y} tuples
-    let datas = allGroup.map(function (grpName) { // .map allows to do something for each element of the list
-        return {
-            name: grpName,
-            values: item[grpName]
-        };
-    }
-    );
-    */
-
+    };
 
     // I strongly advise to have a look to datas with
-    console.log(datas);
-
+    //console.log(datas);
 
     // A color scale: one color for each group
     let myColor = d3.scaleOrdinal()
-        .domain(groupes)
+        .domain(liste_court)
         .range(d3.schemeSet2);
-
 
     // Add X axis --> it is a date format
     let xScale = d3.scaleTime()
@@ -106,6 +88,7 @@ function lignes(div, champs) {
     let line = d3.line()
         .x(function (d, i) { return xScale(years[i]) })
         .y(function (d) { return yScale(+d) });
+    
     svg.selectAll("myLines")
         .data(datas)
         .enter()
@@ -154,8 +137,6 @@ function lignes(div, champs) {
         .style("fill", function (d) { return myColor(d.name) })
         .style("font-size", 15);
 
-    /*/ Add a legend (interactive)
-    
     svg
         .selectAll("myLegend")
         .data(datas)
@@ -163,17 +144,16 @@ function lignes(div, champs) {
         .append('g')
         .append("text")
         .attr('x', function (d, i) { return 30 + i * 200 })
-        .attr('y', function (d, i) { return 108})
+        .attr('y', function (d, i) { return -50})
         .text(function (d) { return d.name; })
         .style("fill", function (d) { return myColor(d.name) })
         .style("font-size", 15)
         .on("click", function (d) {
             // is the element currently visible ?
-            currentOpacity = d3.selectAll("." + d.name).style("opacity")
+            current = d3.selectAll("." + this.getHTML());
             // Change the opacity: from 0 to 1 or from 1 to 0
-            d3.selectAll("." + d.name).transition().style("opacity", currentOpacity == 1 ? 0 : 1)
+            current.transition().style("opacity", current.style("opacity") == '1' ? '0' : '1');
         });
-        */
 };
 
 function hoverEnter(index){
@@ -200,13 +180,43 @@ function fillPage() {
 
 }
 
+function raccourcir_liste(liste){
+
+    let court = ["_"];
+    let commun = liste[0].split('_');
+    let mots = [];
+    let L = commun.length;
+    for(let i=0; i < liste.length; i++){
+        mots[i] = liste[i].split('_');
+        court[i]="_";
+        for(let w=0; w < L; w++){
+            if (mots[i][w] != commun[w]) {
+                commun[w]='';
+            };
+        };
+    };
+    for(let w=0; w<L; w++){
+        if (commun[w]==""){
+            for(let i=0; i < liste.length; i++){
+                court[i] += mots[i][w]+'_';
+            };
+        };   
+    };
+
+    for(let i=0; i < liste.length; i++){
+        court[i]=court[i].slice(0,-1);
+    };
+    return court;
+};
+
+
  $(function () {
       
+    liste_court = raccourcir_liste(liste);
+    fillPage();
 
-      fillPage();
+    $("#graphe_couts").fadeIn();
 
-      $("#graphe_couts").fadeIn();
-
-   });
+});
 
 
