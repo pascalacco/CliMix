@@ -1,5 +1,5 @@
 var gooIndex = document.getElementById('goo-index');
-
+var [liste_court, commun] = raccourcir_liste(liste);
 
 function displayError(reason, details) {
     let msg;
@@ -21,16 +21,18 @@ function displayError(reason, details) {
 function lignes(div, champs) {
 
     // set the dimensions and margins of the graph
-    let margin = { top: 100, right: 100, bottom: 50, left: 100 },
-        width = 860 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
+    let margin = { top: 90, right: 200, bottom: 50, left: 100 },
+        width = 960 - margin.left - margin.right,
+        height = 700 - margin.top - margin.bottom;
 
     // append the svg object to the body of the page
+ 
     var svg = div
         .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
+        .attr("viewBox", "0 0 "+(width + margin.left + margin.right)+" "+(height + margin.top + margin.bottom))
+               .attr("width", width + margin.left + margin.right)
+       .attr("height", height + margin.top + margin.bottom)
+    .append("g")
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
 
@@ -53,7 +55,7 @@ function lignes(div, champs) {
                 if (val > y_domain[1]) y_domain[1] = val;
             }
         }
-        datas.push(data);
+        if (data["values"].length>0) datas.push(data);
     };
 
     // I strongly advise to have a look to datas with
@@ -143,8 +145,8 @@ function lignes(div, champs) {
         .enter()
         .append('g')
         .append("text")
-        .attr('x', function (d, i) { return 30 + i * 200 })
-        .attr('y', function (d, i) { return -50})
+        .attr('x', function (d, i) { return 30 + (i%4) * 150 })
+        .attr('y', function (d, i) { return -15 - 15* Math.floor(i/4)})
         .text(function (d) { return d.name; })
         .style("fill", function (d) { return myColor(d.name) })
         .style("font-size", 15)
@@ -204,15 +206,15 @@ function raccourcir_liste(liste){
     };
 
     for(let i=0; i < liste.length; i++){
-        court[i]=court[i].slice(0,-1);
+        court[i]=court[i].slice(1,-1);
     };
-    return court;
+    return [court, commun];
 };
 
 
  $(function () {
       
-    liste_court = raccourcir_liste(liste);
+
     fillPage();
 
     $("#graphe_couts").fadeIn();

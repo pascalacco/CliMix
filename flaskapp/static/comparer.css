@@ -97,9 +97,9 @@ body {
 }
 
 .content-wrapper {
-    width: calc(100% - 100px);
+    width: calc(100% - 10px);
     position: relative;
-    left: 100px;
+    left: 10px;
     height: 100%;
     overflow: hidden;
     padding: 50px;
@@ -109,34 +109,29 @@ body {
 
 .screen {
     width: calc(100% - 100px);
-    max-width: 800px;
+    max-width: 1600px;
     height: 100%;
     position: absolute;
     top: -100%;
+    left: var("--taille");
     background: white;
     opacity: 0;
-    display: grid;
-    grid-template-rows: 50px auto auto;
-    grid-template-columns: 100%;
-    grid-template-areas: 'heading' 'text' 'image';
     transition: all 1s ease;
     transition-delay: 0s;
 }
 
 .screen.visible {
-    top: 15px ;
+    top: 0px ;
     opacity: 1;
     transition: all 1.5s ease;
     transition-delay: 0.8s ease;
 }
 
 .screen h2 {
-    grid-area: heading;
 }
 
 .screen p {
-    margin-top: 40px;
-    grid-area: text;
+    margin-top: 0px;
     text-align: center;
     justify-content: center;
     align-items: center;
@@ -144,28 +139,20 @@ body {
 }
 
 .screen div {
-    margin-top: 40px;
-    grid-area: text;
-    text-align: center;
-    justify-content: center;
     align-items: center;
     display: flex;
 }
 
-.image {
-    width: 100%;
-    height: 200px;
-    border-radius: 10px;
-    background-size: cover;
-    background-position: center center;
-}
+
 
 h2 {
-    font-size: 25px;
+    margin-bottom: 5px;
+    font-size: 18px;
     position: relative;
     text-align: center;
 }
 
+/*
 h2:after {
     content: '';
     position: absolute;
@@ -174,4 +161,4 @@ h2:after {
     background: #1fc058;
     left: calc(50% - 35px);
     bottom: -15px;
-}
+}*/
