@@ -1,16 +1,12 @@
-import jinja2
-from flask import Flask, request, jsonify, render_template, redirect, make_response, send_file, session
+from flask import Flask, request, jsonify, render_template, redirect, make_response, send_file
 from flask_cors import CORS, cross_origin
+import jinja2
 
-import datetime
-import traceback
-import os
 
 from admin.resources import admin_blueprint, parties
-#from jeu.resources import jeu_blueprint
 
 
-from flaskapp.archiveur import DataManager, Parties
+from flaskapp.archiveur import DataManager
 from flaskapp import archiveur
 from flaskapp import maitre_de_jeu
 from climix import visualiseur
@@ -25,7 +21,7 @@ cors = CORS(app)
 CORS(app, support_credentials=True)
 
 
-@app.route('/')
+@app.route('/index')
 @cross_origin(support_credentials=True)
 def home_html():
     return render_template("index.html")
@@ -151,8 +147,6 @@ def commit(equipe, partie, annee):
 def telecharger(chemin):
 
     return send_file(chemin)
-
-    return resp
 
 
 @app.route("/sauvegarder/<equipe>/<partie>/<annee>")

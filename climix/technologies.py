@@ -70,8 +70,8 @@ infos = {
     "eolienneON":   {"PoutMax": 1.4,        "Cout" : 3.5,      "FacteurCO2": 16.},
     "eolienneOFF":  {"PoutMax": 2.4,        "Cout" : 6.,        "FacteurCO2": 17.},
     "panneauPV":    {"PoutMax": 3.,          "Cout" : 3.6,      "FacteurCO2": 44.},
-    "centraleNuc":  {"PoutMax": PoutNuke,    "CoutRenouv" : 2,        "FacteurCO2": 7. , "CoutDemantele": 0.5},
-    "EPR2":         {"PoutMax": 1.67,       "Cout" : 3.6,      "FacteurCO2": 6.},
+    "centraleNuc":  {"PoutMax": PoutNuke,    "CoutRenouv" : 2,  "FacteurCO2": 7. , "CoutDemantele": 0.5},
+    "EPR2":         {"PoutMax": 1.67,       "Cout" : 8.6,      "FacteurCO2": 6.},
     "methanation":  {"PoutMax": None,       "Cout" : 4.85,     "FacteurCO2": 0.},
     "biomasse":     {"PoutMax": PoutMaxBio, "Cout" : 0.12,     "FacteurCO2": 107.},
     "batt":        {"PoutMax": 20.08/10.,  "Cout" : 0.8,      "FacteurCO2": 0.}

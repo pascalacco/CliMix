@@ -1,0 +1,164 @@
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    font-family: tahoma;
+}
+
+.menu {
+    --taille :60px;
+    position: absolute;
+    left: 0;
+    top: auto;
+    font-size: 20pt;
+    width: var(--taille);
+    background: #b0bdd6;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.menu ul {
+    list-style: none;
+    margin: 0px;
+    width: calc(var(--taille)*0.75);
+    height:100%;
+    position: relative;
+    padding: 0px;
+    filter: url(#goo);
+    z-index: 1;
+}
+
+.menu ul li {
+    width: 100%;
+    height: var(--taille);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu ul span {
+    background: white;
+    border-radius: 50%;
+    width: calc(var(--taille)*0.75);
+    height: calc(var(--taille)*0.75);
+    margin: calc(var(--taille)*0.25*0.5) 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    color: #333;
+}
+
+.menu ul .goo-index {
+    width: calc(var(--taille));
+    height: calc(var(--taille)*0.75);
+    background: white;
+    position: absolute;
+    left: 0px;
+    top: 0;
+    z-index: -1;
+    border-radius: calc(var(--taille)*0.75) 0 0 calc(var(--taille)*0.75);
+    transition: all 1s ease;
+}
+
+.menu ul .goo-index:before {
+    content: '';
+    position: absolute;
+    width: calc(var(--taille)*0.5);
+    height: calc(var(--taille)*0.5);
+    background-image: radial-gradient(circle at 0px 0px, transparent 0, transparent calc(var(--taille)*0.25), white calc(var(--taille)*0.25));
+    top: calc(var(--taille)*0.25*-1);
+    left: calc(var(--taille)*0.625);
+}
+
+.menu ul .goo-index:after {
+    content: '';
+    position: absolute;
+    width: calc(var(--taille)*0.5);
+    height: calc(var(--taille)*0.5);
+    background-image: radial-gradient(circle at 0px calc(var(--taille)*0.5), transparent 0, transparent calc(var(--taille)*0.25), white calc(var(--taille)*0.25));
+    bottom: calc(var(--taille)*0.25*-1);
+    left: calc(var(--taille)*0.625);
+}
+
+.content-wrapper {
+    width: calc(100% - 10px);
+    position: relative;
+    left: 10px;
+    height: 100%;
+    overflow: hidden;
+    padding: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+.screen {
+    width: calc(100% - 100px);
+    max-width: 1600px;
+    height: 100%;
+    position: absolute;
+    top: -100%;
+    left: var("--taille");
+    background: white;
+    opacity: 0;
+    transition: all 1s ease;
+    transition-delay: 0s;
+}
+
+.screen.visible {
+    top: 0px ;
+    opacity: 1;
+    transition: all 1.5s ease;
+    transition-delay: 0.8s ease;
+}
+
+.screen h2 {
+}
+
+.screen p {
+    margin-top: 0px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.screen div {
+    align-items: center;
+    display: flex;
+}
+
+
+
+h2 {
+    margin-bottom: 5px;
+    font-size: 18px;
+    position: relative;
+    text-align: center;
+}
+
+/*
+h2:after {
+    content: '';
+    position: absolute;
+    width: 70px;
+    height: 5px;
+    background: #1fc058;
+    left: calc(50% - 35px);
+    bottom: -15px;
+}*/

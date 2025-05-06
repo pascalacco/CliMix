@@ -21,172 +21,242 @@
 {% block content %}
 {{ super() }}
 
-<h3 class="mt-3 mb-5 text-center">Pour commencer, sélectionnez votre promo et groupe de TD</h3>
+<h5 class="mt-3 mb-5 text-center">Sélectionnez votre po, scénario, ... </h5>
 
-<div class="pt-3 row justify-content-center gy-4">
-	<div class="form-outline col-md-3">
+<div class="row justify-content-center">
+	<div class="col-auto">
+		Lister :
+	</div>
+	<div class="form-outline col-auto">
 		<form>
-			<select name="grpInput" id="poInput" class="form-select form-select-md"
-			        onchange="promoChange()">
-				<option value="default">Choisir une PO...</option>
+			<select name="grpInput" id="poInput" class="form-select form-select-md">
+				<option value="default">toutes les PO</option>
 				<option value="IMACS">IMACS</option>
 				<option value="MIC">MIC</option>
 				<option value="IC">IC</option>
 				<option value="ICBE">ICBE</option>
-				<option value="Poudlard">Poudlard</option>
+				<option value="POUDLARD">Poudlard</option>
 			</select>
 		</form>
 	</div>
-	<div class="form-outline col-md-3">
+	<div class="form-outline col-auto">
 		<form>
-			<select name="grpInput" id="tdInput" class="form-select form-select-md">
-				<option value="default">Choisir un groupe de td...</option>
-				<option value="A">A</option>
-				<option value="B">B</option>
-				<option value="C">C</option>
-				<option value="D">D</option>
-				<option value="E">E</option>
-				<option value="Serpentar">Serpentar</option>
+			<select name="grpInput" id="scenarioInput" class="form-select form-select-md">
+				<option value="default">tous les scenarios...</option>
+				<option value="S1">S1</option>
+				<option value="S2">S2</option>
+				<option value="S3Enr">S3 Energies renouvelables</option>
+				<option value="S3Nuke">S3 Nucléaire</option>
+				<option value="S4">S4</option>
+				<option value="2025Plat">2025 constant</option>
 			</select>
 		</form>
+	</div>
+	<div class="form-outline col-auto">
+		<form>
+			<select name="filtreInput" id="Filtre" class="form-select form-select-md">
+				<option value="default">tous</option>
+				<option value="libres">avec parties libres</option>
+				<option value="encours">avec parties en cours</option>
+				<option value="checked">selectionnées</option>
+			</select>
+		</form>
+	</div>
+	<div class="col-auto">
+		<button class="btn btn-sm btn-outline-primary" type="button"
+			onclick="$(this).tooltip('hide');selectionne('add')" id="selectionne" data-bs-toggle="tooltip"
+			data-bs-placement="top" data-bs-title="Ajouter à la liste">
+			<i class="fa fa-plus"> </i> Lister
+		</button>
+		<button class="btn btn-sm btn-outline-primary" type="button"
+			onclick="$(this).tooltip('hide');selectionne('remove')" id="selectionne" data-bs-toggle="tooltip"
+			data-bs-placement="top" data-bs-title="Enlever de la liste">
+			<i class="fa fa-minus"> </i> Retirer
+		</button>
 	</div>
 </div>
 
+<hr class="w-100" style="height: 2px; background-color: #333;">
 
-<div class="accordion" id="accordionGroupes">
-	{% for groupe, parties in grouplist.items() %}
-	<div class="accordion-item d-none" id="accordion-{{groupe}}">
-		<h2 class="accordion-header" id="heading{{ groupe }}">
+<div class="accordion" id="accordionInsa">
+	<div class="accordion-item" id="accordionInsa">
+		<h6 class="accordion-header" id="headingInsa">
 			<div class="row">
-				
-				<div class="col-11">
-					<button class="accordion-button collapsed" type="button"
-					        data-bs-toggle="collapse" data-bs-target="#collapse{{ groupe }}"
-					        aria-expanded="false" aria-controls="collapse{{ groupe }}">
-						Groupe : {{ groupe }}
+				<div class="col-10">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse"
+						data-bs-target="#collapseInsa" aria-expanded="false" aria-controls="collapseInsa">
+						Liste des parties :
 					</button>
 				</div>
-				<div class="col-1">
-					<button class="btn btn-sm btn-info"
-					        type="button"
-					        onclick="go_to_comparer('{{ groupe }}')"
-					        id="comparer{{ groupe }}"
-					        data-bs-toggle="tooltip"
-					        data-bs-placement="top"
-					        title="Comparer les parties sélectionnées de ce groupe"
-					>
+				<div class="col-2">
+					<input type="checkbox" id="check-select" class="Option" data-bs-toggle="tooltip"
+						data-bs-placement="top" title="Sélectionner tout se qui est sélectionable">
+					<button class="btn btn-sm btn-info valide_si_checked" type="button" onclick="go_to_comparer('')"
+						id="comparer-select" data-bs-toggle="tooltip" data-bs-placement="top"
+						title="Comparer les parties sélectionnées">
 						<i class="fa fa-chart-line"> </i>
 					</button>
+					<button class="btn btn-sm btn-secondary valide_si_checked" type="button" onclick="download('')"
+						id="download-select" data-bs-toggle="tooltip" data-bs-placement="right"
+						title="Télécharger un zip des parties sélectionnées">
+						<i class="fa fa-file-archive"></i>
+					</button>
+					<!--button class="btn btn-sm btn-danger valide_si_checked" type="button"
+						onclick="$(this).tooltip('hide');effacer_sur('')" id="reset-select" data-bs-toggle="tooltip"
+						data-bs-placement="top" title="Effacer toutes les parties sélectionnées !">
+						<i class="fa fa-trash-can"></i>
+					</button-->
 				</div>
 			</div>
-		</h2>
-		<div id="collapse{{ groupe }}" class="accordion-collapse collapse"
-		     aria-labelledby="heading{{ groupe }}" data-bs-parent="#accordionGroupes">
+		</h6>
+		<div id="collapseInsa" class="accordion-collapse" aria-labelledby="headingInsa" data-bs-parent="#accordionInsa">
 			<div class="accordion-body">
-				
-				<div class="accordion" id="sub{{ groupe }}">
-					{% for partie in parties %}
-					<div class="accordion-item">
-						<h3 class="accordion-header" id="sub-heading{{ groupe }}{{ partie }}">
+				<div class="accordion" id="accordionGroupes">
+					{% for groupe, parties in grouplist.items() %}
+					<div class="accordion-item d-none" id="accordion-{{groupe}}">
+						<!--div class="accordion-item " id="accordion-{{groupe}}"-->
+						<h2 class="accordion-header" id="heading{{ groupe }}">
 							<div class="row">
 								<div class="col-10">
-									<button class="accordion-button" type="button" data-bs-toggle="collapse"
-									        data-bs-target="#sub-collapse{{ groupe }}{{ partie}}"
-									        aria-expanded="false" aria-controls="collapse{{ groupe }}">
-										Scénario {{ partie }}
+									<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+										data-bs-target="#collapse{{ groupe }}" aria-expanded="false"
+										aria-controls="collapse{{ groupe }}">
+										Groupe : {{ groupe }}
 									</button>
 								</div>
-								<div class="col-2" align="left">
-									<row>
-										<input type="checkbox" id="check-{{ groupe }}-{{ partie }}" class="Option"
-										       data-bs-toggle="tooltip"
-										       data-bs-placement="top"
-										       title="Sélectionner toutes les équipes de ce scénario.">
-										<button class="btn btn-sm btn-danger"
-										        type="button"
-										        onclick="effacer_sur('{{ groupe }}-{{ partie }}')"
-										        id="reset{{ groupe }}"
-										        data-bs-toggle="tooltip"
-										        data-bs-placement="top"
-										        title="Effacer les parties sélectionnées !">
-											<i class="fa fa-trash-can"></i>
-										</button>
-										<button class="btn btn-sm btn-secondary"
-										        type="button"
-										        onclick="download('{{ groupe }}')"
-										        id="download{{ groupe }}"
-										        data-bs-toggle="tooltip"
-										        data-bs-placement="right"
-										        title="Télécharger un zip des parties sélectionnées"
-										>
-											<i class="fa fa-file-archive"></i>
-										</button>
-									</row>
+								<div class="col-2">
+									<input type="checkbox" id="check-{{ groupe }}" class="Option"
+										data-bs-toggle="tooltip" data-bs-placement="top"
+										title="Sélectionner tout dans {{ groupe }}">
+									<button class="btn btn-sm btn-info valide_si_checked" type="button"
+										onclick="go_to_comparer('{{ groupe }}')" id="comparer{{ groupe }}"
+										data-bs-toggle="tooltip" data-bs-placement="top"
+										title="Comparer les parties de {{ groupe }}">
+										<i class="fa fa-chart-line"> </i>
+									</button>
+									<button class="btn btn-sm btn-secondary valide_si_checked" type="button"
+										onclick="download('{{ groupe }}')" id="download{{ groupe }}"
+										data-bs-toggle="tooltip" data-bs-placement="right"
+										title="Télécharger un zip de {{ groupe }}">
+										<i class="fa fa-file-archive"></i>
+									</button>
+									<button class="btn btn-sm btn-danger valide_si_checked" type="button"
+										onclick="$(this).tooltip('hide');effacer_sur('{{ groupe }}')"
+										id="reset{{ groupe }}" data-bs-toggle="tooltip" data-bs-placement="top"
+										title="Effacer les parties sélectionnées de {{ groupe }} !">
+										<i class="fa fa-trash-can"></i>
+									</button>
 								</div>
 							</div>
-						</h3>
-						<div id="sub-collapse{{ groupe }}{{ partie}}"
-						     class="accordion-collapse collapse"
-						     aria-labelledby="sub-heading{{ groupe }}{{ partie }}"
-						     data-bs-parent="#sub{{ groupe }}">
+						</h2>
+						<!--div id="collapse{{ groupe }}" class="accordion-collapse"-->
+						<div id="collapse{{ groupe }}" class="accordion-collapse collapse"
+							aria-labelledby="heading{{ groupe }}" data-bs-parent="#accordionGroupes">
 							<div class="accordion-body">
-								{% for num, datas in parties[partie].items() %}
-								<ul>
-									<div class="row left">
-										<div class="col-10">
-											<div class="progress" id="progress-{{ groupe }}-{{ partie }}-{{num}}">
-												<div class="progress-bar progress-bar-striped"
-												     id="progressbar-{{ groupe }}-{{ partie }}-{{num}}"
-												     role="progressbar"
-												     aria-valuenow="{{ datas['annee'][:4] }}"
-												     aria-valuemin="2020" aria-valuemax="2050"
-												     style="width:{{ datas['percent'] }}%">
-													{{ datas['annee'] }}
+								<div class="accordion" id="sub{{ groupe }}">
+									{% for partie in parties %}
+									<div class="accordion-item d-none" id="accordion-{{ groupe }}_{{ partie }}">
+										<h3 class="accordion-header" id="sub-heading{{ groupe }}{{ partie }}">
+											<div class="row">
+												<div class="col-10">
+													<button class="accordion-button" type="button"
+														data-bs-toggle="collapse"
+														data-bs-target="#sub-collapse{{ groupe }}{{ partie}}"
+														aria-expanded="false" aria-controls="collapse{{ groupe }}">
+														Scénario {{ partie }}
+													</button>
+												</div>
+												<div class="col-2" align="left">
+													<row>
+														<input type="checkbox" id="check-{{ groupe }}-{{ partie }}"
+															class="Option" data-bs-toggle="tooltip"
+															data-bs-placement="top"
+															aria-controls="reset{{ groupe }}-{{ partie }}"
+															title="Sélectionner tout dans {{ groupe }}-{{ partie }}">
+														<button class="btn btn-sm btn-info valide_si_checked"
+															type="button"
+															onclick="$(this).tooltip('hide');go_to_comparer('{{ groupe }}-{{ partie }}')"
+															id="comparer{{ groupe }}-{{ partie }}"
+															data-bs-toggle="tooltip" data-bs-placement="top"
+															title="Comparer les parties sélectionnées de {{ groupe }}-{{ partie }}">
+															<i class="fa fa-chart-line"> </i>
+														</button>
+														<button class="btn btn-sm btn-danger valide_si_checked"
+															type="button"
+															onclick="$(this).tooltip('hide');effacer_sur('{{ groupe }}-{{ partie }}')"
+															id="reset{{ groupe }}-{{ partie }}" data-bs-toggle="tooltip"
+															data-bs-placement="top"
+															title="Effacer les parties sélectionnées de {{ groupe }}-{{ partie }} !">
+															<i class="fa fa-trash-can"></i>
+														</button>
+													</row>
 												</div>
 											</div>
-											<label for="progress-{{ groupe }}-{{ partie }}-{{num}}">
-												Equipe {{ num }}
-											</label>
-										</div>
-										<div class="col-2" align="left">
-											<div calss="row">
-												<input type="checkbox"
-												       class="subOption"
-												       id="check-{{ groupe }}-{{ partie }}-sub{{num}}"
-												       data-bs-toggle="tooltip"
-												       data-bs-placement="top"
-												       title="Sélectionner/délectionner cette équipe.">
-												<a href="/saisie/{{ datas['equipe'] }}/{{ partie }}/{{ datas['annee'][0:4] }}"
-												   id="join-{{ groupe }}-{{ partie }}-sub{{num}}"
-												   class="btn btn-info btn-sm"
-												   data-bs-toggle="tooltip"
-												   data-bs-placement="top"
-												   title="Rejoindre la partie en cours.">
-													<i class="fa fa-right-to-bracket"></i>
-												</a>
-												<button class="btn btn-sm btn-primary"
-												        type="button"
-												        onclick='creer_sur("{{ groupe }}","{{ partie }}","{{ num }}")'
-												        id="creer-{{ groupe }}-{{ partie }}-sub{{num}}"
-												        data-bs-toggle="tooltip"
-												        data-bs-placement="top"
-												        title="Créer cette partie">
-													<i class="fa fa-gear"></i>
-												</button>
+										</h3>
+										<!-- div id="sub-collapse{{ groupe }}{{ partie}}"
+											class="accordion-collapse"-->
+										<div id="sub-collapse{{ groupe }}{{ partie}}"
+											class="accordion-collapse collapse"
+											aria-labelledby="sub-heading{{ groupe }}{{ partie }}"
+											data-bs-parent="#sub{{ groupe }}">
+											<div class="accordion-body">
+												{% for num, datas in parties[partie].items() %}
+												<ul>
+													<div class="row left">
+														<div class="col-10">
+															<div class="progress"
+																id="progress-{{ groupe }}-{{ partie }}-{{num}}">
+																<div class="progress-bar progress-bar-striped"
+																	id="progressbar-{{ groupe }}-{{ partie }}-{{num}}"
+																	role="progressbar"
+																	aria-valuenow="{{ datas['annee'][:4] }}"
+																	aria-valuemin="2020" aria-valuemax="2050"
+																	style="width:{{ datas['percent'] }}%">
+																	{{ datas['annee'] }}
+																</div>
+															</div>
+															<label>
+																Equipe {{ num }}
+															</label>
+														</div>
+														<div class="col-2" align="left">
+															<div calss="row">
+																<input type="checkbox" class="subOption"
+																	id="check-{{ groupe }}-{{ partie }}-sub{{num}}"
+																	data-bs-toggle="tooltip" data-bs-placement="top"
+																	title="(Dé)sélectionner l'équipe {{ groupe }}-{{ partie }}-{{num}}">
+																<a href="/saisie/{{ datas['equipe'] }}/{{ partie }}/{{ datas['annee'][0:4] }}"
+																	id="join-{{ groupe }}-{{ partie }}-sub{{num}}"
+																	class="btn btn-success btn-sm"
+																	data-bs-toggle="tooltip" data-bs-placement="top"
+																	title="Rejoindre l'équipe {{ groupe }}-{{ partie }}-{{num}}">
+																	<i class="fa fa-right-to-bracket"></i>
+																</a>
+																<button class="btn btn-sm btn-success" type="button"
+																	onclick='$(this).tooltip("hide");creer_sur("{{ groupe }}","{{ partie }}","{{ num }}",this)'
+																	id="creer-{{ groupe }}-{{ partie }}-sub{{num}}"
+																	data-bs-toggle="tooltip" data-bs-placement="top"
+																	title="Créer l'équipe {{ groupe }}-{{ partie }}-{{num}}">
+																	<i class="fa fa-gear"></i>
+																</button>
+															</div>
+														</div>
+													</div>
+												</ul>
+												{%- endfor %}
 											</div>
 										</div>
 									</div>
-								</ul>
-								{%- endfor %}
+									{%- endfor %}
+								</div>
 							</div>
 						</div>
 					</div>
-					{%- endfor %}
+					{% endfor %}
 				</div>
 			</div>
 		</div>
 	</div>
-	{% endfor %}
 </div>
 
 {% endblock%}
@@ -198,6 +268,3 @@
 <script type="text/javascript" src="/static/tableau_de_bord.js"></script>
 
 {% endblock %}
-
-
-

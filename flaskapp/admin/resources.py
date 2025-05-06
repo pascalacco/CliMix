@@ -10,6 +10,7 @@ admin_blueprint = Blueprint('admin', __name__)
 parties = Parties()
 
 
+@admin_blueprint.route('/', methods=['GET'])
 @admin_blueprint.route('/admin/tableau_de_bord', methods=['GET'])
 def tableau_de_bord():
     grouplist = parties.get_liste_groupes_par_parties()

@@ -287,10 +287,11 @@ def calculer_nb(mix, annee):
     return nb
 
 
-budget_ratio = {'S1': 90./120.,
-                'S2': 100./120.,
-                'S3Enr': 110./120.,
-                'S3Nuke': 110./120.
+budget_ratio = {'S1': 110./120.,
+                'S2': 130./120.,
+                'S3Enr': 160./120.,
+                'S3Nuke': 160./120.,
+                'S4': 190./120.
                 }
 
 def calculer(dm, annee, actions, scenario):
@@ -352,10 +353,24 @@ def calculer_resultats(mix, actions, chroniques, prod_renouvelables, puissances)
 
     result = result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances)
     result.update(result_couts(actions, annuel, result['prodGazFossile']))
-
+    result.update(calculer_stats(result))
 
     # result.update(result_ressources(mix, save, nbPions, nvPions))
     return result
+
+
+def calculer_stats(resultats):
+    results = {}
+    results["puissanceEolienneTotale"] = resultats["puissanceEolienneOFF"] + resultats["puissanceEolienneON"]
+    results["equilibreEnrNucleaire"] = int(resultats["prodNucleaire"] / 
+                                                (   resultats["prodNucleaire"] +
+                                                    resultats["prodOnshore"] + 
+                                                    resultats["prodOffshore"] +
+                                                    resultats["prodPv"] + 
+                                                    resultats["prodEau"]
+                                                )* 100.
+                                            )    
+    return results
 
 
 def result_couts(actions, annuel, prodGazFossile):

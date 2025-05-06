@@ -1,3 +1,6 @@
+var gooIndex = document.getElementById('goo-index');
+var [liste_court, commun] = raccourcir_liste(liste);
+
 function displayError(reason, details) {
     let msg;
     const modal = new bootstrap.Modal($("#errModal"));
@@ -15,69 +18,53 @@ function displayError(reason, details) {
     modal.toggle();
 }
 
-function lignes(div) {
+function lignes(div, champs) {
 
     // set the dimensions and margins of the graph
-    let margin = { top: 10, right: 100, bottom: 30, left: 30 },
-        width = 860 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
+    let margin = { top: 90, right: 200, bottom: 50, left: 100 },
+        width = 960 - margin.left - margin.right,
+        height = 700 - margin.top - margin.bottom;
 
     // append the svg object to the body of the page
+ 
     var svg = div
         .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
+        .attr("viewBox", "0 0 "+(width + margin.left + margin.right)+" "+(height + margin.top + margin.bottom))
+               .attr("width", width + margin.left + margin.right)
+       .attr("height", height + margin.top + margin.bottom)
+    .append("g")
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
 
-
-    let allGroup = liste;
-
-    
     let parseTime = d3.timeParse("%Y");
     let years = annees.map((e) => parseTime(e));
 
     let datas = [];
-    let time_domain=[years[0], years.slice(-1)[0]];
-    let item = compilation['cout'];
-    let groupes = Object.keys(item);
-    let first_key = groupes[0];
-    y_domain=[item[first_key][0], item[first_key][0]];
-    for (let key in item) {
-        data={"name" :key, "values" : []};
-        for (let i = 0; i < item[key].length; i++) {
-            let val = item[key][i];
-            if (val != null){
-                data.values.push( val
+    let time_domain = [years[0], years.slice(-1)[0]];
+    let item = compilation[champs];
+    let first_key = liste[0];
+    y_domain = [item[first_key][0], item[first_key][0]];
+    for (let k=0; k<liste_court.length; k++) {
+        data = { "name": liste_court[k], "values": [] };
+        for (let i = 0; i < item[liste[k]].length; i++) {
+            let val = item[liste[k]][i];
+            if (val != null) {
+                data.values.push(val
                 );
-                if (val<y_domain[0]) y_domain[0]=val;
-                if (val>y_domain[1]) y_domain[1]=val;
+                if (val < y_domain[0]) y_domain[0] = val;
+                if (val > y_domain[1]) y_domain[1] = val;
             }
         }
-        datas.push(data);
-    }
-
-    /* Reformat the data: we need an array of arrays of {x, y} tuples
-    let datas = allGroup.map(function (grpName) { // .map allows to do something for each element of the list
-        return {
-            name: grpName,
-            values: item[grpName]
-        };
-    }
-    );
-    */
-
+        if (data["values"].length>0) datas.push(data);
+    };
 
     // I strongly advise to have a look to datas with
-    console.log(datas);
-
+    //console.log(datas);
 
     // A color scale: one color for each group
     let myColor = d3.scaleOrdinal()
-        .domain(groupes)
+        .domain(liste_court)
         .range(d3.schemeSet2);
-
 
     // Add X axis --> it is a date format
     let xScale = d3.scaleTime()
@@ -101,8 +88,9 @@ function lignes(div) {
 
     // Add the lines
     let line = d3.line()
-        .x(function (d,i) { return xScale(years[i]) })
+        .x(function (d, i) { return xScale(years[i]) })
         .y(function (d) { return yScale(+d) });
+    
     svg.selectAll("myLines")
         .data(datas)
         .enter()
@@ -140,41 +128,97 @@ function lignes(div) {
         .append('g')
         .append("text")
         .attr("class", function (d) { return d.name })
-        .datum(function (d) { return { name: d.name, value: d.values[d.values.length - 1] }; }) // keep only the last value of each time series
-        .attr("transform", function (d, i) { return "translate(" + xScale(years[i]) + "," + yScale(d.value) + ")"; }) // Put the text at the position of the last point
+        .datum(function (d) { return { 
+            name: d.name, 
+            year: years[d.values.length - 1], 
+            value: d.values[d.values.length - 1] }; }) // keep only the last value of each time series
+        .attr("transform", function (d, i) { 
+            return "translate(" + xScale(d.year) + "," + yScale(d.value) + ")"; }) // Put the text at the position of the last point
         .attr("x", 12) // shift the text a bit more right
         .text(function (d) { return d.name; })
         .style("fill", function (d) { return myColor(d.name) })
         .style("font-size", 15);
 
-    /*/ Add a legend (interactive)
-    
     svg
         .selectAll("myLegend")
         .data(datas)
         .enter()
         .append('g')
         .append("text")
-        .attr('x', function (d, i) { return 30 + i * 200 })
-        .attr('y', function (d, i) { return 108})
+        .attr('x', function (d, i) { return 30 + (i%4) * 150 })
+        .attr('y', function (d, i) { return -15 - 15* Math.floor(i/4)})
         .text(function (d) { return d.name; })
         .style("fill", function (d) { return myColor(d.name) })
         .style("font-size", 15)
         .on("click", function (d) {
             // is the element currently visible ?
-            currentOpacity = d3.selectAll("." + d.name).style("opacity")
+            current = d3.selectAll("." + this.getHTML());
             // Change the opacity: from 0 to 1 or from 1 to 0
-            d3.selectAll("." + d.name).transition().style("opacity", currentOpacity == 1 ? 0 : 1)
+            current.transition().style("opacity", current.style("opacity") == '1' ? '0' : '1');
         });
-        */
+};
+
+function hoverEnter(index){
+    let nowVisible = document.getElementById('screen_' + index);
+    gooIndex.style.top = 60  * index + 'px';
+    let allScreens = document.querySelectorAll('.screen');
+    allScreens.forEach(e => {
+        e.classList.remove('visible')
+    })
+    
+    nowVisible.classList.add('visible');
+}
+
+function fillPage() {
+
+    lignes(d3.select("#graphe_couts"),"cout");
+    lignes(d3.select("#graphe_co2"),"co2");
+    lignes(d3.select("#graphe_gaz"),"prodGazFossile");
+    lignes(d3.select("#graphe_nuke"),"puissanceNucleaire");
+    if ("puissanceEolienneTotale" in compilation) lignes(d3.select("#graphe_eolien"),"puissanceEolienneTotale");
+    lignes(d3.select("#graphe_pv"),"puissancePV");
+    if ("equilibreEnrNucleaire" in compilation) lignes(d3.select("#graphe_equilibre"),"equilibreEnrNucleaire");
+    lignes(d3.select("#graphe_penuries"),"nbPenuries");
+
+}
+
+function raccourcir_liste(liste){
+
+    let court = ["_"];
+    let commun = liste[0].split('_');
+    let mots = [];
+    let L = commun.length;
+    for(let i=0; i < liste.length; i++){
+        mots[i] = liste[i].split('_');
+        court[i]="_";
+        for(let w=0; w < L; w++){
+            if (mots[i][w] != commun[w]) {
+                commun[w]='';
+            };
+        };
+    };
+    for(let w=0; w<L; w++){
+        if (commun[w]==""){
+            for(let i=0; i < liste.length; i++){
+                court[i] += mots[i][w]+'_';
+            };
+        };   
+    };
+
+    for(let i=0; i < liste.length; i++){
+        court[i]=court[i].slice(1,-1);
+    };
+    return [court, commun];
 };
 
 
+ $(function () {
+      
 
-function fillPage() {
-    lignes(d3.select("#resultats"));
-}
+    fillPage();
 
+    $("#graphe_couts").fadeIn();
 
+});
 
 

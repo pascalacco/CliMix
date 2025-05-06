@@ -148,13 +148,8 @@ def calculer_data(dm, annee):
 
     datas.emissions_co2 = int(resultats["co2"])
     datas.puissance_photovoltaique_totale = int(resultats["puissancePV"] * 1000.0)  #GWH -> MWh
-    datas.puissance_eolienne_totale = int(
-        (resultats["puissanceEolienneOFF"] + resultats["puissanceEolienneOFF"]) * 1000.0)  #GWH -> MWh
-    datas.equilibre_enr_nucleaire = int(resultats["prodNucleaire"] / (resultats["prodNucleaire"] +
-                                                                      resultats["prodOnshore"] + resultats[
-                                                                          "prodOffshore"] +
-                                                                      resultats["prodPv"] + resultats[
-                                                                          "prodEau"]) * 100.)
+    datas.puissance_eolienne_totale = int(resultats["puissanceEolienneTotale"] * 1000.0)  #GWH -> MWh
+    datas.equilibre_enr_nucleaire = int(resultats["equilibreEnrNucleaire"])
 
     neg_transfert = [
         resultats['transfert'][reg] for reg in resultats['transfert']
