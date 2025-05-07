@@ -1,4 +1,3 @@
-var gooIndex = document.getElementById('goo-index');
 var [liste_court, commun] = raccourcir_liste(liste);
 
 function displayError(reason, details) {
@@ -19,19 +18,22 @@ function displayError(reason, details) {
 }
 
 function lignes(div, champs) {
-
     // set the dimensions and margins of the graph
-    let margin = { top: 90, right: 200, bottom: 50, left: 100 },
-        width = 960 - margin.left - margin.right,
-        height = 700 - margin.top - margin.bottom;
+    let margin = { top: 90, right: 200, bottom: 50, left: 100 };
+    
+    // Get the container's width
+    let containerWidth = div.node().getBoundingClientRect().width;
+    let width = containerWidth - margin.left - margin.right;
+    if (width <0) width = 0;
+    let height = Math.min(700, width * 0.7) - margin.top - margin.bottom; // maintain aspect ratio
 
     // append the svg object to the body of the page
- 
     var svg = div
         .append("svg")
-        .attr("viewBox", "0 0 "+(width + margin.left + margin.right)+" "+(height + margin.top + margin.bottom))
-               .attr("width", width + margin.left + margin.right)
-       .attr("height", height + margin.top + margin.bottom)
+        .attr("viewBox", "0 0 " + (width + margin.left + margin.right) + " " + (height + margin.top + margin.bottom))
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .style("width", "100%")
+        .style("height", "auto")
     .append("g")
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
@@ -59,7 +61,6 @@ function lignes(div, champs) {
     };
 
     // I strongly advise to have a look to datas with
-    //console.log(datas);
 
     // A color scale: one color for each group
     let myColor = d3.scaleOrdinal()
@@ -158,9 +159,24 @@ function lignes(div, champs) {
         });
 };
 
-function hoverEnter(index){
+function hoverEnter(index, gooIndex){
     let nowVisible = document.getElementById('screen_' + index);
-    gooIndex.style.top = 60  * index + 'px';
+    const menuWrapper = document.querySelector('.menu-wrapper');
+    const menuItem = document.querySelector(`.menu ul li:nth-child(${index + 1})`);
+    
+    // Get the actual position of the menu item relative to the viewport
+    const menuItemRect = menuItem.getBoundingClientRect();
+    const menuWrapperRect = menuWrapper.getBoundingClientRect();
+    
+    // Calculate position relative to menu wrapper
+    const position = menuItemRect.top - menuWrapperRect.top;
+    
+    // Set position using transform for better performance
+    gooIndex.style.transform = `translateY(${position}px)`;
+    
+    //const position = getCssVariable("--navbar-height", true) + (getCssVariable("--taille", true) * index);
+    //gooIndex.style.top = position + 'px';
+    
     let allScreens = document.querySelectorAll('.screen');
     allScreens.forEach(e => {
         e.classList.remove('visible')
@@ -211,14 +227,43 @@ function raccourcir_liste(liste){
     return [court, commun];
 };
 
+// Get CSS variable value helper function
+function getCssVariable(varName, asNumber = false) {
+    const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    if (asNumber) {
+        return parseInt(value) || 0; // returns just the number without units, defaults to 0 if parsing fails
+    }
+    return value;
+}
+
+// Update navbar height CSS variable
+function updateNavbarHeight() {
+    const navbar = document.querySelector('.navbar');
+    if (navbar) {
+        const navbarHeight = navbar.offsetHeight;
+        document.documentElement.style.setProperty('--navbar-height', `${navbarHeight}px`);
+    }
+}
+
+// Call it once when the page loads
+document.addEventListener('DOMContentLoaded', updateNavbarHeight);
+// Also call it when the window is resized
+window.addEventListener('resize', updateNavbarHeight);
 
  $(function () {
-      
+    var gooIndex = document.getElementById('goo-index');
+    
+    hoverEnter(2, gooIndex);
+    
+    // Add hover handlers to menu items
+    $('.menu ul li').hover(function() {
+        const index = $(this).index();
+        hoverEnter(index, gooIndex);
+    });
+
 
     fillPage();
-
-    $("#graphe_couts").fadeIn();
-
+    //$("#graphe_couts").fadeIn();
 });
 
 

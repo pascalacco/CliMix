@@ -13,30 +13,45 @@ body {
     font-family: tahoma;
 }
 
-.menu {
-    --taille :60px;
-    position: absolute;
+:root {
+    --taille: 50px;
+    --navbar-height: 60px; /* Default value, will be updated by JS */
+}
+
+.menu-wrapper {
+    width: 100vw;
+    position: fixed;
+    top: var(--navbar-height);
     left: 0;
-    top: auto;
+    height: calc(100vh - var(--navbar-height));
+    display: flex;
+    flex-direction: row;
+    overflow-y: auto;
+    background: #b0bdd6;
+}
+
+.menu {
+    position: sticky;
+    top: 0;
     font-size: 20pt;
     width: var(--taille);
-    background: #b0bdd6;
-    height: 100%;
+    min-height: calc(var(--taille)*8);
+    flex-shrink: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+    justify-content: flex-start;
+    z-index: 1;
 }
 
 .menu ul {
     list-style: none;
     margin: 0px;
-    width: calc(var(--taille)*0.75);
+    width: var(--taille);
     height:100%;
     position: relative;
     padding: 0px;
     filter: url(#goo);
-    z-index: 1;
+    z-index: 2;
+    pointer-events: all;
 }
 
 .menu ul li {
@@ -47,6 +62,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
 .menu ul span {
@@ -58,8 +74,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1;
-    cursor: pointer;
     transition: all 0.5s ease;
     color: #333;
 }
@@ -69,62 +83,49 @@ body {
     height: calc(var(--taille)*0.75);
     background: white;
     position: absolute;
-    left: 0px;
+    left: 0;
     top: 0;
     z-index: -1;
     border-radius: calc(var(--taille)*0.75) 0 0 calc(var(--taille)*0.75);
-    transition: all 1s ease;
+    transition: all 0.5s ease;
 }
 
 .menu ul .goo-index:before {
     content: '';
     position: absolute;
-    width: calc(var(--taille)*0.5);
-    height: calc(var(--taille)*0.5);
+    width: calc(var(--taille)*0.25);
+    height: calc(var(--taille)*0.25);
     background-image: radial-gradient(circle at 0px 0px, transparent 0, transparent calc(var(--taille)*0.25), white calc(var(--taille)*0.25));
     top: calc(var(--taille)*0.25*-1);
-    left: calc(var(--taille)*0.625);
+    left: calc(var(--taille)*0.75);
 }
 
 .menu ul .goo-index:after {
     content: '';
     position: absolute;
-    width: calc(var(--taille)*0.5);
-    height: calc(var(--taille)*0.5);
-    background-image: radial-gradient(circle at 0px calc(var(--taille)*0.5), transparent 0, transparent calc(var(--taille)*0.25), white calc(var(--taille)*0.25));
+    width: calc(var(--taille)*0.25);
+    height: calc(var(--taille)*0.25);
+    background-image: radial-gradient(circle at 0px calc(var(--taille)*0.25), transparent 0, transparent calc(var(--taille)*0.25), white calc(var(--taille)*0.25));
     bottom: calc(var(--taille)*0.25*-1);
-    left: calc(var(--taille)*0.625);
-}
-
-.content-wrapper {
-    width: calc(100% - 10px);
-    position: relative;
-    left: 10px;
-    height: 100%;
-    overflow: hidden;
-    padding: 50px;
-    display: flex;
-    justify-content: center;
+    left: calc(var(--taille)*0.75);
 }
 
 .screen {
-    width: calc(100% - 100px);
-    max-width: 1600px;
-    height: 100%;
+    width: calc(100vw - var(--taille));
+    min-height: 100vh;
     position: absolute;
-    top: -100%;
-    left: var("--taille");
+    top: 0;
+    left: calc(-100vw + var(--taille)*2.25);
     background: white;
     opacity: 0;
-    transition: all 1s ease;
-    transition-delay: 0s;
+    transition: all 0.5s 0s ease;
+    padding: 20px;
 }
 
 .screen.visible {
-    top: 0px ;
+    left: var(--taille);
     opacity: 1;
-    transition: all 1.5s ease;
-    transition-delay: 0.8s ease;
+    transition: all 1s 0.5s ease;
 }
 
 .screen h2 {
