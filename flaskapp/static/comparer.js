@@ -253,7 +253,7 @@ window.addEventListener('resize', updateNavbarHeight);
  $(function () {
     var gooIndex = document.getElementById('goo-index');
     
-    hoverEnter(2, gooIndex);
+    hoverEnter(0, gooIndex);
     
     // Add hover handlers to menu items
     $('.menu ul li').hover(function() {
