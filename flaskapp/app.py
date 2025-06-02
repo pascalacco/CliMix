@@ -3,7 +3,7 @@ from flask_cors import CORS, cross_origin
 import jinja2
 
 
-from admin.resources import admin_blueprint, parties
+from flaskapp.admin.resources import admin_blueprint, parties
 
 
 from flaskapp.archiveur import DataManager
