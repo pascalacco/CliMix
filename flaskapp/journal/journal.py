@@ -3,26 +3,23 @@ import random
 from flaskapp.journal.texteur import *
 from climix.technologies import infos
 
-
 class Personnage:
-    def __init__(self, nom, prenom, role, affiliation):
+    def __init__(self, nom, pronom, role, affiliation):
         self.nom = nom
-        self.prenom = prenom
         self.role = role
         self.affiliation = affiliation
+        self.pronom = pronom
 
     def __repr__(self):
-        return (f"Personnage(nom={self.nom}, prenom={self.prenom}, "
+        return (f"Personnage(nom={self.nom}"
                 f"rôle={self.role}, affiliation={self.affiliation}")
 
     def afficher_details(self):
         details = (
             f"Nom : {self.nom}\n"
-            f"Prénom : {self.prenom}\n"
             f"Rôle : {self.role}\n"
             f"Affiliation : {self.affiliation}\n"
         )
-        print(details)
 
 
 def generer_listes_personnages(personnages):
@@ -217,7 +214,7 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
             region = random.choice(data.regions_photovoltaiques)
         else:
             infrastructure = 'photovoltaïque'
-            region = 'France'
+            region = "fr"
         return infrastructure, region
 
     elif personnage.role == 'PDG éolien':
@@ -240,11 +237,12 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
                 return "Aucune région éolienne disponible."
         else:
             infrastructure = 'éolien'
-            region = 'France'
+            #region = 'France'
+            region = "fr"
 
         return infrastructure, region
 
-    elif personnage.role == 'texte_resultat':
+    elif personnage.role == 'agriculteur':
         # Choisir une infrastructure parmi celles avec des régions non vides
         infrastructures_non_vides = []
         if data.regions_photovoltaiques:
@@ -328,15 +326,13 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
 
 
 def generate_article(character, data, dictionnaire_regions, year):
+
     if character.role != 'première ministre':
         infrastructure, region_choisie = choisir_infrastructure_et_region(character, data)
-        print(character.role)
-        print(infrastructure)
-        print(region_choisie)
 
     if character.role == 'greenpeace':
         texte = texte_greenpeace(character, dictionnaire_regions.get(region_choisie), infrastructure)
-    elif character.role == 'texte_resultat':
+    elif character.role == 'agriculteur':
         texte = texte_agriculteur(character, dictionnaire_regions.get(region_choisie), infrastructure)
     elif character.role == 'PDG solaire':
         texte = texte_pdg_solaire(character, dictionnaire_regions.get(region_choisie))
@@ -353,7 +349,30 @@ def generate_article(character, data, dictionnaire_regions, year):
 
     return texte
 
+def make_text(data,nom,pronom,role):
+    if role == "agriculteur":
+        personnage = Personnage(nom,pronom,"agriculteur","Paysans en colère")
+    elif role == "activiste":
+        personnage = Personnage(nom,pronom,"activiste","La nature avant les profits")
+    elif role == "PDG solaire":
+        personnage = Personnage(nom,pronom,"PDG solaire","Power Solar")
+    elif role == "PDG éolien":
+        personnage = Personnage(nom,pronom,"PDG éolien","Wind Power")
+    elif role == "élu(e)":
+        personnage = Personnage(nom,pronom,"élue","Parti Socialiste")
+    elif role == "greenpeace":
+        personnage = Personnage(nom,pronom,"greenpeace","greenpeace")
+    elif role == "prem ministre":
+        personnage = Personnage(nom,pronom,"première ministre","La République En Marche")
+    
+    from flaskapp.journal.france import dictionnaire_regions as regions
+    
+    article = generate_article(personnage, data, regions, 2040)
+    return article
 
+    
+
+"""
 def exemple(datas):
     personnages = [Personnage("Dossal", "Charles", "texte_resultat", "Paysans en colère")]
 
@@ -378,7 +397,7 @@ def exemple(datas):
 
     article = generate_article(character[0], datas, regions, 2040)
     return article
-
+"""
 
 if __name__ == "__main__":
 

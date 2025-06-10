@@ -56,55 +56,149 @@ def texte_agriculteur(personnage, region, infrastructure):
         return "Erreur : Impossible de générer des arguments suffisants pour ce personnage et cette infrastructure."
 
     # Modèles de texte pour chaque infrastructure
-    modeles_eolien = [
-    f"Dans la région {region.nom}, {personnage.nom} {personnage.prenom}, un agriculteur affilié à {personnage.affiliation}, "
-    f"mène un combat acharné contre l'implantation d'un parc éolien à proximité de ses terres. Lors de la {foire}, une grande foire agricole locale, "
-    f"il a pris la parole pour exprimer son opposition claire à cette infrastructure, expliquant en détails les raisons de son désaccord. "
-    f"Selon lui, {arguments[0]}, ce qui représente une menace directe pour la durabilité de ses cultures et le respect de l'environnement agricole. "
-    f"De plus, {arguments[1]}, aggravant encore les risques qu'il perçoit pour l'économie locale. {personnage.nom} s’est engagé à mener cette lutte "
-    f"jusqu’au bout, convaincu qu’il défend non seulement sa propre exploitation, mais aussi l’identité rurale et le mode de vie agricole de {region.nom}.",
-    
-    f"{personnage.nom} {personnage.prenom}, un agriculteur de {region.nom} et membre actif de {personnage.affiliation}, a profité de l’occasion de la"
-    f" {foire} pour exprimer sa vive opposition face au projet d'éoliennes. Il a fermement déclaré que {arguments[0]}, ce qui aurait des répercussions "
-    f"sérieuses sur la santé et la sécurité des personnes et des animaux de la région. Il a également ajouté que {arguments[1]}. Son engagement "
-    f"a suscité une forte adhésion parmi les agriculteurs et les habitants de la région, qui partagent ses préoccupations quant aux conséquences de "
-    f"cette installation sur le paysage et l'économie locale.",
-    
-    # Trois autres variantes similaires avec détails supplémentaires
-    ]
+    if personnage.pronom == "il":
+        modeles_eolien = [
+        f"Dans la région {region.nom}, {personnage.nom}, un agriculteur affilié à {personnage.affiliation}, "
+        f"mène un combat acharné contre l'implantation d'un parc éolien à proximité de ses terres. Lors de la {foire}, une grande foire agricole locale, "
+        f"il a pris la parole pour exprimer son opposition claire à cette infrastructure, expliquant en détails les raisons de son désaccord. "
+        f"Selon lui, {arguments[0]}, ce qui représente une menace directe pour la durabilité de ses cultures et le respect de l'environnement agricole. "
+        f"De plus, {arguments[1]}, aggravant encore les risques qu'il perçoit pour l'économie locale. {personnage.nom} s’est engagé à mener cette lutte "
+        f"jusqu’au bout, convaincu qu’il défend non seulement sa propre exploitation, mais aussi l’identité rurale et le mode de vie agricole de {region.nom}.",
+        
+        f"{personnage.nom}, un agriculteur de {region.nom} et membre actif de {personnage.affiliation}, a profité de l’occasion de la"
+        f" {foire} pour exprimer sa vive opposition face au projet d'éoliennes. Il a fermement déclaré que {arguments[0]}, ce qui aurait des répercussions "
+        f"sérieuses sur la santé et la sécurité des personnes et des animaux de la région. Il a également ajouté que {arguments[1]}. Son engagement "
+        f"a suscité une forte adhésion parmi les agriculteurs et les habitants de la région, qui partagent ses préoccupations quant aux conséquences de "
+        f"cette installation sur le paysage et l'économie locale."
+        ]
+    elif personnage.pronom == "elle":
+        modeles_eolien = [
+        f"Dans la région {region.nom}, {personnage.nom}, une agricultrice affiliée à {personnage.affiliation}, "
+        f"mène un combat acharné contre l'implantation d'un parc éolien à proximité de ses terres. Lors de la {foire}, une grande foire agricole locale, "
+        f"elle a pris la parole pour exprimer son opposition claire à cette infrastructure, expliquant en détails les raisons de son désaccord. "
+        f"Selon elle, {arguments[0]}, ce qui représente une menace directe pour la durabilité de ses cultures et le respect de l'environnement agricole. "
+        f"De plus, {arguments[1]}, aggravant encore les risques qu'elle perçoit pour l'économie locale. {personnage.nom} s’est engagée à mener cette lutte "
+        f"jusqu’au bout, convaincu qu’elle défend non seulement sa propre exploitation, mais aussi l’identité rurale et le mode de vie agricole de {region.nom}.",
+        
+        f"{personnage.nom}, une agricultrice de {region.nom} et membre active de {personnage.affiliation}, a profité de l’occasion de la"
+        f" {foire} pour exprimer sa vive opposition face au projet d'éoliennes. Elle a fermement déclaré que {arguments[0]}, ce qui aurait des répercussions "
+        f"sérieuses sur la santé et la sécurité des personnes et des animaux de la région. Elle a également ajouté que {arguments[1]}. Son engagement "
+        f"a suscité une forte adhésion parmi les agriculteurs et les habitants de la région, qui partagent ses préoccupations quant aux conséquences de "
+        f"cette installation sur le paysage et l'économie locale."
+        ]
+    elif personnage.pronom == "iel":
+        modeles_eolien = [
+        f"Dans la région {region.nom}, {personnage.nom}, un.e agriculeut.rice affilié.e à {personnage.affiliation}, "
+        f"mène un combat acharné contre l'implantation d'un parc éolien à proximité de ses terres. Lors de la {foire}, une grande foire agricole locale, "
+        f"iel a pris la parole pour exprimer son opposition claire à cette infrastructure, expliquant en détails les raisons de son désaccord. "
+        f"Selon iel, {arguments[0]}, ce qui représente une menace directe pour la durabilité de ses cultures et le respect de l'environnement agricole. "
+        f"De plus, {arguments[1]}, aggravant encore les risques qu'iel perçoit pour l'économie locale. {personnage.nom} s’est engagé.e à mener cette lutte "
+        f"jusqu’au bout, convaincu qu’iel défend non seulement sa propre exploitation, mais aussi l’identité rurale et le mode de vie agricole de {region.nom}.",
+        
+        f"{personnage.nom}, un.e agriculteur.ice de {region.nom} et membre actif.ve de {personnage.affiliation}, a profité de l’occasion de la"
+        f" {foire} pour exprimer sa vive opposition face au projet d'éoliennes. Iel a fermement déclaré que {arguments[0]}, ce qui aurait des répercussions "
+        f"sérieuses sur la santé et la sécurité des personnes et des animaux de la région. Iel a également ajouté que {arguments[1]}. Son engagement "
+        f"a suscité une forte adhésion parmi les agriculteurs et les habitants de la région, qui partagent ses préoccupations quant aux conséquences de "
+        f"cette installation sur le paysage et l'économie locale."
+        ]
 
-    
-    modeles_photovoltaique = [
-    f"Dans la région de {region.nom}, {personnage.nom} {personnage.prenom}, un agriculteur affilié à {personnage.affiliation}, a exprimé récemment "
-    f"son mécontentement à propos de l'installation de panneaux solaires dans ses environs. Lors de la {foire}, il a pris le micro pour expliquer en détail "
-    f"pourquoi il considère que cette infrastructure est problématique pour les terres agricoles environnantes. {personnage.nom} a souligné que "
-    f"{arguments[0]}, ce qui, selon lui, compromet l'équilibre de son exploitation. En outre, il a mis l'accent sur le fait que {arguments[1]}, "
-    f"pointant du doigt les conséquences néfastes à long terme pour la biodiversité de la région. Profondément attaché à la préservation de ses terres, "
-    f"il a affirmé que cette installation bouleverserait non seulement l’économie locale, mais aussi les modes de production agricoles traditionnels.",
-    
-    f"{personnage.nom} {personnage.prenom}, un agriculteur originaire de {region.nom}, est un membre influent de {personnage.affiliation}. Il s'est exprimé "
-    f"lors de la {foire} pour dénoncer l'installation croissante de panneaux photovoltaïques dans la région. Il a affirmé que {arguments[0]}, et que cette "
-    f"situation posait un risque majeur pour l’avenir de l’agriculture dans cette zone. Il a également fait part de son inquiétude en ajoutant que "
-    f"{arguments[1]}. {personnage.nom} est désormais à la tête d’un mouvement de protestation croissant, réunissant de plus en plus d’agriculteurs et de riverains "
-    f"qui craignent les répercussions écologiques de ces installations solaires sur leurs exploitations.",
-    
-    # Trois autres variantes similaires avec détails supplémentaires
-    ]
+    if personnage.pronom == "il":
+        modeles_photovoltaique = [
+        f"Dans la région de {region.nom}, {personnage.nom}, un agriculteur affilié à {personnage.affiliation}, a exprimé récemment "
+        f"son mécontentement à propos de l'installation de panneaux solaires dans ses environs. Lors de la {foire}, il a pris le micro pour expliquer en détail "
+        f"pourquoi il considère que cette infrastructure est problématique pour les terres agricoles environnantes. {personnage.nom} a souligné que "
+        f"{arguments[0]}, ce qui, selon lui, compromet l'équilibre de son exploitation. En outre, il a mis l'accent sur le fait que {arguments[1]}, "
+        f"pointant du doigt les conséquences néfastes à long terme pour la biodiversité de la région. Profondément attaché à la préservation de ses terres, "
+        f"il a affirmé que cette installation bouleverserait non seulement l’économie locale, mais aussi les modes de production agricoles traditionnels.",
+        
+        f"{personnage.nom}, un agriculteur originaire de {region.nom}, est un membre influent de {personnage.affiliation}. Il s'est exprimé "
+        f"lors de la {foire} pour dénoncer l'installation croissante de panneaux photovoltaïques dans la région. Il a affirmé que {arguments[0]}, et que cette "
+        f"situation posait un risque majeur pour l’avenir de l’agriculture dans cette zone. Il a également fait part de son inquiétude en ajoutant que "
+        f"{arguments[1]}. {personnage.nom} est désormais à la tête d’un mouvement de protestation croissant, réunissant de plus en plus d’agriculteurs et de riverains "
+        f"qui craignent les répercussions écologiques de ces installations solaires sur leurs exploitations.",
+        
+        # Trois autres variantes similaires avec détails supplémentaires
+        ]
+    elif personnage.pronom == "elle":
+        modeles_photovoltaique = [
+        f"Dans la région de {region.nom}, {personnage.nom}, une agricultrice affiliée à {personnage.affiliation}, a exprimé récemment "
+        f"son mécontentement à propos de l'installation de panneaux solaires dans ses environs. Lors de la {foire}, elle a pris le micro pour expliquer en détail "
+        f"pourquoi elle considère que cette infrastructure est problématique pour les terres agricoles environnantes. {personnage.nom} a souligné que "
+        f"{arguments[0]}, ce qui, selon elle, compromet l'équilibre de son exploitation. En outre, elle a mis l'accent sur le fait que {arguments[1]}, "
+        f"pointant du doigt les conséquences néfastes à long terme pour la biodiversité de la région. Profondément attachée à la préservation de ses terres, "
+        f"elle a affirmé que cette installation bouleverserait non seulement l’économie locale, mais aussi les modes de production agricoles traditionnels.",
+        
+        f"{personnage.nom}, une agricultrice originaire de {region.nom}, est une membre influente de {personnage.affiliation}. Elle s'est exprimée "
+        f"lors de la {foire} pour dénoncer l'installation croissante de panneaux photovoltaïques dans la région. Elle a affirmé que {arguments[0]}, et que cette "
+        f"situation posait un risque majeur pour l’avenir de l’agriculture dans cette zone. Elle a également fait part de son inquiétude en ajoutant que "
+        f"{arguments[1]}. {personnage.nom} est désormais à la tête d’un mouvement de protestation croissant, réunissant de plus en plus d’agriculteurs et de riverains "
+        f"qui craignent les répercussions écologiques de ces installations solaires sur leurs exploitations.",
+        
+        # Trois autres variantes similaires avec détails supplémentaires
+        ]
+    elif personnage.pronom == "iel":
+        modeles_photovoltaique = [
+        f"Dans la région de {region.nom}, {personnage.nom}, un.e agriculteur.ice affilié.e à {personnage.affiliation}, a exprimé récemment "
+        f"son mécontentement à propos de l'installation de panneaux solaires dans ses environs. Lors de la {foire}, iel a pris le micro pour expliquer en détail "
+        f"pourquoi iel considère que cette infrastructure est problématique pour les terres agricoles environnantes. {personnage.nom} a souligné que "
+        f"{arguments[0]}, ce qui, selon iel, compromet l'équilibre de son exploitation. En outre, iel a mis l'accent sur le fait que {arguments[1]}, "
+        f"pointant du doigt les conséquences néfastes à long terme pour la biodiversité de la région. Profondément attaché.e à la préservation de ses terres, "
+        f"iel a affirmé que cette installation bouleverserait non seulement l’économie locale, mais aussi les modes de production agricoles traditionnels.",
+        
+        f"{personnage.nom}, un.e agriculteur.ice originaire de {region.nom}, est un.e membre influent.e de {personnage.affiliation}. Iel s'est exprimé.e "
+        f"lors de la {foire} pour dénoncer l'installation croissante de panneaux photovoltaïques dans la région. Iel a affirmé que {arguments[0]}, et que cette "
+        f"situation posait un risque majeur pour l’avenir de l’agriculture dans cette zone. Iel a également fait part de son inquiétude en ajoutant que "
+        f"{arguments[1]}. {personnage.nom} est désormais à la tête d’un mouvement de protestation croissant, réunissant de plus en plus d’agriculteurs et de riverains "
+        f"qui craignent les répercussions écologiques de ces installations solaires sur leurs exploitations.",
+        
+        # Trois autres variantes similaires avec détails supplémentaires
+        ]
 
-    modeles_methaniseur = [
-    f"Lors de la {foire} en {region.nom}, {personnage.nom} {personnage.prenom}, un agriculteur et membre actif de {personnage.affiliation}, a exprimé avec passion "
-    f"son opposition à l’installation d'un méthaniseur près de ses terres. Il a déclaré que {arguments[0]}, soulignant les répercussions négatives sur l’exploitation "
-    f"de ses terres et le bien-être des habitants locaux. {personnage.nom} a également mis en lumière que {arguments[1]}, ce qui pourrait, selon lui, avoir des effets "
-    f"désastreux sur les ressources en eau et sur l’ensemble du réseau agricole local. En tant que défenseur infatigable de l’agriculture durable, il s’est engagé à "
-    f"mener cette bataille, conscient de l'importance de protéger l’environnement rural de {region.nom}.",
-    
-    f"En {region.nom}, {personnage.nom} {personnage.prenom}, un agriculteur, a pris la parole lors de la {foire} pour contester le projet controversé d’un méthaniseur près "
-    f"de ses terres. Selon lui, {arguments[0]}, ce qui mettrait en péril l'avenir de son exploitation. En outre, il a averti que {arguments[1]}. {personnage.nom}, "
-    f"connu pour sa détermination et son sens de l'engagement, a réussi à sensibiliser de nombreux autres agriculteurs et citoyens, qui partagent désormais ses préoccupations "
-    f"face à ce qu'ils perçoivent comme une menace pour le mode de vie agricole traditionnel et l'équilibre écologique de la région.",
-    
-    # Trois autres variantes similaires avec détails supplémentaires
-    ]
+    if personnage.pronom == "il":
+        modeles_methaniseur = [
+        f"Lors de la {foire} en {region.nom}, {personnage.nom}, un agriculteur et membre actif de {personnage.affiliation}, a exprimé avec passion "
+        f"son opposition à l’installation d'un méthaniseur près de ses terres. Il a déclaré que {arguments[0]}, soulignant les répercussions négatives sur l’exploitation "
+        f"de ses terres et le bien-être des habitants locaux. {personnage.nom} a également mis en lumière que {arguments[1]}, ce qui pourrait, selon lui, avoir des effets "
+        f"désastreux sur les ressources en eau et sur l’ensemble du réseau agricole local. En tant que défenseur infatigable de l’agriculture durable, il s’est engagé à "
+        f"mener cette bataille, conscient de l'importance de protéger l’environnement rural de {region.nom}.",
+        
+        f"En {region.nom}, {personnage.nom}, un agriculteur, a pris la parole lors de la {foire} pour contester le projet controversé d’un méthaniseur près "
+        f"de ses terres. Selon lui, {arguments[0]}, ce qui mettrait en péril l'avenir de son exploitation. En outre, il a averti que {arguments[1]}. {personnage.nom}, "
+        f"connu pour sa détermination et son sens de l'engagement, a réussi à sensibiliser de nombreux autres agriculteurs et citoyens, qui partagent désormais ses préoccupations "
+        f"face à ce qu'ils perçoivent comme une menace pour le mode de vie agricole traditionnel et l'équilibre écologique de la région.",
+        
+        # Trois autres variantes similaires avec détails supplémentaires
+        ]
+    elif personnage.pronom == "elle":
+        modeles_methaniseur = [
+        f"Lors de la {foire} en {region.nom}, {personnage.nom}, une agricultrice et membre active de {personnage.affiliation}, a exprimé avec passion "
+        f"son opposition à l’installation d'un méthaniseur près de ses terres. Elle a déclaré que {arguments[0]}, soulignant les répercussions négatives sur l’exploitation "
+        f"de ses terres et le bien-être des habitants locaux. {personnage.nom} a également mis en lumière que {arguments[1]}, ce qui pourrait, selon elle, avoir des effets "
+        f"désastreux sur les ressources en eau et sur l’ensemble du réseau agricole local. En tant que défenseuse infatigable de l’agriculture durable, elle s’est engagée à "
+        f"mener cette bataille, consciente de l'importance de protéger l’environnement rural de {region.nom}.",
+        
+        f"En {region.nom}, {personnage.nom}, une agricultrice, a pris la parole lors de la {foire} pour contester le projet controversé d’un méthaniseur près "
+        f"de ses terres. Selon elle, {arguments[0]}, ce qui mettrait en péril l'avenir de son exploitation. En outre, elle a averti que {arguments[1]}. {personnage.nom}, "
+        f"connue pour sa détermination et son sens de l'engagement, a réussi à sensibiliser de nombreux autres agriculteurs et citoyens, qui partagent désormais ses préoccupations "
+        f"face à ce qu'ils perçoivent comme une menace pour le mode de vie agricole traditionnel et l'équilibre écologique de la région.",
+        
+        # Trois autres variantes similaires avec détails supplémentaires
+        ]
+    elif personnage.pronom == "iel":
+        modeles_methaniseur = [
+        f"Lors de la {foire} en {region.nom}, {personnage.nom}, un.e agriculteur.ice et membre actif.ve de {personnage.affiliation}, a exprimé avec passion "
+        f"son opposition à l’installation d'un méthaniseur près de ses terres. Iel a déclaré que {arguments[0]}, soulignant les répercussions négatives sur l’exploitation "
+        f"de ses terres et le bien-être des habitants locaux. {personnage.nom} a également mis en lumière que {arguments[1]}, ce qui pourrait, selon iel, avoir des effets "
+        f"désastreux sur les ressources en eau et sur l’ensemble du réseau agricole local. En tant que défenseur.euse infatigable de l’agriculture durable, iel s’est engagé.e à "
+        f"mener cette bataille, conscient.e de l'importance de protéger l’environnement rural de {region.nom}.",
+        
+        f"En {region.nom}, {personnage.nom}, un.e agriculteur.ice, a pris la parole lors de la {foire} pour contester le projet controversé d’un méthaniseur près "
+        f"de ses terres. Selon iel, {arguments[0]}, ce qui mettrait en péril l'avenir de son exploitation. En outre, iel a averti que {arguments[1]}. {personnage.nom}, "
+        f"connu.e pour sa détermination et son sens de l'engagement, a réussi à sensibiliser de nombreux autres agriculteurs et citoyens, qui partagent désormais ses préoccupations "
+        f"face à ce qu'ils perçoivent comme une menace pour le mode de vie agricole traditionnel et l'équilibre écologique de la région.",
+        
+        # Trois autres variantes similaires avec détails supplémentaires
+        ]
 
 
     # Sélectionner aléatoirement un texte en fonction de l'infrastructure
@@ -195,61 +289,185 @@ def texte_activiste(personnage, region, infrastructure):
     if len(arguments) < 2:
         return "Erreur : Impossible de générer des arguments suffisants pour ce personnage et cette infrastructure."
 
+
+    if personnage.pronom == "elle":
     # Modèles de texte pour chaque infrastructure
-    modeles_eolien_offshore = [
-        f"Dans la ville côtière de {ville}, {personnage.nom} {personnage.prenom}, une fervente activiste pour l'environnement, "
+        modeles_eolien_offshore = [
+            f"Dans la ville côtière de {ville}, {personnage.nom}, une fervente activiste pour l'environnement, "
+            f"a récemment pris position contre le projet d'implantation d'un parc éolien offshore. Lors d'un rassemblement organisé sur la plage, "
+            f"elle a déclaré que les éoliennes menaçaient l'habitat des {espece}, une espèce protégée qui joue un rôle crucial dans l'écosystème local. "
+            f"De plus, elle a reçu le soutien précieux de {soutien}, qui a souligné l'importance de protéger la biodiversité locale face à cette menace. "
+            f"Cette mobilisation attire l'attention sur les enjeux environnementaux, montrant que les communautés côtières ne resteront pas passives devant "
+            f"des projets qui pourraient avoir des conséquences durables sur leur environnement.",
+            
+            f"{personnage.nom}, une activiste passionnée de {ville}, a pris la parole lors d'une manifestation bruyante pour dénoncer le projet de parc éolien offshore. "
+            f"Elle a affirmé que cette infrastructure pourrait gravement perturber les habitudes migratoires des {espece}, dont la présence est essentielle à "
+            f"l'équilibre écologique de la région. En outre, {soutien}, une figure respectée de la communauté, s'est jointe à elle, rappelant l'urgence de "
+            f"préserver les écosystèmes côtiers face à cette menace. Leur appel a suscité un débat public sur les choix énergétiques, soulignant l'importance "
+            f"de l'écologie dans le développement durable.",
+            
+            # Ajoutez d'autres variantes similaires pour l'éolien offshore
+        ]
+    elif personnage.pronom == "il":
+        modeles_eolien_offshore = [
+        f"Dans la ville côtière de {ville}, {personnage.nom}, un fervent activiste pour l'environnement, "
         f"a récemment pris position contre le projet d'implantation d'un parc éolien offshore. Lors d'un rassemblement organisé sur la plage, "
-        f"elle a déclaré que les éoliennes menaçaient l'habitat des {espece}, une espèce protégée qui joue un rôle crucial dans l'écosystème local. "
-        f"De plus, elle a reçu le soutien précieux de {soutien}, qui a souligné l'importance de protéger la biodiversité locale face à cette menace. "
+        f"il a déclaré que les éoliennes menaçaient l'habitat des {espece}, une espèce protégée qui joue un rôle crucial dans l'écosystème local. "
+        f"De plus, il a reçu le soutien précieux de {soutien}, qui a souligné l'importance de protéger la biodiversité locale face à cette menace. "
         f"Cette mobilisation attire l'attention sur les enjeux environnementaux, montrant que les communautés côtières ne resteront pas passives devant "
         f"des projets qui pourraient avoir des conséquences durables sur leur environnement.",
         
-        f"{personnage.nom} {personnage.prenom}, une activiste passionnée de {ville}, a pris la parole lors d'une manifestation bruyante pour dénoncer le projet de parc éolien offshore. "
-        f"Elle a affirmé que cette infrastructure pourrait gravement perturber les habitudes migratoires des {espece}, dont la présence est essentielle à "
-        f"l'équilibre écologique de la région. En outre, {soutien}, une figure respectée de la communauté, s'est jointe à elle, rappelant l'urgence de "
+        f"{personnage.nom}, un activiste passionné de {ville}, a pris la parole lors d'une manifestation bruyante pour dénoncer le projet de parc éolien offshore. "
+        f"Il a affirmé que cette infrastructure pourrait gravement perturber les habitudes migratoires des {espece}, dont la présence est essentielle à "
+        f"l'équilibre écologique de la région. En outre, {soutien}, une figure respectée de la communauté, s'est jointe à lui, rappelant l'urgence de "
         f"préserver les écosystèmes côtiers face à cette menace. Leur appel a suscité un débat public sur les choix énergétiques, soulignant l'importance "
         f"de l'écologie dans le développement durable.",
         
         # Ajoutez d'autres variantes similaires pour l'éolien offshore
     ]
-    
-    modeles_eolien_onshore = [
-        f"Dans la sous-préfecture de {random.choice(region.sous_prefectures)}, {personnage.nom} {personnage.prenom} s'oppose fermement à un projet de parc éolien onshore. "
-        f"Elle a mis en avant les risques que ce projet pose pour les {espece}, qui sont déjà menacés par la perte de leur habitat. "
-        f"À ses côtés, {soutien} a soutenu cette lutte, rappelant que le développement durable doit impérativement prendre en compte la protection des espèces locales. "
-        f"Cet engagement a résonné auprès des habitants, qui s'inquiètent des conséquences de ce projet sur leur environnement.",
+    elif personnage.pronom == "iel":
+        modeles_eolien_offshore = [
+        f"Dans la ville côtière de {ville}, {personnage.nom}, un.e fervent.e activiste pour l'environnement, "
+        f"a récemment pris position contre le projet d'implantation d'un parc éolien offshore. Lors d'un rassemblement organisé sur la plage, "
+        f"iel a déclaré que les éoliennes menaçaient l'habitat des {espece}, une espèce protégée qui joue un rôle crucial dans l'écosystème local. "
+        f"De plus, iel a reçu le soutien précieux de {soutien}, qui a souligné l'importance de protéger la biodiversité locale face à cette menace. "
+        f"Cette mobilisation attire l'attention sur les enjeux environnementaux, montrant que les communautés côtières ne resteront pas passives devant "
+        f"des projets qui pourraient avoir des conséquences durables sur leur environnement.",
         
-        f"À {random.choice(region.sous_prefectures)}, {personnage.nom} {personnage.prenom} s'est mobilisée contre la construction d'un parc éolien onshore. "
-        f"Elle a souligné que cette infrastructure pourrait dégrader les habitats des {espece} et qu'il est impératif d'envisager des alternatives moins nocives. "
-        f"Le soutien de {soutien} a été essentiel dans cette mobilisation, car il a alerté la communauté sur l'importance de conserver la biodiversité face à ce type de projets. "
-        f"Cela a permis de rassembler les citoyens autour de l'idée que la nature doit être protégée.",
+        f"{personnage.nom}, un.e activiste passionné.e de {ville}, a pris la parole lors d'une manifestation bruyante pour dénoncer le projet de parc éolien offshore. "
+        f"Iel a affirmé que cette infrastructure pourrait gravement perturber les habitudes migratoires des {espece}, dont la présence est essentielle à "
+        f"l'équilibre écologique de la région. En outre, {soutien}, une figure respectée de la communauté, s'est jointe à iel, rappelant l'urgence de "
+        f"préserver les écosystèmes côtiers face à cette menace. Leur appel a suscité un débat public sur les choix énergétiques, soulignant l'importance "
+        f"de l'écologie dans le développement durable.",
         
-        # Ajoutez d'autres variantes similaires pour l'éolien onshore
+        # Ajoutez d'autres variantes similaires pour l'éolien offshore
     ]
+    if personnage.pronom == "elle":
+        modeles_eolien_onshore = [
+            f"Dans la sous-préfecture de {random.choice(region.sous_prefectures)}, {personnage.nom} s'oppose fermement à un projet de parc éolien onshore. "
+            f"Elle a mis en avant les risques que ce projet pose pour les {espece}, qui sont déjà menacés par la perte de leur habitat. "
+            f"À ses côtés, {soutien} a soutenu cette lutte, rappelant que le développement durable doit impérativement prendre en compte la protection des espèces locales. "
+            f"Cet engagement a résonné auprès des habitants, qui s'inquiètent des conséquences de ce projet sur leur environnement.",
+            
+            f"À {random.choice(region.sous_prefectures)}, {personnage.nom} s'est mobilisée contre la construction d'un parc éolien onshore. "
+            f"Elle a souligné que cette infrastructure pourrait dégrader les habitats des {espece} et qu'il est impératif d'envisager des alternatives moins nocives. "
+            f"Le soutien de {soutien} a été essentiel dans cette mobilisation, car il a alerté la communauté sur l'importance de conserver la biodiversité face à ce type de projets. "
+            f"Cela a permis de rassembler les citoyens autour de l'idée que la nature doit être protégée.",
+            
+            # Ajoutez d'autres variantes similaires pour l'éolien onshore
+        ]
+    elif personnage.pronom == "il":
+        modeles_eolien_onshore = [
+            f"Dans la sous-préfecture de {random.choice(region.sous_prefectures)}, {personnage.nom} s'oppose fermement à un projet de parc éolien onshore. "
+            f"Il a mis en avant les risques que ce projet pose pour les {espece}, qui sont déjà menacés par la perte de leur habitat. "
+            f"À ses côtés, {soutien} a soutenu cette lutte, rappelant que le développement durable doit impérativement prendre en compte la protection des espèces locales. "
+            f"Cet engagement a résonné auprès des habitants, qui s'inquiètent des conséquences de ce projet sur leur environnement.",
+            
+            f"À {random.choice(region.sous_prefectures)}, {personnage.nom} s'est mobilisé contre la construction d'un parc éolien onshore. "
+            f"Il a souligné que cette infrastructure pourrait dégrader les habitats des {espece} et qu'il est impératif d'envisager des alternatives moins nocives. "
+            f"Le soutien de {soutien} a été essentiel dans cette mobilisation, car il a alerté la communauté sur l'importance de conserver la biodiversité face à ce type de projets. "
+            f"Cela a permis de rassembler les citoyens autour de l'idée que la nature doit être protégée.",
+            
+            # Ajoutez d'autres variantes similaires pour l'éolien onshore
+        ]
+    elif personnage.pronom == "iel":
+        modeles_eolien_onshore = [
+            f"Dans la sous-préfecture de {random.choice(region.sous_prefectures)}, {personnage.nom} s'oppose fermement à un projet de parc éolien onshore. "
+            f"Iel a mis en avant les risques que ce projet pose pour les {espece}, qui sont déjà menacés par la perte de leur habitat. "
+            f"À ses côtés, {soutien} a soutenu cette lutte, rappelant que le développement durable doit impérativement prendre en compte la protection des espèces locales. "
+            f"Cet engagement a résonné auprès des habitants, qui s'inquiètent des conséquences de ce projet sur leur environnement.",
+            
+            f"À {random.choice(region.sous_prefectures)}, {personnage.nom} s'est mobilisé.e contre la construction d'un parc éolien onshore. "
+            f"Iel a souligné que cette infrastructure pourrait dégrader les habitats des {espece} et qu'il est impératif d'envisager des alternatives moins nocives. "
+            f"Le soutien de {soutien} a été essentiel dans cette mobilisation, car il a alerté la communauté sur l'importance de conserver la biodiversité face à ce type de projets. "
+            f"Cela a permis de rassembler les citoyens autour de l'idée que la nature doit être protégée.",
+            
+            # Ajoutez d'autres variantes similaires pour l'éolien onshore
+        ]
 
-    modeles_photovoltaiques = [
-        f"À {ville}, {personnage.nom} {personnage.prenom} a organisé une action de sensibilisation massive contre l'installation de panneaux photovoltaïques sur des terres sensibles. "
-        f"Lors de cet événement, elle a exprimé ses craintes quant à l'impact de ces panneaux sur les habitats des {espece}, qui migrent souvent à proximité. "
-        f"Elle a été rejointe par {soutien}, qui a exprimé ses préoccupations concernant l'impact environnemental de ce projet sur la biodiversité locale. "
-        f"Cette action a permis de réunir des membres de la communauté locale, soulignant l'importance de la protection de la nature et de l'équilibre des écosystèmes.",
-        
-        f"Dans la charmante ville côtière de {ville}, {personnage.nom} {personnage.prenom} s'est mobilisée contre le projet de panneaux photovoltaïques. "
-        f"Elle a souligné que l'emplacement choisi pour les panneaux perturberait les habitats des {espece}, qui sont déjà en déclin. "
-        f"{soutien} s'est également joint à elle, appelant à une évaluation environnementale plus rigoureuse et à la prise en compte des effets potentiels sur la faune. "
-        f"Leur engagement a été salué par de nombreux citoyens, qui ont exprimé leur désir de voir un développement durable qui ne compromet pas leur environnement.",
-        
-        # Ajoutez d'autres variantes similaires
-    ]
+    if personnage.pronom == "elle":
+        modeles_photovoltaiques = [
+            f"À {ville}, {personnage.nom} a organisé une action de sensibilisation massive contre l'installation de panneaux photovoltaïques sur des terres sensibles. "
+            f"Lors de cet événement, elle a exprimé ses craintes quant à l'impact de ces panneaux sur les habitats des {espece}, qui migrent souvent à proximité. "
+            f"Elle a été rejointe par {soutien}, qui a exprimé ses préoccupations concernant l'impact environnemental de ce projet sur la biodiversité locale. "
+            f"Cette action a permis de réunir des membres de la communauté locale, soulignant l'importance de la protection de la nature et de l'équilibre des écosystèmes.",
+            
+            f"Dans la charmante ville côtière de {ville}, {personnage.nom} s'est mobilisée contre le projet de panneaux photovoltaïques. "
+            f"Elle a souligné que l'emplacement choisi pour les panneaux perturberait les habitats des {espece}, qui sont déjà en déclin. "
+            f"{soutien} s'est également joint à elle, appelant à une évaluation environnementale plus rigoureuse et à la prise en compte des effets potentiels sur la faune. "
+            f"Leur engagement a été salué par de nombreux citoyens, qui ont exprimé leur désir de voir un développement durable qui ne compromet pas leur environnement.",
+            
+            # Ajoutez d'autres variantes similaires
+        ]
+    elif personnage.pronom == "il":
+        modeles_photovoltaiques = [
+            f"À {ville}, {personnage.nom} a organisé une action de sensibilisation massive contre l'installation de panneaux photovoltaïques sur des terres sensibles. "
+            f"Lors de cet événement, il a exprimé ses craintes quant à l'impact de ces panneaux sur les habitats des {espece}, qui migrent souvent à proximité. "
+            f"Il a été rejoint par {soutien}, qui a exprimé ses préoccupations concernant l'impact environnemental de ce projet sur la biodiversité locale. "
+            f"Cette action a permis de réunir des membres de la communauté locale, soulignant l'importance de la protection de la nature et de l'équilibre des écosystèmes.",
+            
+            f"Dans la charmante ville côtière de {ville}, {personnage.nom} s'est mobilisé contre le projet de panneaux photovoltaïques. "
+            f"Il a souligné que l'emplacement choisi pour les panneaux perturberait les habitats des {espece}, qui sont déjà en déclin. "
+            f"{soutien} s'est également joint à lui, appelant à une évaluation environnementale plus rigoureuse et à la prise en compte des effets potentiels sur la faune. "
+            f"Leur engagement a été salué par de nombreux citoyens, qui ont exprimé leur désir de voir un développement durable qui ne compromet pas leur environnement.",
+            
+            # Ajoutez d'autres variantes similaires
+        ]
+    elif personnage.pronom == "iel":
+        modeles_photovoltaiques = [
+            f"À {ville}, {personnage.nom} a organisé une action de sensibilisation massive contre l'installation de panneaux photovoltaïques sur des terres sensibles. "
+            f"Lors de cet événement, iel a exprimé ses craintes quant à l'impact de ces panneaux sur les habitats des {espece}, qui migrent souvent à proximité. "
+            f"Iel a été rejoint.e par {soutien}, qui a exprimé ses préoccupations concernant l'impact environnemental de ce projet sur la biodiversité locale. "
+            f"Cette action a permis de réunir des membres de la communauté locale, soulignant l'importance de la protection de la nature et de l'équilibre des écosystèmes.",
+            
+            f"Dans la charmante ville côtière de {ville}, {personnage.nom} s'est mobilisé.e contre le projet de panneaux photovoltaïques. "
+            f"Iel a souligné que l'emplacement choisi pour les panneaux perturberait les habitats des {espece}, qui sont déjà en déclin. "
+            f"{soutien} s'est également joint à iel, appelant à une évaluation environnementale plus rigoureuse et à la prise en compte des effets potentiels sur la faune. "
+            f"Leur engagement a été salué par de nombreux citoyens, qui ont exprimé leur désir de voir un développement durable qui ne compromet pas leur environnement.",
+            
+            # Ajoutez d'autres variantes similaires
+        ]
 
-    modeles_methaniseur = [
-        f"Lors d'une réunion à {ville}, {personnage.nom} {personnage.prenom}, une activiste engagée, a vivement critiqué l'installation d'un méthaniseur près de la côte. "
-        f"Elle a alerté le public sur le fait que ce projet mettrait en danger les {espece}, qui jouent un rôle vital dans la chaîne alimentaire marine. "
-        f"En outre, elle a reçu le soutien enthousiaste de {soutien}, qui a partagé ses inquiétudes concernant les effets de ce projet sur la santé de l'écosystème marin. "
+    if personnage.pronom == "elle":
+        modeles_methaniseur = [
+            f"Lors d'une réunion à {ville}, {personnage.nom}, une activiste engagée, a vivement critiqué l'installation d'un méthaniseur près de la côte. "
+            f"Elle a alerté le public sur le fait que ce projet mettrait en danger les {espece}, qui jouent un rôle vital dans la chaîne alimentaire marine. "
+            f"En outre, elle a reçu le soutien enthousiaste de {soutien}, qui a partagé ses inquiétudes concernant les effets de ce projet sur la santé de l'écosystème marin. "
+            f"Cette réunion a mis en lumière les préoccupations croissantes des habitantes de la région, qui craignent que des décisions économiques à court terme nuisent "
+            f"à leur environnement à long terme.",
+            
+            f"A {ville}, {personnage.nom} a pris la parole lors d'une manifestation pacifique pour s'opposer à un projet de méthaniseur. "
+            f"Elle a expliqué que l'installation de cet équipement pourrait avoir des répercussions néfastes sur les {espece}, qui sont déjà en danger. "
+            f"{soutien} a également exprimé son soutien, insistant sur l'importance de protéger les espèces locales et de trouver des solutions durables pour les déchets. "
+            f"Cela a suscité un dialogue public sur la nécessité de mieux prendre en compte l'environnement dans les décisions industrielles.",
+            
+            # Ajoutez d'autres variantes similaires
+        ]
+    elif personnage.pronom == "il":
+        modeles_methaniseur = [
+        f"Lors d'une réunion à {ville}, {personnage.nom}, un activiste engagé, a vivement critiqué l'installation d'un méthaniseur près de la côte. "
+        f"Il a alerté le public sur le fait que ce projet mettrait en danger les {espece}, qui jouent un rôle vital dans la chaîne alimentaire marine. "
+        f"En outre, il a reçu le soutien enthousiaste de {soutien}, qui a partagé ses inquiétudes concernant les effets de ce projet sur la santé de l'écosystème marin. "
         f"Cette réunion a mis en lumière les préoccupations croissantes des habitantes de la région, qui craignent que des décisions économiques à court terme nuisent "
         f"à leur environnement à long terme.",
         
-        f"A {ville}, {personnage.nom} {personnage.prenom} a pris la parole lors d'une manifestation pacifique pour s'opposer à un projet de méthaniseur. "
-        f"Elle a expliqué que l'installation de cet équipement pourrait avoir des répercussions néfastes sur les {espece}, qui sont déjà en danger. "
+        f"A {ville}, {personnage.nom} a pris la parole lors d'une manifestation pacifique pour s'opposer à un projet de méthaniseur. "
+        f"Il a expliqué que l'installation de cet équipement pourrait avoir des répercussions néfastes sur les {espece}, qui sont déjà en danger. "
+        f"{soutien} a également exprimé son soutien, insistant sur l'importance de protéger les espèces locales et de trouver des solutions durables pour les déchets. "
+        f"Cela a suscité un dialogue public sur la nécessité de mieux prendre en compte l'environnement dans les décisions industrielles.",
+        
+        # Ajoutez d'autres variantes similaires
+    ]
+    elif personnage.pronom == "iel":
+        modeles_methaniseur = [
+        f"Lors d'une réunion à {ville}, {personnage.nom}, un.e activiste engagé.e, a vivement critiqué l'installation d'un méthaniseur près de la côte. "
+        f"Iel a alerté le public sur le fait que ce projet mettrait en danger les {espece}, qui jouent un rôle vital dans la chaîne alimentaire marine. "
+        f"En outre, iel a reçu le soutien enthousiaste de {soutien}, qui a partagé ses inquiétudes concernant les effets de ce projet sur la santé de l'écosystème marin. "
+        f"Cette réunion a mis en lumière les préoccupations croissantes des habitantes de la région, qui craignent que des décisions économiques à court terme nuisent "
+        f"à leur environnement à long terme.",
+        
+        f"A {ville}, {personnage.nom} a pris la parole lors d'une manifestation pacifique pour s'opposer à un projet de méthaniseur. "
+        f"Iel a expliqué que l'installation de cet équipement pourrait avoir des répercussions néfastes sur les {espece}, qui sont déjà en danger. "
         f"{soutien} a également exprimé son soutien, insistant sur l'importance de protéger les espèces locales et de trouver des solutions durables pour les déchets. "
         f"Cela a suscité un dialogue public sur la nécessité de mieux prendre en compte l'environnement dans les décisions industrielles.",
         
@@ -300,50 +518,120 @@ def texte_pdg_solaire(personnage, region):
     arguments = generer_arguments_photovoltaique()
     arguments_selectionnes = random.sample(arguments, 2)
 
-    # Modèles de texte génériques
-    textes = [
-    f"Le PDG de {personnage.affiliation}, {personnage.prenom} {personnage.nom}, ancienne étudiante de l'INSA Toulouse, met en avant sa passion pour l'énergie photovoltaïque. "
-    f"Premièrement, {arguments_selectionnes[0]}. Deuxièmement, {arguments_selectionnes[1]}.",
-    
-    f"{personnage.prenom} {personnage.nom}, PDG de {personnage.affiliation}, a un parcours impressionnant à l'INSA Toulouse qui l'a conduit à défendre les énergies renouvelables. "
-    f"Un argument majeur qu'il évoque est {arguments_selectionnes[0]}. Par ailleurs, {arguments_selectionnes[1]}.",
-    
-    f"{personnage.prenom} {personnage.nom}, à la tête de {personnage.affiliation}, affirme que l'énergie photovoltaïque représente l'avenir, comme l'indique sa formation à l'INSA Toulouse. "
-    f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des points essentiels qu'il souhaite mettre en avant.",
-    
-    f"Lors d'un récent événement, {personnage.prenom} {personnage.nom}, PDG de {personnage.affiliation}, a souligné l'importance de l'énergie renouvelable, une thématique renforcée par son passage à l'INSA Toulouse. "
-    f"Pour commencer, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} constituent des arguments solides pour l'énergie photovoltaïque.",
-    
-    f"Dans une allocution, {personnage.prenom} {personnage.nom}, PDG de {personnage.affiliation}, a partagé son expérience à l'INSA Toulouse, qui lui a permis de comprendre les enjeux environnementaux. "
-    f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} illustrent pourquoi le développement de l'énergie photovoltaïque est crucial.",
-    
-    f"{personnage.prenom} {personnage.nom}, dirigeante de {personnage.affiliation}, formée à l'INSA Toulouse, évoque l'avenir prometteur de l'énergie photovoltaïque. "
-    f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} démontrent les avantages de ce secteur en pleine croissance.",
-    
-    f"Le PDG de {personnage.affiliation}, {personnage.prenom} {personnage.nom}, a récemment exprimé une vision claire pour l'énergie photovoltaïque, fruit de son éducation à l'INSA Toulouse. "
-    f"Tout d'abord, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des raisons cruciales pour soutenir cette filière.",
-    
-    f"{personnage.prenom} {personnage.nom}, à la tête de {personnage.affiliation}, a récemment défendu ardemment l'énergie photovoltaïque. "
-    f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des arguments essentiels pour son développement."
-]
+    if personnage.pronom == "il":
+        # Modèles de texte génériques
+        textes = [
+        f"Le PDG de {personnage.affiliation}, {personnage.nom}, ancien étudiant de l'INSA Toulouse, met en avant sa passion pour l'énergie photovoltaïque. "
+        f"Premièrement, {arguments_selectionnes[0]}. Deuxièmement, {arguments_selectionnes[1]}.",
+        
+        f"{personnage.nom}, PDG de {personnage.affiliation}, a un parcours impressionnant à l'INSA Toulouse qui l'a conduit à défendre les énergies renouvelables. "
+        f"Un argument majeur qu'il évoque est {arguments_selectionnes[0]}. Par ailleurs, {arguments_selectionnes[1]}.",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, affirme que l'énergie photovoltaïque représente l'avenir, comme l'indique sa formation à l'INSA Toulouse. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des points essentiels qu'il souhaite mettre en avant.",
+        
+        f"Lors d'un récent événement, {personnage.nom}, PDG de {personnage.affiliation}, a souligné l'importance de l'énergie renouvelable, une thématique renforcée par son passage à l'INSA Toulouse. "
+        f"Pour commencer, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} constituent des arguments solides pour l'énergie photovoltaïque.",
+        
+        f"Dans une allocution, {personnage.nom}, PDG de {personnage.affiliation}, a partagé son expérience à l'INSA Toulouse, qui lui a permis de comprendre les enjeux environnementaux. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} illustrent pourquoi le développement de l'énergie photovoltaïque est crucial.",
+        
+        f"{personnage.nom}, dirigeant de {personnage.affiliation}, formé à l'INSA Toulouse, évoque l'avenir prometteur de l'énergie photovoltaïque. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} démontrent les avantages de ce secteur en pleine croissance.",
+        
+        f"Le PDG de {personnage.affiliation}, {personnage.nom}, a récemment exprimé une vision claire pour l'énergie photovoltaïque, fruit de son éducation à l'INSA Toulouse. "
+        f"Tout d'abord, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des raisons cruciales pour soutenir cette filière.",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, a récemment défendu ardemment l'énergie photovoltaïque. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des arguments essentiels pour son développement."
+    ]
+    elif personnage.pronom == "elle":
+            # Modèles de texte génériques
+        textes = [
+        f"La PDG de {personnage.affiliation}, {personnage.nom}, ancienne étudiante de l'INSA Toulouse, met en avant sa passion pour l'énergie photovoltaïque. "
+        f"Premièrement, {arguments_selectionnes[0]}. Deuxièmement, {arguments_selectionnes[1]}.",
+        
+        f"{personnage.nom}, PDG de {personnage.affiliation}, a un parcours impressionnant à l'INSA Toulouse qui l'a conduite à défendre les énergies renouvelables. "
+        f"Un argument majeur qu'elle évoque est {arguments_selectionnes[0]}. Par ailleurs, {arguments_selectionnes[1]}.",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, affirme que l'énergie photovoltaïque représente l'avenir, comme l'indique sa formation à l'INSA Toulouse. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des points essentiels qu'elle souhaite mettre en avant.",
+        
+        f"Lors d'un récent événement, {personnage.nom}, PDG de {personnage.affiliation}, a souligné l'importance de l'énergie renouvelable, une thématique renforcée par son passage à l'INSA Toulouse. "
+        f"Pour commencer, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} constituent des arguments solides pour l'énergie photovoltaïque.",
+        
+        f"Dans une allocution, {personnage.nom}, PDG de {personnage.affiliation}, a partagé son expérience à l'INSA Toulouse, qui lui a permis de comprendre les enjeux environnementaux. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} illustrent pourquoi le développement de l'énergie photovoltaïque est crucial.",
+        
+        f"{personnage.nom}, dirigeante de {personnage.affiliation}, formée à l'INSA Toulouse, évoque l'avenir prometteur de l'énergie photovoltaïque. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} démontrent les avantages de ce secteur en pleine croissance.",
+        
+        f"La PDG de {personnage.affiliation}, {personnage.nom}, a récemment exprimé une vision claire pour l'énergie photovoltaïque, fruit de son éducation à l'INSA Toulouse. "
+        f"Tout d'abord, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des raisons cruciales pour soutenir cette filière.",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, a récemment défendu ardemment l'énergie photovoltaïque. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des arguments essentiels pour son développement."
+    ]
+    elif personnage.pronom == "iel":
+            # Modèles de texte génériques
+        textes = [
+        f"Le.a PDG de {personnage.affiliation}, {personnage.nom}, ancien.ne étudiant.e de l'INSA Toulouse, met en avant sa passion pour l'énergie photovoltaïque. "
+        f"Premièrement, {arguments_selectionnes[0]}. Deuxièmement, {arguments_selectionnes[1]}.",
+        
+        f"{personnage.nom}, PDG de {personnage.affiliation}, a un parcours impressionnant à l'INSA Toulouse qui l'a conduit.e à défendre les énergies renouvelables. "
+        f"Un argument majeur qu'iel évoque est {arguments_selectionnes[0]}. Par ailleurs, {arguments_selectionnes[1]}.",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, affirme que l'énergie photovoltaïque représente l'avenir, comme l'indique sa formation à l'INSA Toulouse. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des points essentiels qu'iel souhaite mettre en avant.",
+        
+        f"Lors d'un récent événement, {personnage.nom}, PDG de {personnage.affiliation}, a souligné l'importance de l'énergie renouvelable, une thématique renforcée par son passage à l'INSA Toulouse. "
+        f"Pour commencer, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} constituent des arguments solides pour l'énergie photovoltaïque.",
+        
+        f"Dans une allocution, {personnage.nom}, PDG de {personnage.affiliation}, a partagé son expérience à l'INSA Toulouse, qui lui a permis de comprendre les enjeux environnementaux. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} illustrent pourquoi le développement de l'énergie photovoltaïque est crucial.",
+        
+        f"{personnage.nom}, dirigeant.e de {personnage.affiliation}, formé.e à l'INSA Toulouse, évoque l'avenir prometteur de l'énergie photovoltaïque. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} démontrent les avantages de ce secteur en pleine croissance.",
+        
+        f"Le.a PDG de {personnage.affiliation}, {personnage.nom}, a récemment exprimé une vision claire pour l'énergie photovoltaïque, fruit de son éducation à l'INSA Toulouse. "
+        f"Tout d'abord, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des raisons cruciales pour soutenir cette filière.",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, a récemment défendu ardemment l'énergie photovoltaïque. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des arguments essentiels pour son développement."
+    ]
 
 
     # Choisir un texte aléatoire
     texte_choisi = random.choice(textes)
 
-    # Variantes de texte pour la France
-    variantes_france = [
-        f"{personnage.prenom} {personnage.nom} défend une vision ambitieuse pour l’énergie photovoltaïque en France. « L’inaction ralentit considérablement les progrès que nous pourrions réaliser, » déclare-t-elle. Elle appelle à une politique publique plus volontariste pour accélérer le déploiement des installations photovoltaïques.",
-        f"{personnage.prenom} {personnage.nom}, PDG de {personnage.affiliation}, plaide pour une véritable révolution solaire en France. « Nos voisins européens avancent plus vite que nous dans ce domaine, » observe-t-elle. Elle estime que la France pourrait devenir un leader mondial du photovoltaïque avec les bons investissements.",
-        f"En tant que dirigeante de {personnage.affiliation}, {personnage.prenom} {personnage.nom} s'inquiète du retard pris par la France dans le développement de l'énergie photovoltaïque. « Le gouvernement doit impérativement revoir sa stratégie s’il veut tenir ses engagements climatiques, » insiste-t-elle."
-    ]
+    if personnage.pronom == "elle":
+        # Variantes de texte pour la France
+        variantes_france = [
+            f"{personnage.nom} défend une vision ambitieuse pour l’énergie photovoltaïque en France. « L’inaction ralentit considérablement les progrès que nous pourrions réaliser, » déclare-t-elle. Elle appelle à une politique publique plus volontariste pour accélérer le déploiement des installations photovoltaïques.",
+            f"{personnage.nom}, PDG de {personnage.affiliation}, plaide pour une véritable révolution solaire en France. « Nos voisins européens avancent plus vite que nous dans ce domaine, » observe-t-elle. Elle estime que la France pourrait devenir un leader mondial du photovoltaïque avec les bons investissements.",
+            f"En tant que dirigeante de {personnage.affiliation}, {personnage.nom} s'inquiète du retard pris par la France dans le développement de l'énergie photovoltaïque. « Le gouvernement doit impérativement revoir sa stratégie s’il veut tenir ses engagements climatiques, » insiste-t-elle."
+        ]
+    elif personnage.pronom == "il":
+        # Variantes de texte pour la France
+        variantes_france = [
+            f"{personnage.nom} défend une vision ambitieuse pour l’énergie photovoltaïque en France. « L’inaction ralentit considérablement les progrès que nous pourrions réaliser, » déclare-t-il. Il appelle à une politique publique plus volontariste pour accélérer le déploiement des installations photovoltaïques.",
+            f"{personnage.nom}, PDG de {personnage.affiliation}, plaide pour une véritable révolution solaire en France. « Nos voisins européens avancent plus vite que nous dans ce domaine, » observe-t-il. Il estime que la France pourrait devenir un leader mondial du photovoltaïque avec les bons investissements.",
+            f"En tant que dirigeant de {personnage.affiliation}, {personnage.nom} s'inquiète du retard pris par la France dans le développement de l'énergie photovoltaïque. « Le gouvernement doit impérativement revoir sa stratégie s’il veut tenir ses engagements climatiques, » insiste-t-il."
+        ]
+    elif personnage.pronom == "iel":
+        # Variantes de texte pour la France
+        variantes_france = [
+            f"{personnage.nom} défend une vision ambitieuse pour l’énergie photovoltaïque en France. « L’inaction ralentit considérablement les progrès que nous pourrions réaliser, » déclare iel. Iel appelle à une politique publique plus volontariste pour accélérer le déploiement des installations photovoltaïques.",
+            f"{personnage.nom}, PDG de {personnage.affiliation}, plaide pour une véritable révolution solaire en France. « Nos voisins européens avancent plus vite que nous dans ce domaine, » observe iel. Iel estime que la France pourrait devenir un leader mondial du photovoltaïque avec les bons investissements.",
+            f"En tant que dirigeante de {personnage.affiliation}, {personnage.nom} s'inquiète du retard pris par la France dans le développement de l'énergie photovoltaïque. « Le gouvernement doit impérativement revoir sa stratégie s’il veut tenir ses engagements climatiques, » insiste iel."
+        ]
 
     # Variantes de texte pour les régions hors France
     sous_prefecture = random.choice(region.sous_prefectures)
     variantes_hors_france = [
-        f"Sous la direction de {personnage.prenom} {personnage.nom}, {personnage.affiliation} continue de renforcer son engagement pour le solaire avec un nouveau parc photovoltaïque à proximité de {sous_prefecture}. Cette initiative va fournir de l'électricité verte pour des milliers de foyers.",
-        f"{personnage.prenom} {personnage.nom}, PDG de {personnage.affiliation}, annonce un ambitieux projet de parc photovoltaïque dans la région de {sous_prefecture}, visant à augmenter la capacité énergétique renouvelable et à réduire l'empreinte carbone de la région.",
-        f"{personnage.prenom} {personnage.nom} continue de développer des projets solaires près de {sous_prefecture}, avec l'objectif de stimuler l'économie locale tout en contribuant à la transition énergétique."
+        f"Sous la direction de {personnage.nom}, {personnage.affiliation} continue de renforcer son engagement pour le solaire avec un nouveau parc photovoltaïque à proximité de {sous_prefecture}. Cette initiative va fournir de l'électricité verte pour des milliers de foyers.",
+        f"{personnage.nom}, PDG de {personnage.affiliation}, annonce un ambitieux projet de parc photovoltaïque dans la région de {sous_prefecture}, visant à augmenter la capacité énergétique renouvelable et à réduire l'empreinte carbone de la région.",
+        f"{personnage.nom} continue de développer des projets solaires près de {sous_prefecture}, avec l'objectif de stimuler l'économie locale tout en contribuant à la transition énergétique."
     ]
 
     # Adapter le texte en fonction de la région
@@ -389,32 +677,85 @@ def texte_pdg_eolien(personnage, region):
     # Générer des arguments aléatoires sur l'éolien
     arguments_selectionnes = selectionner_arguments_eoliennes()
 
+    if personnage.pronom == "il":
     # Modèles de texte
-    textes = [
-    f"Le PDG de {personnage.affiliation}, {personnage.prenom} {personnage.nom}, ancien élève de l'INSA Toulouse, exprime sa passion pour les énergies renouvelables, "
-    f"notamment l'éolien. Premièrement, {arguments_selectionnes[0]}. Deuxièmement, {arguments_selectionnes[1]}. ",
-    
-    f"{personnage.prenom} {personnage.nom}, à la tête de {personnage.affiliation}, a un parcours à l'INSA Toulouse qui l'a conduit à défendre les énergies renouvelables. "
-    f"Un argument majeur en faveur de l'éolien est {arguments_selectionnes[0]}. Par ailleurs, {arguments_selectionnes[1]}. ",
-    
-    f"{personnage.prenom} {personnage.nom}, dirigeant de {personnage.affiliation}, affirme que l'énergie éolienne est l'avenir, une conviction renforcée par sa formation à l'INSA Toulouse. "
-    f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des points essentiels qu'il souhaite mettre en avant. ",
-    
-    f"Lors d'un récent événement, {personnage.prenom} {personnage.nom}, PDG de {personnage.affiliation}, a souligné les enjeux environnementaux, notamment grâce à son passage à l'INSA Toulouse. "
-    f"Pour commencer, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} constituent des arguments solides pour l'énergie éolienne. ",
-    
-    f"Dans une allocution, {personnage.prenom} {personnage.nom}, PDG de {personnage.affiliation}, a partagé l'importance des énergies renouvelables, comme le prouve son expérience à l'INSA Toulouse. "
-    f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} illustrent les raisons de développer l'énergie éolienne. ",
-    
-    f"{personnage.prenom} {personnage.nom}, à la tête de {personnage.affiliation}, formé à l'INSA Toulouse, voit un avenir prometteur pour l'éolien. "
-    f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} démontrent les avantages de ce secteur en pleine croissance. ",
-    
-    f"Le PDG de {personnage.affiliation}, {personnage.prenom} {personnage.nom}, a récemment partagé une vision claire pour l'énergie éolienne, fruit de son éducation à l'INSA Toulouse. "
-    f"Tout d'abord, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des raisons cruciales pour soutenir cette filière. ",
-    
-    f"{personnage.prenom} {personnage.nom}, dirigeant de {personnage.affiliation}, défend ardemment l'énergie éolienne. "
-    f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des arguments essentiels pour son développement. "
-    ]
+        textes = [
+        f"Le PDG de {personnage.affiliation}, {personnage.nom}, ancien élève de l'INSA Toulouse, exprime sa passion pour les énergies renouvelables, "
+        f"notamment l'éolien. Premièrement, {arguments_selectionnes[0]}. Deuxièmement, {arguments_selectionnes[1]}. ",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, a un parcours à l'INSA Toulouse qui l'a conduit à défendre les énergies renouvelables. "
+        f"Un argument majeur en faveur de l'éolien est {arguments_selectionnes[0]}. Par ailleurs, {arguments_selectionnes[1]}. ",
+        
+        f"{personnage.nom}, dirigeant de {personnage.affiliation}, affirme que l'énergie éolienne est l'avenir, une conviction renforcée par sa formation à l'INSA Toulouse. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des points essentiels qu'il souhaite mettre en avant. ",
+        
+        f"Lors d'un récent événement, {personnage.nom}, PDG de {personnage.affiliation}, a souligné les enjeux environnementaux, notamment grâce à son passage à l'INSA Toulouse. "
+        f"Pour commencer, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} constituent des arguments solides pour l'énergie éolienne. ",
+        
+        f"Dans une allocution, {personnage.nom}, PDG de {personnage.affiliation}, a partagé l'importance des énergies renouvelables, comme le prouve son expérience à l'INSA Toulouse. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} illustrent les raisons de développer l'énergie éolienne. ",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, formé à l'INSA Toulouse, voit un avenir prometteur pour l'éolien. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} démontrent les avantages de ce secteur en pleine croissance. ",
+        
+        f"Le PDG de {personnage.affiliation}, {personnage.nom}, a récemment partagé une vision claire pour l'énergie éolienne, fruit de son éducation à l'INSA Toulouse. "
+        f"Tout d'abord, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des raisons cruciales pour soutenir cette filière. ",
+        
+        f"{personnage.nom}, dirigeant de {personnage.affiliation}, défend ardemment l'énergie éolienne. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des arguments essentiels pour son développement. "
+        ]
+    elif personnage.pronom == "elle":
+        textes = [
+        f"La PDG de {personnage.affiliation}, {personnage.nom}, ancienne élève de l'INSA Toulouse, exprime sa passion pour les énergies renouvelables, "
+        f"notamment l'éolien. Premièrement, {arguments_selectionnes[0]}. Deuxièmement, {arguments_selectionnes[1]}. ",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, a un parcours à l'INSA Toulouse qui l'a conduite à défendre les énergies renouvelables. "
+        f"Un argument majeur en faveur de l'éolien est {arguments_selectionnes[0]}. Par ailleurs, {arguments_selectionnes[1]}. ",
+        
+        f"{personnage.nom}, dirigeante de {personnage.affiliation}, affirme que l'énergie éolienne est l'avenir, une conviction renforcée par sa formation à l'INSA Toulouse. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des points essentiels qu'il souhaite mettre en avant. ",
+        
+        f"Lors d'un récent événement, {personnage.nom}, PDG de {personnage.affiliation}, a souligné les enjeux environnementaux, notamment grâce à son passage à l'INSA Toulouse. "
+        f"Pour commencer, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} constituent des arguments solides pour l'énergie éolienne. ",
+        
+        f"Dans une allocution, {personnage.nom}, PDG de {personnage.affiliation}, a partagé l'importance des énergies renouvelables, comme le prouve son expérience à l'INSA Toulouse. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} illustrent les raisons de développer l'énergie éolienne. ",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, formée à l'INSA Toulouse, voit un avenir prometteur pour l'éolien. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} démontrent les avantages de ce secteur en pleine croissance. ",
+        
+        f"La PDG de {personnage.affiliation}, {personnage.nom}, a récemment partagé une vision claire pour l'énergie éolienne, fruit de son éducation à l'INSA Toulouse. "
+        f"Tout d'abord, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des raisons cruciales pour soutenir cette filière. ",
+        
+        f"{personnage.nom}, dirigeante de {personnage.affiliation}, défend ardemment l'énergie éolienne. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des arguments essentiels pour son développement. "
+        ]
+    elif personnage.pronom == "iel":
+        textes = [
+        f"Le.a PDG de {personnage.affiliation}, {personnage.nom}, ancien.ne élève de l'INSA Toulouse, exprime sa passion pour les énergies renouvelables, "
+        f"notamment l'éolien. Premièrement, {arguments_selectionnes[0]}. Deuxièmement, {arguments_selectionnes[1]}. ",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, a un parcours à l'INSA Toulouse qui l'a conduit.e à défendre les énergies renouvelables. "
+        f"Un argument majeur en faveur de l'éolien est {arguments_selectionnes[0]}. Par ailleurs, {arguments_selectionnes[1]}. ",
+        
+        f"{personnage.nom}, dirigeant.e de {personnage.affiliation}, affirme que l'énergie éolienne est l'avenir, une conviction renforcée par sa formation à l'INSA Toulouse. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des points essentiels qu'iel souhaite mettre en avant. ",
+        
+        f"Lors d'un récent événement, {personnage.nom}, PDG de {personnage.affiliation}, a souligné les enjeux environnementaux, notamment grâce à son passage à l'INSA Toulouse. "
+        f"Pour commencer, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} constituent des arguments solides pour l'énergie éolienne. ",
+        
+        f"Dans une allocution, {personnage.nom}, PDG de {personnage.affiliation}, a partagé l'importance des énergies renouvelables, comme le prouve son expérience à l'INSA Toulouse. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} illustrent les raisons de développer l'énergie éolienne. ",
+        
+        f"{personnage.nom}, à la tête de {personnage.affiliation}, formé.e à l'INSA Toulouse, voit un avenir prometteur pour l'éolien. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} démontrent les avantages de ce secteur en pleine croissance. ",
+        
+        f"Le.a PDG de {personnage.affiliation}, {personnage.nom}, a récemment partagé une vision claire pour l'énergie éolienne, fruit de son éducation à l'INSA Toulouse. "
+        f"Tout d'abord, {arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des raisons cruciales pour soutenir cette filière. ",
+        
+        f"{personnage.nom}, dirigeant.e de {personnage.affiliation}, défend ardemment l'énergie éolienne. "
+        f"{arguments_selectionnes[0]} et {arguments_selectionnes[1]} sont des arguments essentiels pour son développement. "
+        ]
 
 
     # Adapter le texte en fonction de la région avec 4 versions aléatoires
@@ -491,14 +832,33 @@ def texte_elue(personnage, region, situation):
     else:
         ville = random.choice(region.sous_prefectures)
     
-    # Introduction aléatoire
-    introductions = [
-        f"En tant que députée-maire de {ville}, {personnage.prenom} {personnage.nom}, membre du parti {personnage.affiliation},",
-        f"Dans son rôle de députée-maire de {ville}, {personnage.prenom} {personnage.nom} ({personnage.affiliation}),",
-        f"{personnage.prenom} {personnage.nom}, députée-maire de la ville de {ville},",
-        f"Députée-maire de {ville}, {personnage.prenom} {personnage.nom}, affiliée au parti {personnage.affiliation},",
-        f"{personnage.prenom} {personnage.nom}, élue de la commune de {ville},"
-    ]
+    if personnage.pronom == "elle":
+        # Introduction aléatoire
+        introductions = [
+            f"En tant que députée-maire de {ville}, {personnage.nom}, membre du parti {personnage.affiliation},",
+            f"Dans son rôle de députée-maire de {ville}, {personnage.nom} ({personnage.affiliation}),",
+            f"{personnage.nom}, députée-maire de la ville de {ville},",
+            f"Députée-maire de {ville}, {personnage.nom}, affiliée au parti {personnage.affiliation},",
+            f"{personnage.nom}, élue de la commune de {ville},"
+        ]
+    elif personnage.pronom == "il":
+        # Introduction aléatoire
+        introductions = [
+            f"En tant que député-maire de {ville}, {personnage.nom}, membre du parti {personnage.affiliation},",
+            f"Dans son rôle de député-maire de {ville}, {personnage.nom} ({personnage.affiliation}),",
+            f"{personnage.nom}, député-maire de la ville de {ville},",
+            f"Député-maire de {ville}, {personnage.nom}, affilié au parti {personnage.affiliation},",
+            f"{personnage.nom}, élu de la commune de {ville},"
+        ]
+    elif personnage.pronom == "iel":
+        # Introduction aléatoire
+        introductions = [
+            f"En tant que député.e-maire de {ville}, {personnage.nom}, membre du parti {personnage.affiliation},",
+            f"Dans son rôle de député.e-maire de {ville}, {personnage.nom} ({personnage.affiliation}),",
+            f"{personnage.nom}, député.e-maire de la ville de {ville},",
+            f"Député.e-maire de {ville}, {personnage.nom}, affilié.e au parti {personnage.affiliation},",
+            f"{personnage.nom}, élu.e de la commune de {ville},"
+        ]
     introduction = random.choice(introductions)
 
     # Partie principale : regret sur la fermeture ou le manque d'infrastructure
@@ -511,8 +871,12 @@ def texte_elue(personnage, region, situation):
     conclusion = tirer_argument_creation_site(ville)
 
     # Construction du texte
-    texte = f"{introduction} a récemment pris la parole pour évoquer les défis auxquels notre territoire est confronté. {corps} Cependant, elle a également souligné une avancée importante pour l'avenir de {ville} : {conclusion}"
-
+    if personnage.pronom == "elle":
+        texte = f"{introduction} a récemment pris la parole pour évoquer les défis auxquels notre territoire est confronté. {corps} Cependant, elle a également souligné une avancée importante pour l'avenir de {ville} : {conclusion}"
+    elif personnage.pronom == "il":
+        texte = f"{introduction} a récemment pris la parole pour évoquer les défis auxquels notre territoire est confronté. {corps} Cependant, il a également souligné une avancée importante pour l'avenir de {ville} : {conclusion}"
+    elif personnage.pronom == "iel":
+        texte = f"{introduction} a récemment pris la parole pour évoquer les défis auxquels notre territoire est confronté. {corps} Cependant, iel a également souligné une avancée importante pour l'avenir de {ville} : {conclusion}"
     return texte
 
 
@@ -562,17 +926,42 @@ def texte_greenpeace(personnage, region, statut):
     # Sélection d'une personnalité locale
     personalite_locale = random.choice(region.personnalites)
 
-    # Textes pour un discours si la centrale est supprimée
-    discours_supprime = [
-        f"Je me félicite aujourd'hui de la fermeture définitive de la centrale de {centrale}. C'est un jour historique pour {region.nom}.",
-        f"La fermeture de la centrale de {centrale} marque un tournant décisif pour {region.nom}, un avenir plus propre nous attend.",
-        f"Le démantèlement de la centrale de {centrale} est une victoire pour tous les militants et les habitants de {region.nom}.",
-        f"Nous célébrons aujourd'hui la fermeture de la centrale de {centrale}, une étape essentielle vers un avenir énergétique durable.",
-        f"Je suis fier de constater que la lutte a porté ses fruits avec la fermeture de la centrale de {centrale}. {region.nom} tourne une page sombre de son histoire.",
-        f"La fin de l'exploitation de la centrale de {centrale} est une décision courageuse, qui garantit un avenir plus sûr pour les habitants de {region.nom}.",
-        f"La fermeture de la centrale nucléaire de {centrale} est une décision majeure en faveur de la santé publique et de la protection de l'environnement dans notre région.",
-        f"Aujourd'hui, nous disons adieu à une énergie du passé avec la fermeture de la centrale de {centrale}, ouvrant la voie à un avenir basé sur des énergies renouvelables pour {region.nom}."
-    ]
+    if personnage.pronom == "il":
+        # Textes pour un discours si la centrale est supprimée
+        discours_supprime = [
+            f"Je me félicite aujourd'hui de la fermeture définitive de la centrale de {centrale}. C'est un jour historique pour {region.nom}.",
+            f"La fermeture de la centrale de {centrale} marque un tournant décisif pour {region.nom}, un avenir plus propre nous attend.",
+            f"Le démantèlement de la centrale de {centrale} est une victoire pour tous les militants et les habitants de {region.nom}.",
+            f"Nous célébrons aujourd'hui la fermeture de la centrale de {centrale}, une étape essentielle vers un avenir énergétique durable.",
+            f"Je suis fier de constater que la lutte a porté ses fruits avec la fermeture de la centrale de {centrale}. {region.nom} tourne une page sombre de son histoire.",
+            f"La fin de l'exploitation de la centrale de {centrale} est une décision courageuse, qui garantit un avenir plus sûr pour les habitants de {region.nom}.",
+            f"La fermeture de la centrale nucléaire de {centrale} est une décision majeure en faveur de la santé publique et de la protection de l'environnement dans notre région.",
+            f"Aujourd'hui, nous disons adieu à une énergie du passé avec la fermeture de la centrale de {centrale}, ouvrant la voie à un avenir basé sur des énergies renouvelables pour {region.nom}."
+        ]
+    elif personnage.pronom == "elle":
+        # Textes pour un discours si la centrale est supprimée
+        discours_supprime = [
+            f"Je me félicite aujourd'hui de la fermeture définitive de la centrale de {centrale}. C'est un jour historique pour {region.nom}.",
+            f"La fermeture de la centrale de {centrale} marque un tournant décisif pour {region.nom}, un avenir plus propre nous attend.",
+            f"Le démantèlement de la centrale de {centrale} est une victoire pour tous les militants et les habitants de {region.nom}.",
+            f"Nous célébrons aujourd'hui la fermeture de la centrale de {centrale}, une étape essentielle vers un avenir énergétique durable.",
+            f"Je suis fiere de constater que la lutte a porté ses fruits avec la fermeture de la centrale de {centrale}. {region.nom} tourne une page sombre de son histoire.",
+            f"La fin de l'exploitation de la centrale de {centrale} est une décision courageuse, qui garantit un avenir plus sûr pour les habitants de {region.nom}.",
+            f"La fermeture de la centrale nucléaire de {centrale} est une décision majeure en faveur de la santé publique et de la protection de l'environnement dans notre région.",
+            f"Aujourd'hui, nous disons adieu à une énergie du passé avec la fermeture de la centrale de {centrale}, ouvrant la voie à un avenir basé sur des énergies renouvelables pour {region.nom}."
+        ]
+    elif personnage.pronom == "iel":
+        # Textes pour un discours si la centrale est supprimée
+        discours_supprime = [
+            f"Je me félicite aujourd'hui de la fermeture définitive de la centrale de {centrale}. C'est un jour historique pour {region.nom}.",
+            f"La fermeture de la centrale de {centrale} marque un tournant décisif pour {region.nom}, un avenir plus propre nous attend.",
+            f"Le démantèlement de la centrale de {centrale} est une victoire pour tous les militants et les habitants de {region.nom}.",
+            f"Nous célébrons aujourd'hui la fermeture de la centrale de {centrale}, une étape essentielle vers un avenir énergétique durable.",
+            f"Je suis fier.e de constater que la lutte a porté ses fruits avec la fermeture de la centrale de {centrale}. {region.nom} tourne une page sombre de son histoire.",
+            f"La fin de l'exploitation de la centrale de {centrale} est une décision courageuse, qui garantit un avenir plus sûr pour les habitants de {region.nom}.",
+            f"La fermeture de la centrale nucléaire de {centrale} est une décision majeure en faveur de la santé publique et de la protection de l'environnement dans notre région.",
+            f"Aujourd'hui, nous disons adieu à une énergie du passé avec la fermeture de la centrale de {centrale}, ouvrant la voie à un avenir basé sur des énergies renouvelables pour {region.nom}."
+        ]
 
     # Textes pour un discours si la centrale est maintenue
     discours_maintenue = [
@@ -589,62 +978,163 @@ def texte_greenpeace(personnage, region, statut):
     # Générer deux arguments pour renforcer le discours
     arguments = tirer_arguments_greenpeace()
     
-    # Structure du texte final
-    if statut == "supprimée":
-        discours = random.choice(discours_supprime)
-        texte = f"{personnage.prenom} {personnage.nom} a pris la parole lors de la manifestation devant la centrale nucléaire de {centrale}. {discours} {arguments[0]} {arguments[1]} " \
-                f"Il a tenu à rappeler que cette victoire est le résultat d'années de lutte et a salué le soutien constant de {personalite_locale}, qui a toujours défendu cette cause avec ferveur."
-    else:
-        discours = random.choice(discours_maintenue)
-        texte = f"{personnage.prenom} {personnage.nom} s'est exprimé devant la centrale de {centrale} pour dénoncer le prolongement de son activité. {discours} {arguments[0]} {arguments[1]} " \
-                f"Il a également rappelé le soutien indéfectible de {personalite_locale}, qui se tient aux côtés des citoyens dans cette lutte pour un avenir sans nucléaire."
+    if personnage.pronom == "il":
+        # Structure du texte final
+        if statut == "supprimée":
+            discours = random.choice(discours_supprime)
+            texte = f"{personnage.nom} a pris la parole lors de la manifestation devant la centrale nucléaire de {centrale}. {discours} {arguments[0]} {arguments[1]} " \
+                    f"Il a tenu à rappeler que cette victoire est le résultat d'années de lutte et a salué le soutien constant de {personalite_locale}, qui a toujours défendu cette cause avec ferveur."
+        else:
+            discours = random.choice(discours_maintenue)
+            texte = f"{personnage.nom} s'est exprimé devant la centrale de {centrale} pour dénoncer le prolongement de son activité. {discours} {arguments[0]} {arguments[1]} " \
+                    f"Il a également rappelé le soutien indéfectible de {personalite_locale}, qui se tient aux côtés des citoyens dans cette lutte pour un avenir sans nucléaire."
+    elif personnage.pronom == "elle":
+        # Structure du texte final
+        if statut == "supprimée":
+            discours = random.choice(discours_supprime)
+            texte = f"{personnage.nom} a pris la parole lors de la manifestation devant la centrale nucléaire de {centrale}. {discours} {arguments[0]} {arguments[1]} " \
+                    f"Elle a tenu à rappeler que cette victoire est le résultat d'années de lutte et a salué le soutien constant de {personalite_locale}, qui a toujours défendu cette cause avec ferveur."
+        else:
+            discours = random.choice(discours_maintenue)
+            texte = f"{personnage.nom} s'est exprimée devant la centrale de {centrale} pour dénoncer le prolongement de son activité. {discours} {arguments[0]} {arguments[1]} " \
+                    f"Elle a également rappelé le soutien indéfectible de {personalite_locale}, qui se tient aux côtés des citoyens dans cette lutte pour un avenir sans nucléaire."
+    elif personnage.pronom == "iel":
+        # Structure du texte final
+        if statut == "supprimée":
+            discours = random.choice(discours_supprime)
+            texte = f"{personnage.nom} a pris la parole lors de la manifestation devant la centrale nucléaire de {centrale}. {discours} {arguments[0]} {arguments[1]} " \
+                    f"Iel a tenu à rappeler que cette victoire est le résultat d'années de lutte et a salué le soutien constant de {personalite_locale}, qui a toujours défendu cette cause avec ferveur."
+        else:
+            discours = random.choice(discours_maintenue)
+            texte = f"{personnage.nom} s'est exprimé.e devant la centrale de {centrale} pour dénoncer le prolongement de son activité. {discours} {arguments[0]} {arguments[1]} " \
+                    f"Iel a également rappelé le soutien indéfectible de {personalite_locale}, qui se tient aux côtés des citoyens dans cette lutte pour un avenir sans nucléaire."
     
     return texte
 
 
 
 def texte_premiere_ministre(character, data, year):
-    contexts = [
-    "Lors d'une conférence de presse à Paris, la Première ministre a souligné les progrès significatifs de notre pays en matière de transition énergétique.",
-    "Dans le cadre de la Journée mondiale de l'environnement, la Première ministre a pris la parole pour rappeler l'importance des choix énergétiques durables.",
-    #"En visite dans une centrale éolienne en Bretagne, la Première ministre a évoqué les efforts du gouvernement pour atteindre ses objectifs climatiques.",
-    "Au milieu des débats parlementaires sur l'énergie, la Première ministre a exposé les grandes lignes de la politique énergétique du gouvernement.",
-    "À l'occasion d'un sommet sur le climat à Bombay, la Première ministre a affirmé que la France était en bonne voie pour respecter ses engagements.",
-    "Dans un discours prononcé devant les jeunes, la Première ministre a encouragé l'engagement pour un avenir énergétique responsable.",
-    "En réponse aux critiques sur la politique énergétique, la Première ministre a défendu les choix du gouvernement lors d'un entretien télévisé.",
-    "Lors d'une visite dans une région touchée par des coupures d'électricité, la Première ministre a promis des actions concrètes pour améliorer la situation.",
-    #"À l'occasion de l'ouverture d'un nouveau parc éolien offshore, la Première ministre a célébré l'avancement des projets énergétiques.",
-    "En réponse à la hausse des émissions de CO2, la Première ministre a détaillé les nouvelles mesures mises en place par le gouvernement.",
-    "Lors d'un forum international sur l'énergie renouvelable, la Première ministre a plaidé pour une coopération accrue entre les nations.",
-    "Dans un cadre universitaire, la Première ministre a souligné le rôle crucial de l'innovation dans la transition vers des énergies propres.",
-    "En participant à une table ronde avec des acteurs du secteur énergétique, la Première ministre a souligné l'importance de l'engagement collectif.",
-    "À l'occasion de la publication d'un rapport sur le climat, la Première ministre a appelé à une action immédiate pour lutter contre le changement climatique.",
-    "Dans un entretien avec des journalistes, la Première ministre a partagé sa vision d'une France plus verte et plus durable à l'horizon 2030."
-]
+    if character.pronom == "elle":
+        contexts = [
+        "Lors d'une conférence de presse à Paris, la Première ministre a souligné les progrès significatifs de notre pays en matière de transition énergétique.",
+        "Dans le cadre de la Journée mondiale de l'environnement, la Première ministre a pris la parole pour rappeler l'importance des choix énergétiques durables.",
+        #"En visite dans une centrale éolienne en Bretagne, la Première ministre a évoqué les efforts du gouvernement pour atteindre ses objectifs climatiques.",
+        "Au milieu des débats parlementaires sur l'énergie, la Première ministre a exposé les grandes lignes de la politique énergétique du gouvernement.",
+        "À l'occasion d'un sommet sur le climat à Bombay, la Première ministre a affirmé que la France était en bonne voie pour respecter ses engagements.",
+        "Dans un discours prononcé devant les jeunes, la Première ministre a encouragé l'engagement pour un avenir énergétique responsable.",
+        "En réponse aux critiques sur la politique énergétique, la Première ministre a défendu les choix du gouvernement lors d'un entretien télévisé.",
+        "Lors d'une visite dans une région touchée par des coupures d'électricité, la Première ministre a promis des actions concrètes pour améliorer la situation.",
+        #"À l'occasion de l'ouverture d'un nouveau parc éolien offshore, la Première ministre a célébré l'avancement des projets énergétiques.",
+        "En réponse à la hausse des émissions de CO2, la Première ministre a détaillé les nouvelles mesures mises en place par le gouvernement.",
+        "Lors d'un forum international sur l'énergie renouvelable, la Première ministre a plaidé pour une coopération accrue entre les nations.",
+        "Dans un cadre universitaire, la Première ministre a souligné le rôle crucial de l'innovation dans la transition vers des énergies propres.",
+        "En participant à une table ronde avec des acteurs du secteur énergétique, la Première ministre a souligné l'importance de l'engagement collectif.",
+        "À l'occasion de la publication d'un rapport sur le climat, la Première ministre a appelé à une action immédiate pour lutter contre le changement climatique.",
+        "Dans un entretien avec des journalistes, la Première ministre a partagé sa vision d'une France plus verte et plus durable à l'horizon 2030."
+    ]
+    elif character.pronom == "il":
+        contexts = [
+        "Lors d'une conférence de presse à Paris, le Premier ministre a souligné les progrès significatifs de notre pays en matière de transition énergétique.",
+        "Dans le cadre de la Journée mondiale de l'environnement, le Premier ministre a pris la parole pour rappeler l'importance des choix énergétiques durables.",
+        #"En visite dans une centrale éolienne en Bretagne, la Première ministre a évoqué les efforts du gouvernement pour atteindre ses objectifs climatiques.",
+        "Au milieu des débats parlementaires sur l'énergie, le Premier ministre a exposé les grandes lignes de la politique énergétique du gouvernement.",
+        "À l'occasion d'un sommet sur le climat à Bombay, le Premier ministre a affirmé que la France était en bonne voie pour respecter ses engagements.",
+        "Dans un discours prononcé devant les jeunes, le Premier ministre a encouragé l'engagement pour un avenir énergétique responsable.",
+        "En réponse aux critiques sur la politique énergétique, le Premier ministre a défendu les choix du gouvernement lors d'un entretien télévisé.",
+        "Lors d'une visite dans une région touchée par des coupures d'électricité, le Premier ministre a promis des actions concrètes pour améliorer la situation.",
+        #"À l'occasion de l'ouverture d'un nouveau parc éolien offshore, la Première ministre a célébré l'avancement des projets énergétiques.",
+        "En réponse à la hausse des émissions de CO2, le Premier ministre a détaillé les nouvelles mesures mises en place par le gouvernement.",
+        "Lors d'un forum international sur l'énergie renouvelable, le Premier ministre a plaidé pour une coopération accrue entre les nations.",
+        "Dans un cadre universitaire, le Premier ministre a souligné le rôle crucial de l'innovation dans la transition vers des énergies propres.",
+        "En participant à une table ronde avec des acteurs du secteur énergétique, le Premier ministre a souligné l'importance de l'engagement collectif.",
+        "À l'occasion de la publication d'un rapport sur le climat, le Premier ministre a appelé à une action immédiate pour lutter contre le changement climatique.",
+        "Dans un entretien avec des journalistes, le Premier ministre a partagé sa vision d'une France plus verte et plus durable à l'horizon 2030."
+    ]
+    elif character.pronom == "iel":
+        contexts = [
+        "Lors d'une conférence de presse à Paris, le.a Premier.e ministre a souligné les progrès significatifs de notre pays en matière de transition énergétique.",
+        "Dans le cadre de la Journée mondiale de l'environnement, le.a Premier.e ministre a pris la parole pour rappeler l'importance des choix énergétiques durables.",
+        #"En visite dans une centrale éolienne en Bretagne, la Première ministre a évoqué les efforts du gouvernement pour atteindre ses objectifs climatiques.",
+        "Au milieu des débats parlementaires sur l'énergie, le.a Premier.e ministre a exposé les grandes lignes de la politique énergétique du gouvernement.",
+        "À l'occasion d'un sommet sur le climat à Bombay, le.a Premier.e ministre a affirmé que la France était en bonne voie pour respecter ses engagements.",
+        "Dans un discours prononcé devant les jeunes, le.a Premier.e ministre a encouragé l'engagement pour un avenir énergétique responsable.",
+        "En réponse aux critiques sur la politique énergétique, le.a Premier.e ministre a défendu les choix du gouvernement lors d'un entretien télévisé.",
+        "Lors d'une visite dans une région touchée par des coupures d'électricité, le.a Premier.e ministre a promis des actions concrètes pour améliorer la situation.",
+        #"À l'occasion de l'ouverture d'un nouveau parc éolien offshore, la Première ministre a célébré l'avancement des projets énergétiques.",
+        "En réponse à la hausse des émissions de CO2, le.a Premier.e ministre a détaillé les nouvelles mesures mises en place par le gouvernement.",
+        "Lors d'un forum international sur l'énergie renouvelable, le.a Premier.e ministre a plaidé pour une coopération accrue entre les nations.",
+        "Dans un cadre universitaire, le.a Premier.e ministre a souligné le rôle crucial de l'innovation dans la transition vers des énergies propres.",
+        "En participant à une table ronde avec des acteurs du secteur énergétique, le.a Premier.e ministre a souligné l'importance de l'engagement collectif.",
+        "À l'occasion de la publication d'un rapport sur le climat, le.a Premier.e ministre a appelé à une action immédiate pour lutter contre le changement climatique.",
+        "Dans un entretien avec des journalistes, le.a Premier.e ministre a partagé sa vision d'une France plus verte et plus durable à l'horizon 2030."
+    ]
     
     # Sélectionne un contexte aléatoire
     context = random.choice(contexts)
 
-    # Textes de l'article
-    article_templates = [
-    f"{context} Dans une déclaration récente et marquante, {character.prenom} {character.nom}, Première ministre et membre éminent de {character.affiliation}, a clairement exprimé que d'ici {year}, la France s'engage à atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Pour réaliser cet objectif ambitieux, nous prévoyons d'installer une puissance totale de {data.puissance_photovoltaique_totale} MW en photovoltaïque, ainsi que {data.puissance_eolienne_totale} MW en éolien, renforçant ainsi notre capacité à produire une énergie durable. En outre, elle a souligné l'importance cruciale de réduire nos émissions de CO2, qui se chiffrent actuellement à un total alarmant de {data.emissions_co2} tonnes, une tâche que nous devons aborder de manière urgente et concertée.",
-    
-    f"{context} Au cours de son intervention, {character.prenom} {character.nom}, agissant en tant que Première ministre au service de {character.affiliation}, a mis en lumière l'objectif ambitieux et déterminé du gouvernement de garantir un mix énergétique stable et durable. À l'horizon de {year}, nous nous engageons fermement à atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Dans cette optique, nous visons une puissance photovoltaïque impressionnante de {data.puissance_photovoltaique_totale} MW et une puissance éolienne tout aussi significative de {data.puissance_eolienne_totale} MW. La réduction des émissions de CO2 à un niveau de {data.emissions_co2} tonnes est non seulement souhaitée, mais également essentielle pour assurer notre avenir collectif et préserver notre planète pour les générations futures.",
-    
-    f"{context} En se tenant devant des journalistes attentifs et engagés, {character.prenom} {character.nom}, Première ministre, a exprimé avec conviction la volonté déterminée du gouvernement de promouvoir un mix énergétique diversifié et équilibré. D'ici {year}, la France prévoit d'atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance installée impressionnante de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, l'objectif est clair et ambitieux : réduire nos émissions de CO2 à un niveau acceptable de {data.emissions_co2} tonnes, afin de garantir un environnement sain pour tous.",
-    
-    f"{context} {character.prenom} {character.nom}, en tant que Première ministre engagée et responsable, a déclaré avec fermeté que la transition énergétique est une priorité absolue pour le gouvernement. D'ici {year}, nous visons à établir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance photovoltaïque de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW, il est impératif que nous réduisions nos émissions de CO2, qui sont actuellement évaluées à {data.emissions_co2} tonnes, et ce, pour le bien-être de notre écosystème.",
-    
-    f"{context} Dans un discours passionné et inspirant, {character.prenom} {character.nom} a révélé les objectifs stratégiques et cruciaux du gouvernement pour l'année {year}. Nous aspirons à un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%, avec une puissance photovoltaïque installée de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW. La lutte contre les émissions de CO2, actuellement chiffrées à {data.emissions_co2} tonnes, représente un engagement fort et nécessaire pour notre génération, ainsi qu'une obligation morale envers nos enfants.",
-    
-    f"{context} À l'occasion de sa déclaration, {character.prenom} {character.nom} a discuté des choix énergétiques futurs et des décisions stratégiques du pays. En {year}, la France s'engage à maintenir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Nous visons à installer une impressionnante capacité de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, tout en s'efforçant de réduire nos émissions de CO2 à un niveau soutenable de {data.emissions_co2} tonnes, dans le cadre d'une démarche de développement durable.",
-    
-    f"{context} En s'adressant au public avec passion, {character.prenom} {character.nom} a présenté une vision claire et ambitieuse pour le mix énergétique de la France. Pour {year}, l'objectif est d'atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. La puissance photovoltaïque installée devrait atteindre un total de {data.puissance_photovoltaique_totale} MW, tandis que la puissance éolienne devrait atteindre {data.puissance_eolienne_totale} MW, avec un objectif de réduction des émissions de CO2 à {data.emissions_co2} tonnes, un élément fondamental de notre stratégie de transition énergétique.",
-    
-    f"{context} Lors de son allocution, {character.prenom} {character.nom} a insisté avec force sur l'importance de la transition énergétique pour l'avenir de notre pays et de notre planète. En {year}, le gouvernement vise à établir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance photovoltaïque de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW, nous devons également réduire nos émissions de CO2, qui sont actuellement estimées à {data.emissions_co2} tonnes, pour laisser un héritage durable aux futures générations.",
-    
-    f"{context} Dans un cadre dynamique et engageant, {character.prenom} {character.nom} a présenté les initiatives du gouvernement visant à transformer le mix énergétique de la France. À l'horizon de {year}, nous viserons un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. La France prévoit d'installer une impressionnante capacité de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, tout en s'engageant à réduire les émissions de CO2 à un niveau de {data.emissions_co2} tonnes, dans le but d'assurer un avenir énergétique propre et respectueux de l'environnement."
-]
+    if character.pronom == "elle":
+        # Textes de l'article
+        article_templates = [
+        f"{context} Dans une déclaration récente et marquante, {character.nom}, Première ministre et membre éminent de {character.affiliation}, a clairement exprimé que d'ici {year}, la France s'engage à atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Pour réaliser cet objectif ambitieux, nous prévoyons d'installer une puissance totale de {data.puissance_photovoltaique_totale} MW en photovoltaïque, ainsi que {data.puissance_eolienne_totale} MW en éolien, renforçant ainsi notre capacité à produire une énergie durable. En outre, elle a souligné l'importance cruciale de réduire nos émissions de CO2, qui se chiffrent actuellement à un total alarmant de {data.emissions_co2} tonnes, une tâche que nous devons aborder de manière urgente et concertée.",
+        
+        f"{context} Au cours de son intervention, {character.nom}, agissant en tant que Première ministre au service de {character.affiliation}, a mis en lumière l'objectif ambitieux et déterminé du gouvernement de garantir un mix énergétique stable et durable. À l'horizon de {year}, nous nous engageons fermement à atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Dans cette optique, nous visons une puissance photovoltaïque impressionnante de {data.puissance_photovoltaique_totale} MW et une puissance éolienne tout aussi significative de {data.puissance_eolienne_totale} MW. La réduction des émissions de CO2 à un niveau de {data.emissions_co2} tonnes est non seulement souhaitée, mais également essentielle pour assurer notre avenir collectif et préserver notre planète pour les générations futures.",
+        
+        f"{context} En se tenant devant des journalistes attentifs et engagés, {character.nom}, Première ministre, a exprimé avec conviction la volonté déterminée du gouvernement de promouvoir un mix énergétique diversifié et équilibré. D'ici {year}, la France prévoit d'atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance installée impressionnante de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, l'objectif est clair et ambitieux : réduire nos émissions de CO2 à un niveau acceptable de {data.emissions_co2} tonnes, afin de garantir un environnement sain pour tous.",
+        
+        f"{context} {character.nom}, en tant que Première ministre engagée et responsable, a déclaré avec fermeté que la transition énergétique est une priorité absolue pour le gouvernement. D'ici {year}, nous visons à établir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance photovoltaïque de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW, il est impératif que nous réduisions nos émissions de CO2, qui sont actuellement évaluées à {data.emissions_co2} tonnes, et ce, pour le bien-être de notre écosystème.",
+        
+        f"{context} Dans un discours passionné et inspirant, {character.nom} a révélé les objectifs stratégiques et cruciaux du gouvernement pour l'année {year}. Nous aspirons à un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%, avec une puissance photovoltaïque installée de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW. La lutte contre les émissions de CO2, actuellement chiffrées à {data.emissions_co2} tonnes, représente un engagement fort et nécessaire pour notre génération, ainsi qu'une obligation morale envers nos enfants.",
+        
+        f"{context} À l'occasion de sa déclaration, {character.nom} a discuté des choix énergétiques futurs et des décisions stratégiques du pays. En {year}, la France s'engage à maintenir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Nous visons à installer une impressionnante capacité de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, tout en s'efforçant de réduire nos émissions de CO2 à un niveau soutenable de {data.emissions_co2} tonnes, dans le cadre d'une démarche de développement durable.",
+        
+        f"{context} En s'adressant au public avec passion, {character.nom} a présenté une vision claire et ambitieuse pour le mix énergétique de la France. Pour {year}, l'objectif est d'atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. La puissance photovoltaïque installée devrait atteindre un total de {data.puissance_photovoltaique_totale} MW, tandis que la puissance éolienne devrait atteindre {data.puissance_eolienne_totale} MW, avec un objectif de réduction des émissions de CO2 à {data.emissions_co2} tonnes, un élément fondamental de notre stratégie de transition énergétique.",
+        
+        f"{context} Lors de son allocution, {character.nom} a insisté avec force sur l'importance de la transition énergétique pour l'avenir de notre pays et de notre planète. En {year}, le gouvernement vise à établir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance photovoltaïque de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW, nous devons également réduire nos émissions de CO2, qui sont actuellement estimées à {data.emissions_co2} tonnes, pour laisser un héritage durable aux futures générations.",
+        
+        f"{context} Dans un cadre dynamique et engageant, {character.nom} a présenté les initiatives du gouvernement visant à transformer le mix énergétique de la France. À l'horizon de {year}, nous viserons un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. La France prévoit d'installer une impressionnante capacité de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, tout en s'engageant à réduire les émissions de CO2 à un niveau de {data.emissions_co2} tonnes, dans le but d'assurer un avenir énergétique propre et respectueux de l'environnement."
+    ]
+    elif character.pronom == "il":
+        # Textes de l'article
+        article_templates = [
+        f"{context} Dans une déclaration récente et marquante, {character.nom}, Premier ministre et membre éminent de {character.affiliation}, a clairement exprimé que d'ici {year}, la France s'engage à atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Pour réaliser cet objectif ambitieux, nous prévoyons d'installer une puissance totale de {data.puissance_photovoltaique_totale} MW en photovoltaïque, ainsi que {data.puissance_eolienne_totale} MW en éolien, renforçant ainsi notre capacité à produire une énergie durable. En outre, il a souligné l'importance cruciale de réduire nos émissions de CO2, qui se chiffrent actuellement à un total alarmant de {data.emissions_co2} tonnes, une tâche que nous devons aborder de manière urgente et concertée.",
+        
+        f"{context} Au cours de son intervention, {character.nom}, agissant en tant que Premier ministre au service de {character.affiliation}, a mis en lumière l'objectif ambitieux et déterminé du gouvernement de garantir un mix énergétique stable et durable. À l'horizon de {year}, nous nous engageons fermement à atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Dans cette optique, nous visons une puissance photovoltaïque impressionnante de {data.puissance_photovoltaique_totale} MW et une puissance éolienne tout aussi significative de {data.puissance_eolienne_totale} MW. La réduction des émissions de CO2 à un niveau de {data.emissions_co2} tonnes est non seulement souhaitée, mais également essentielle pour assurer notre avenir collectif et préserver notre planète pour les générations futures.",
+        
+        f"{context} En se tenant devant des journalistes attentifs et engagés, {character.nom}, Premier ministre, a exprimé avec conviction la volonté déterminée du gouvernement de promouvoir un mix énergétique diversifié et équilibré. D'ici {year}, la France prévoit d'atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance installée impressionnante de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, l'objectif est clair et ambitieux : réduire nos émissions de CO2 à un niveau acceptable de {data.emissions_co2} tonnes, afin de garantir un environnement sain pour tous.",
+        
+        f"{context} {character.nom}, en tant que Premier ministre engagé et responsable, a déclaré avec fermeté que la transition énergétique est une priorité absolue pour le gouvernement. D'ici {year}, nous visons à établir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance photovoltaïque de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW, il est impératif que nous réduisions nos émissions de CO2, qui sont actuellement évaluées à {data.emissions_co2} tonnes, et ce, pour le bien-être de notre écosystème.",
+        
+        f"{context} Dans un discours passionné et inspirant, {character.nom} a révélé les objectifs stratégiques et cruciaux du gouvernement pour l'année {year}. Nous aspirons à un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%, avec une puissance photovoltaïque installée de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW. La lutte contre les émissions de CO2, actuellement chiffrées à {data.emissions_co2} tonnes, représente un engagement fort et nécessaire pour notre génération, ainsi qu'une obligation morale envers nos enfants.",
+        
+        f"{context} À l'occasion de sa déclaration, {character.nom} a discuté des choix énergétiques futurs et des décisions stratégiques du pays. En {year}, la France s'engage à maintenir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Nous visons à installer une impressionnante capacité de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, tout en s'efforçant de réduire nos émissions de CO2 à un niveau soutenable de {data.emissions_co2} tonnes, dans le cadre d'une démarche de développement durable.",
+        
+        f"{context} En s'adressant au public avec passion, {character.nom} a présenté une vision claire et ambitieuse pour le mix énergétique de la France. Pour {year}, l'objectif est d'atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. La puissance photovoltaïque installée devrait atteindre un total de {data.puissance_photovoltaique_totale} MW, tandis que la puissance éolienne devrait atteindre {data.puissance_eolienne_totale} MW, avec un objectif de réduction des émissions de CO2 à {data.emissions_co2} tonnes, un élément fondamental de notre stratégie de transition énergétique.",
+        
+        f"{context} Lors de son allocution, {character.nom} a insisté avec force sur l'importance de la transition énergétique pour l'avenir de notre pays et de notre planète. En {year}, le gouvernement vise à établir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance photovoltaïque de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW, nous devons également réduire nos émissions de CO2, qui sont actuellement estimées à {data.emissions_co2} tonnes, pour laisser un héritage durable aux futures générations.",
+        
+        f"{context} Dans un cadre dynamique et engageant, {character.nom} a présenté les initiatives du gouvernement visant à transformer le mix énergétique de la France. À l'horizon de {year}, nous viserons un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. La France prévoit d'installer une impressionnante capacité de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, tout en s'engageant à réduire les émissions de CO2 à un niveau de {data.emissions_co2} tonnes, dans le but d'assurer un avenir énergétique propre et respectueux de l'environnement."
+    ]
+    elif character.pronom == "iel":
+        # Textes de l'article
+        article_templates = [
+        f"{context} Dans une déclaration récente et marquante, {character.nom}, Premier.e ministre et membre éminent de {character.affiliation}, a clairement exprimé que d'ici {year}, la France s'engage à atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Pour réaliser cet objectif ambitieux, nous prévoyons d'installer une puissance totale de {data.puissance_photovoltaique_totale} MW en photovoltaïque, ainsi que {data.puissance_eolienne_totale} MW en éolien, renforçant ainsi notre capacité à produire une énergie durable. En outre, iel a souligné l'importance cruciale de réduire nos émissions de CO2, qui se chiffrent actuellement à un total alarmant de {data.emissions_co2} tonnes, une tâche que nous devons aborder de manière urgente et concertée.",
+        
+        f"{context} Au cours de son intervention, {character.nom}, agissant en tant que Premier.e ministre au service de {character.affiliation}, a mis en lumière l'objectif ambitieux et déterminé du gouvernement de garantir un mix énergétique stable et durable. À l'horizon de {year}, nous nous engageons fermement à atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Dans cette optique, nous visons une puissance photovoltaïque impressionnante de {data.puissance_photovoltaique_totale} MW et une puissance éolienne tout aussi significative de {data.puissance_eolienne_totale} MW. La réduction des émissions de CO2 à un niveau de {data.emissions_co2} tonnes est non seulement souhaitée, mais également essentielle pour assurer notre avenir collectif et préserver notre planète pour les générations futures.",
+        
+        f"{context} En se tenant devant des journalistes attentifs et engagés, {character.nom}, Premier.e ministre, a exprimé avec conviction la volonté déterminée du gouvernement de promouvoir un mix énergétique diversifié et équilibré. D'ici {year}, la France prévoit d'atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance installée impressionnante de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, l'objectif est clair et ambitieux : réduire nos émissions de CO2 à un niveau acceptable de {data.emissions_co2} tonnes, afin de garantir un environnement sain pour tous.",
+        
+        f"{context} {character.nom}, en tant que Premier.e ministre engagé.e et responsable, a déclaré avec fermeté que la transition énergétique est une priorité absolue pour le gouvernement. D'ici {year}, nous visons à établir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance photovoltaïque de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW, il est impératif que nous réduisions nos émissions de CO2, qui sont actuellement évaluées à {data.emissions_co2} tonnes, et ce, pour le bien-être de notre écosystème.",
+        
+        f"{context} Dans un discours passionné et inspirant, {character.nom} a révélé les objectifs stratégiques et cruciaux du gouvernement pour l'année {year}. Nous aspirons à un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%, avec une puissance photovoltaïque installée de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW. La lutte contre les émissions de CO2, actuellement chiffrées à {data.emissions_co2} tonnes, représente un engagement fort et nécessaire pour notre génération, ainsi qu'une obligation morale envers nos enfants.",
+        
+        f"{context} À l'occasion de sa déclaration, {character.nom} a discuté des choix énergétiques futurs et des décisions stratégiques du pays. En {year}, la France s'engage à maintenir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Nous visons à installer une impressionnante capacité de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, tout en s'efforçant de réduire nos émissions de CO2 à un niveau soutenable de {data.emissions_co2} tonnes, dans le cadre d'une démarche de développement durable.",
+        
+        f"{context} En s'adressant au public avec passion, {character.nom} a présenté une vision claire et ambitieuse pour le mix énergétique de la France. Pour {year}, l'objectif est d'atteindre un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. La puissance photovoltaïque installée devrait atteindre un total de {data.puissance_photovoltaique_totale} MW, tandis que la puissance éolienne devrait atteindre {data.puissance_eolienne_totale} MW, avec un objectif de réduction des émissions de CO2 à {data.emissions_co2} tonnes, un élément fondamental de notre stratégie de transition énergétique.",
+        
+        f"{context} Lors de son allocution, {character.nom} a insisté avec force sur l'importance de la transition énergétique pour l'avenir de notre pays et de notre planète. En {year}, le gouvernement vise à établir un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. Avec une puissance photovoltaïque de {data.puissance_photovoltaique_totale} MW et une capacité éolienne de {data.puissance_eolienne_totale} MW, nous devons également réduire nos émissions de CO2, qui sont actuellement estimées à {data.emissions_co2} tonnes, pour laisser un héritage durable aux futures générations.",
+        
+        f"{context} Dans un cadre dynamique et engageant, {character.nom} a présenté les initiatives du gouvernement visant à transformer le mix énergétique de la France. À l'horizon de {year}, nous viserons un équilibre ENR/Nucléaire de {data.equilibre_enr_nucleaire}%. La France prévoit d'installer une impressionnante capacité de {data.puissance_photovoltaique_totale} MW en photovoltaïque et {data.puissance_eolienne_totale} MW en éolien, tout en s'engageant à réduire les émissions de CO2 à un niveau de {data.emissions_co2} tonnes, dans le but d'assurer un avenir énergétique propre et respectueux de l'environnement."
+    ]
 
     # Sélectionne un modèle de texte aléatoire
     article_text = random.choice(article_templates)

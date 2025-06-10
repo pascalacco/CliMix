@@ -392,7 +392,7 @@ function creer(groupe, partie, num) {
         dataType: "json",
         success: function (data, textStatus, jqXHR) {
             if (data[0] == "log_in_success") {
-                location.href = "/saisie/" + groupe + num + "/" + partie + "/";
+                location.href = "/enregistrer_noms/" + groupe + num + "/" + partie + "/";
             } else {
                 displayError("http", data);
             }

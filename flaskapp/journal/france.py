@@ -233,7 +233,7 @@ france_data = DataForGazette(
     regions_centrales_nucleaires=["pll", "occ"]  # Exemples de régions avec centrales nucléaires
 )
 
-
+"""
 personnages = [Personnage("Dossal", "Charles", "agriculteur", "Paysans en colère")]
 personnages.append( Personnage("Rondepierre", "Aude", "activiste", "La nature avant les profits"))
 personnages.append( Personnage("Cros", "Marion", "PDG solaire", "Power Solar"))
@@ -241,7 +241,7 @@ personnages.append( Personnage("Lachaize", "Sébastien", "PDG éolien", "Wind Po
 personnages.append( Personnage("Delga", "Carole", "élue", "Parti Socialiste"))
 personnages.append( Personnage("Acco", "Pascal", "greenpeace", "greenpeace"))
 personnages.append( Personnage(nom='Swift', prenom='Taylor', role='première ministre', affiliation='La République En Marche'))
-
+"""
 
 if __name__ == "__main__":
 
