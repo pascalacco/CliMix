@@ -290,8 +290,15 @@ class vJournal(Visualiseur):
 
         datas = jr.calculer_data(self.dm, self.annee)
 
-        self.jinja_params.update({"article": jr.exemple(datas)
-                            })
+        #self.jinja_params.update({"article": jr.exemple(datas) })
+        with open(f"{self.dm.chemin}/roles.json","r") as f:
+            roles_dict = json.load(f)
+        names = roles_dict["names"]
+        pronouns = roles_dict["pronouns"]
+        roles = roles_dict["roles"]
+        articles = [jr.make_text(datas,name,pronoun,role) for (name,pronoun,role) in zip(names,pronouns,roles)]
+        #articles = [jr.exemple(datas) for _ in range(6)]
+        self.jinja_params.update({"articles": articles})
 
 class vResults(Visualiseur):
     def genere_jinja_parameters(self):
