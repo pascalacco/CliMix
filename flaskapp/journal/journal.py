@@ -159,14 +159,23 @@ def calculer_data(dm, annee):
     mix = dm.get_item_fichier(fichier='mixes', item=annee)
 
     reg_technos = {}
-    for techno in ("panneauPV", "eolienneON", "eolienneOFF", "methanation", "centraleNuc", "EPR2"):
+    for techno in ("centraleNuc", "EPR2"):
         reg_technos[techno] = [reg for reg in mix['unites'] if mix['nb'][reg][techno] > 0]
 
-    datas.regions_photovoltaiques = reg_technos["panneauPV"]
-    datas.regions_eolien_offshore = reg_technos["eolienneOFF"]
-    datas.regions_eolien_onshore = reg_technos["eolienneON"]
-    datas.regions_methaniseur = reg_technos["methanation"]
-    datas.regions_centrales_nucleaires = reg_technos['centraleNuc'] + reg_technos['EPR2']
+    
+    for techno in ("panneauPV", "eolienneON", "eolienneOFF", "methanation"):
+        for reg in mix["unites"]:
+            act = mix["actions"]["regions"][reg][techno]
+            if annee in act:
+                if "nb_nouvelles" in act[annee]:
+                    reg_technos[techno] = act[annee]["nb_nouvelles"]*[reg]
+    
+    datas.regions_photovoltaiques = reg_technos["panneauPV"] if "panneauPV" in reg_technos else None
+    datas.regions_eolien_offshore = reg_technos["eolienneOFF"] if "eolienneOFF" in reg_technos else None
+    datas.regions_eolien_onshore = reg_technos["eolienneON"] if "eolienneON" in reg_technos else None
+    datas.regions_methaniseur = reg_technos["methanation"] if "methanation" in reg_technos else None
+    datas.regions_centrales_nucleaires = reg_technos['centraleNuc'] + reg_technos['EPR2'] if "centraleNuc" and "EPR2" in reg_technos else None
+    
     # region deux fois si les deux technos => plus de proba que si une seule...
     # sinon faire list(set(reg_technos['centraleNuc'] +  reg_technos['EPR2'])) pour même proba
 
@@ -195,8 +204,6 @@ def calculer_data(dm, annee):
 
 
 # # Choix des sujets pour les différents rôles.
-
-
 def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
     """
     Fonction qui choisit une infrastructure et une région basée sur le rôle du personnage
@@ -366,7 +373,6 @@ def make_text(data,nom,pronom,role):
         personnage = Personnage(nom,pronom,"première ministre","La République En Marche")
     
     from flaskapp.journal.france import dictionnaire_regions as regions
-    
     article = generate_article(personnage, data, regions, 2040)
     return article
 
@@ -443,9 +449,7 @@ if __name__ == "__main__":
         print(f"Textes tour {i} : {[generate_article(p, data, dictionnaire_regions, 2024) for p in liste]}")
         print()
     # %%
-
     data.afficher_infos()
-
     # Génération du texte
     perso1 = personnages[0]
     print(texte_agriculteur(perso1, dictionnaire_regions.get("Normandie"), "photovoltaïque"))
