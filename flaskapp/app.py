@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify, render_template, redirect, make_response, send_file
 from flask_cors import CORS, cross_origin
 import jinja2
+import json
 
 
-from admin.resources import admin_blueprint, parties
+from flaskapp.admin.resources import admin_blueprint, parties
 
 
 from flaskapp.archiveur import DataManager
@@ -51,6 +52,24 @@ def set_group():
             resp = make_response(jsonify(["log_in_error pour " + equipe + "/" + partie]))
     return resp
 
+@app.route('/save_names', methods=["POST"])
+@cross_origin(support_credentials=True)
+def save_names():
+    data = request.get_json()
+    equipe = data["equipe"]
+    partie = data["partie"]
+    names = data["names"]
+    pronouns = data["pronouns"]
+    roles = data["roles"]
+    roles_dict = {
+        "names":names,
+        "pronouns":pronouns,
+        "roles":roles
+    }
+    dm = DataManager(equipe=equipe, partie=partie)
+    with open(f"{dm.chemin}/roles.json","w") as f:
+        json.dump(roles_dict,f,ensure_ascii=False,**DataManager.json_opts)
+    return jsonify({"status": "success"})
 
 @app.route('/saisie/<equipe>/<partie>/')
 def saisie(equipe, partie):
@@ -60,6 +79,9 @@ def saisie(equipe, partie):
     resp = saisie_html(equipe=equipe, partie=partie, annee=annee_active)
     return resp
 
+@app.route('/enregistrer_noms/<equipe>/<partie>/')
+def enregistrer_noms(equipe, partie):
+    return render_template("enregistrer_noms.html", equipe=equipe, partie=partie)
 
 
 @app.route('/saisie/<equipe>/<partie>/<annee>')

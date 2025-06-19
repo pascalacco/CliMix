@@ -1,0 +1,119 @@
+{% extends 'bandeau_base.html' %}
+{% block title %} {{ super() }} - Enregistrer Noms {% endblock %}
+{% block content %}
+{{ super() }}
+
+<div class="container pt-5 mb-5">
+    <h1>Noms et rôles</h1>
+    <p><strong>Team:</strong> {{ equipe }}</p>
+    <p><strong>Game:</strong> {{ partie }}</p>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Name and pronoun fields -->
+            {% for i in range(1, 7) %}
+            <div class="mb-4">
+                <label for="name{{ i }}" class="form-label">Nom {{ i }}:</label>
+                <input type="text" class="form-control" id="name{{ i }}" name="name{{ i }}" placeholder="Entrez le nom">
+                
+                <!-- Pronoun selection -->
+                <div class="mt-2">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="pronoun{{ i }}" id="il{{ i }}" value="il">
+                        <label class="form-check-label" for="il{{ i }}">il</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="pronoun{{ i }}" id="elle{{ i }}" value="elle">
+                        <label class="form-check-label" for="elle{{ i }}">elle</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="pronoun{{ i }}" id="iel{{ i }}" value="iel">
+                        <label class="form-check-label" for="iel{{ i }}">iel</label>
+                    </div>
+                </div>
+                
+                <!-- Role display (initially hidden) -->
+                <div class="mt-2" id="role{{ i }}" style="display: none;">
+                    <small class="text-muted">Rôle: <span class="fw-bold" id="roleText{{ i }}"></span></small>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Buttons -->
+            <div class="text-center mt-4 mb-5">
+                <button class="btn btn-secondary me-3" onclick="showRoles()">Voir les rôles</button>
+                <button class="btn btn-primary" onclick="saveAndContinue()">Continue to Saisie Page</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+const roles = ["agriculteur", "activiste", "PDG solaire", "PDG éolien", "élu(e)", "greenpeace","prem ministre"];
+
+function shuffleArray(array) {
+    const shuffled = [...array]; // Create a copy
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+function showRoles() {
+    // Shuffle the roles array to get random assignment
+    const shuffledRoles = shuffleArray(roles);
+    
+    // Assign roles to each person
+    for (let i = 1; i <= 6; i++) {
+        document.getElementById('roleText' + i).textContent = shuffledRoles[i - 1];
+        document.getElementById('role' + i).style.display = 'block';
+    }
+}
+
+function saveNames() {
+    // Collect all the form data
+    const formData = {
+        equipe: "{{ equipe }}",
+        partie: "{{ partie }}",
+        names: [],
+        pronouns: [],
+        roles: []
+    };
+    
+    // Loop through the 6 fields and collect data
+    for (let i = 1; i <= 6; i++) {
+        formData.names.push(document.getElementById('name' + i).value);
+        formData.pronouns.push(document.querySelector('input[name="pronoun' + i + '"]:checked')?.value || '');
+        formData.roles.push(document.getElementById('roleText' + i).textContent);
+    }
+    
+    // Send POST request
+    return $.ajax({
+        url: "/save_names",
+        type: "POST",
+        data: JSON.stringify(formData),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json"
+    });
+}
+
+function saveAndContinue() {
+    saveNames()
+        .then(function(response) {
+            console.log("Names saved successfully!");
+            continueToSaisie();
+        })
+        .catch(function(error) {
+            console.error("Error saving names:", error);
+            alert("Error saving names. Please try again.");
+        });
+}
+
+function continueToSaisie() {
+    location.href = "/saisie/{{ equipe }}/{{ partie }}/";
+}
+</script>
+
+{% endblock %}

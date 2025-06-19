@@ -13,6 +13,8 @@ from flask import json
 
 import flaskapp.journal.journal as jr
 
+import random
+
 
 def init_couleur_et_noms():
     init_cols = ['demande', 'electrolyse',
@@ -290,8 +292,84 @@ class vJournal(Visualiseur):
 
         datas = jr.calculer_data(self.dm, self.annee)
 
-        self.jinja_params.update({"article": jr.exemple(datas)
-                            })
+        #self.jinja_params.update({"article": jr.exemple(datas) })
+        with open(f"{self.dm.chemin}/roles.json","r") as f:
+            roles_dict = json.load(f)
+        names = roles_dict["names"]
+        pronouns = roles_dict["pronouns"]
+        roles = roles_dict["roles"]
+        articles = [jr.make_text(datas,name,pronoun,role) for (name,pronoun,role) in zip(names,pronouns,roles)]
+        #articles = [jr.exemple(datas) for _ in range(6)]
+        self.jinja_params.update({"articles": articles})
+
+class vJournal2(Visualiseur):
+    def genere_jinja_parameters(self):
+        with open(f"{self.dm.chemin}/roles.json","r") as f:
+            roles_dict = json.load(f)
+        names = roles_dict["names"]
+        pronouns = roles_dict["pronouns"]
+        roles = roles_dict["roles"]
+
+        datas = jr.calculer_data(self.dm, self.annee)
+
+        infras_tour = [] #recup les infras sur lesquelles on a agi ce tour ci
+        if datas.regions_photovoltaiques is not None:
+            infras_tour.append("pv")
+        if datas.regions_eolien_offshore is not None:
+            infras_tour.append("off")
+        if datas.regions_eolien_onshore is not None:
+            infras_tour.append("on")
+        if datas.regions_methaniseur is not None:
+            infras_tour.append("meth")
+        if datas.regions_suppression_nucleaire is not None:
+            infras_tour.append("nuc suppr")
+        if datas.regions_centrales_nucleaires is not None:
+            infras_tour.append("nuc")
+        if datas.regions_sous_production is not None:
+            infras_tour.append("sous prod")
+
+        num_written = 0 #on va faire des articles en fonction des rôles des joueurs et des actions du tour
+        articles = []
+        while num_written < 3:
+            player = random.randint(0,len(roles)-1)
+            role = roles[player]
+            name = names[player]
+            pronoun = pronouns[player]
+            if role == "PDG solaire":
+                if "pv" in infras_tour:
+                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    num_written += 1
+                    roles.pop(player)
+            elif role == "PDG éolien":
+                if "off" or "on" in infras_tour:
+                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    num_written += 1
+                    roles.pop(player)
+            elif role == "agriculteur":
+                if "pv" or "on" or "meth" in infras_tour:
+                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    num_written += 1
+                    roles.pop(player)
+            elif role == "activiste":
+                if "pv" or "off" or "on" or "meth" in infras_tour:
+                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    num_written += 1
+                    roles.pop(player)
+            elif role == "greenpeace":
+                if "nuc" or "nuc suppr" in infras_tour:
+                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    num_written += 1
+                    roles.pop(player)
+            elif role == "élue":
+                if "sous prod" or "nuc suppr" in infras_tour:
+                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    num_written += 1
+                    roles.pop(player)
+            elif role == "première ministre":
+                articles.append(jr.make_text(datas,name,pronoun,role))
+                num_written += 1
+                roles.pop(player)
+        self.jinja_params.update({"articles": articles,"names":names,"roles":roles})
 
 class vResults(Visualiseur):
     def genere_jinja_parameters(self):
@@ -304,6 +382,7 @@ class vResults(Visualiseur):
 
 vuesClasses = {"resultats": vResults,
                "journal": vJournal,
+               "journal_2": vJournal2,
                "scenario": vScenario,
                "production": vProduction
                }

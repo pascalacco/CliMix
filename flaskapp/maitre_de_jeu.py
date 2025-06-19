@@ -590,8 +590,9 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
         # ratio[reg] = prod[reg] / prodTotale
         # diff[reg] = ratio[reg] - population[reg]
         # transfert[reg] = int(diff[reg] * 100.)
-        transfert[reg] = prod[reg] / (population[reg] * 68373433.)
-
+        #transfert[reg] = prod[reg] / (population[reg] * 68373433.)
+        transfert[reg] = prod[reg]/(population[reg]*68373433.) - prodTotale/68373433.
+        
     result = {"carte": mix["carte"],
               "annee": mix["annee"],
               "alea": mix["alea"],
@@ -617,5 +618,5 @@ def result_prod_region(mix, annuel, chroniques, prod_renouvelables, puissances):
               "penuriesQuotidien": listePenuriesQuotidien, "penuriesHoraire": listePenuriesHoraire,
               "transfert": transfert
               }
-
+    
     return result

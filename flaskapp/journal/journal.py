@@ -3,26 +3,23 @@ import random
 from flaskapp.journal.texteur import *
 from climix.technologies import infos
 
-
 class Personnage:
-    def __init__(self, nom, prenom, role, affiliation):
+    def __init__(self, nom, pronom, role, affiliation):
         self.nom = nom
-        self.prenom = prenom
         self.role = role
         self.affiliation = affiliation
+        self.pronom = pronom
 
     def __repr__(self):
-        return (f"Personnage(nom={self.nom}, prenom={self.prenom}, "
+        return (f"Personnage(nom={self.nom}"
                 f"rôle={self.role}, affiliation={self.affiliation}")
 
     def afficher_details(self):
         details = (
             f"Nom : {self.nom}\n"
-            f"Prénom : {self.prenom}\n"
             f"Rôle : {self.role}\n"
             f"Affiliation : {self.affiliation}\n"
         )
-        print(details)
 
 
 def generer_listes_personnages(personnages):
@@ -162,14 +159,23 @@ def calculer_data(dm, annee):
     mix = dm.get_item_fichier(fichier='mixes', item=annee)
 
     reg_technos = {}
-    for techno in ("panneauPV", "eolienneON", "eolienneOFF", "methanation", "centraleNuc", "EPR2"):
+    for techno in ("centraleNuc", "EPR2"):
         reg_technos[techno] = [reg for reg in mix['unites'] if mix['nb'][reg][techno] > 0]
 
-    datas.regions_photovoltaiques = reg_technos["panneauPV"]
-    datas.regions_eolien_offshore = reg_technos["eolienneOFF"]
-    datas.regions_eolien_onshore = reg_technos["eolienneON"]
-    datas.regions_methaniseur = reg_technos["methanation"]
-    datas.regions_centrales_nucleaires = reg_technos['centraleNuc'] + reg_technos['EPR2']
+    
+    for techno in ("panneauPV", "eolienneON", "eolienneOFF", "methanation"):
+        for reg in mix["unites"]:
+            act = mix["actions"]["regions"][reg][techno]
+            if annee in act:
+                if "nb_nouvelles" in act[annee]:
+                    reg_technos[techno] = act[annee]["nb_nouvelles"]*[reg]
+    
+    datas.regions_photovoltaiques = reg_technos["panneauPV"] if "panneauPV" in reg_technos else None
+    datas.regions_eolien_offshore = reg_technos["eolienneOFF"] if "eolienneOFF" in reg_technos else None
+    datas.regions_eolien_onshore = reg_technos["eolienneON"] if "eolienneON" in reg_technos else None
+    datas.regions_methaniseur = reg_technos["methanation"] if "methanation" in reg_technos else None
+    datas.regions_centrales_nucleaires = reg_technos['centraleNuc'] + reg_technos['EPR2'] if "centraleNuc" and "EPR2" in reg_technos else None
+    
     # region deux fois si les deux technos => plus de proba que si une seule...
     # sinon faire list(set(reg_technos['centraleNuc'] +  reg_technos['EPR2'])) pour même proba
 
@@ -198,8 +204,6 @@ def calculer_data(dm, annee):
 
 
 # # Choix des sujets pour les différents rôles.
-
-
 def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
     """
     Fonction qui choisit une infrastructure et une région basée sur le rôle du personnage
@@ -217,7 +221,7 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
             region = random.choice(data.regions_photovoltaiques)
         else:
             infrastructure = 'photovoltaïque'
-            region = 'France'
+            region = "fr"
         return infrastructure, region
 
     elif personnage.role == 'PDG éolien':
@@ -240,11 +244,12 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
                 return "Aucune région éolienne disponible."
         else:
             infrastructure = 'éolien'
-            region = 'France'
+            #region = 'France'
+            region = "fr"
 
         return infrastructure, region
 
-    elif personnage.role == 'texte_resultat':
+    elif personnage.role == 'agriculteur':
         # Choisir une infrastructure parmi celles avec des régions non vides
         infrastructures_non_vides = []
         if data.regions_photovoltaiques:
@@ -328,15 +333,13 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
 
 
 def generate_article(character, data, dictionnaire_regions, year):
+
     if character.role != 'première ministre':
         infrastructure, region_choisie = choisir_infrastructure_et_region(character, data)
-        print(character.role)
-        print(infrastructure)
-        print(region_choisie)
 
     if character.role == 'greenpeace':
         texte = texte_greenpeace(character, dictionnaire_regions.get(region_choisie), infrastructure)
-    elif character.role == 'texte_resultat':
+    elif character.role == 'agriculteur':
         texte = texte_agriculteur(character, dictionnaire_regions.get(region_choisie), infrastructure)
     elif character.role == 'PDG solaire':
         texte = texte_pdg_solaire(character, dictionnaire_regions.get(region_choisie))
@@ -353,7 +356,29 @@ def generate_article(character, data, dictionnaire_regions, year):
 
     return texte
 
+def make_text(data,nom,pronom,role):
+    if role == "agriculteur":
+        personnage = Personnage(nom,pronom,"agriculteur","Paysans en colère")
+    elif role == "activiste":
+        personnage = Personnage(nom,pronom,"activiste","La nature avant les profits")
+    elif role == "PDG solaire":
+        personnage = Personnage(nom,pronom,"PDG solaire","Power Solar")
+    elif role == "PDG éolien":
+        personnage = Personnage(nom,pronom,"PDG éolien","Wind Power")
+    elif role == "élu(e)":
+        personnage = Personnage(nom,pronom,"élue","Parti Socialiste")
+    elif role == "greenpeace":
+        personnage = Personnage(nom,pronom,"greenpeace","greenpeace")
+    elif role == "prem ministre":
+        personnage = Personnage(nom,pronom,"première ministre","La République En Marche")
+    
+    from flaskapp.journal.france import dictionnaire_regions as regions
+    article = generate_article(personnage, data, regions, 2040)
+    return article
 
+    
+
+"""
 def exemple(datas):
     personnages = [Personnage("Dossal", "Charles", "texte_resultat", "Paysans en colère")]
 
@@ -378,7 +403,7 @@ def exemple(datas):
 
     article = generate_article(character[0], datas, regions, 2040)
     return article
-
+"""
 
 if __name__ == "__main__":
 
@@ -424,9 +449,7 @@ if __name__ == "__main__":
         print(f"Textes tour {i} : {[generate_article(p, data, dictionnaire_regions, 2024) for p in liste]}")
         print()
     # %%
-
     data.afficher_infos()
-
     # Génération du texte
     perso1 = personnages[0]
     print(texte_agriculteur(perso1, dictionnaire_regions.get("Normandie"), "photovoltaïque"))

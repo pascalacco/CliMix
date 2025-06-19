@@ -15,7 +15,10 @@
         <button class="btn col-1 btn-lg fs-1 btn-primary" id="nextYear" type="button">⊳</button>
     </div>
 
-    <div id="article" class="row justify-content-between mb-5"> {{article}} </div>
+    <!--<div id="article" class="row justify-content-between mb-5"> {{article}} </div> -->
+    {% for article in articles %}
+    <div id="article-{{ loop.index }}" class="row justify-content-between mb-5"> {{ article }} </div>
+    {% endfor %}
     
 </div>
 
