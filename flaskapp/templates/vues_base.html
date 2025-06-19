@@ -31,6 +31,10 @@
             <a class="nav-link {% if vue == 'journal' %} active {% endif %}" aria-current="page"
                onclick="spin('journal')" id="journal" >Journal</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {% if vue == 'journal_2' %} active {% endif %}" aria-current="page"
+               onclick="spin('journal_2')" id="journal_2" >Journal 2</a>
+        </li>
 
         <div class="text-center mt-3 mb-5">
             <button class="btn btn-success" onclick="window.location.href = '/saisie/{{equipe}}/{{partie}}/{{annee}}';" type="button">< Retourner au mix pour le modifier</button>
