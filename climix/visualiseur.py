@@ -333,6 +333,7 @@ class vJournal2(Visualiseur):
         articles = []
         names_final = []
         roles_final = []
+        picked_infra = []
         while num_written < 3:
             player = random.randint(0,len(roles)-1)
             role = roles[player]
@@ -340,7 +341,9 @@ class vJournal2(Visualiseur):
             pronoun = pronouns[player]
             if role == "PDG solaire":
                 if "pv" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    picked_infra.append("pv")
+                    article, _ = jr.make_text(datas,name,pronoun,role)
+                    articles.append(article)
                     num_written += 1
                     roles_final.append(role)
                     names_final.append(name)
@@ -349,7 +352,12 @@ class vJournal2(Visualiseur):
                     pronouns.pop(player)
             elif role == "PDG éolien":
                 if "off" or "on" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    article, infra = jr.make_text(datas,name,pronoun,role)
+                    if infra == "éolien onshore":
+                        picked_infra.append("on")
+                    else:
+                        picked_infra.append("off")
+                    articles.append(article)
                     num_written += 1
                     roles_final.append(role)
                     names_final.append(name)
@@ -358,7 +366,14 @@ class vJournal2(Visualiseur):
                     pronouns.pop(player)
             elif role == "agriculteur":
                 if "pv" or "on" or "meth" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    article, infra = jr.make_text(datas,name,pronoun,role)
+                    if infra == "photovoltaïque":
+                        picked_infra.append("pv")
+                    elif infra == "éolien onshore":
+                        picked_infra.append("on")
+                    else:
+                        picked_infra.append("meth")
+                    articles.append(article)
                     num_written += 1
                     roles_final.append(role)
                     names_final.append(name)
@@ -367,7 +382,16 @@ class vJournal2(Visualiseur):
                     pronouns.pop(player)
             elif role == "activiste":
                 if "pv" or "off" or "on" or "meth" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    article, infra = jr.make_text(datas,name,pronoun,role)
+                    if infra == "photovoltaïque":
+                        picked_infra.append("pv")
+                    elif infra == "éolien onshore":
+                        picked_infra.append("on")
+                    elif infra == "éolien offshore":
+                        picked_infra.append("off")
+                    else:
+                        picked_infra.append("meth")
+                    articles.append(article)
                     num_written += 1
                     roles_final.append(role)
                     names_final.append(name)
@@ -376,7 +400,12 @@ class vJournal2(Visualiseur):
                     pronouns.pop(player)
             elif role == "greenpeace":
                 if "nuc" or "nuc suppr" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    article, infra = jr.make_text(datas,name,pronoun,role)
+                    if infra == "maintenue":
+                        picked_infra.append("nuc")
+                    else:
+                        picked_infra.append("nuc suppr")
+                    articles.append(article)
                     num_written += 1
                     roles_final.append(role)
                     names_final.append(name)
@@ -385,7 +414,12 @@ class vJournal2(Visualiseur):
                     pronouns.pop(player)
             elif role == "élue":
                 if "sous prod" or "nuc suppr" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    article, infra = jr.make_text(datas,name,pronoun,role)
+                    if infra == "sous-production":
+                        picked_infra.append("sous prod")
+                    else:
+                        picked_infra.append("nuc suppr")
+                    articles.append(article)
                     num_written += 1
                     roles_final.append(role)
                     names_final.append(name)
@@ -402,7 +436,7 @@ class vJournal2(Visualiseur):
                 pronouns.pop(player)
         #get image infra 
         base_path = "/Users/julesripoll/Developer/CliMix/flaskapp/static/images_une"
-        infra = random.choice(infras_tour)
+        infra = random.choice(picked_infra)
         if infra == "pv":
             list_imgs = [f for f in os.listdir(f"{base_path}/pv") if 'jpg' in f]
             infra_img = random.choice(list_imgs)
