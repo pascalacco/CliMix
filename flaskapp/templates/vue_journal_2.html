@@ -4,130 +4,100 @@
 {% block head %}
 {{ super() }}
 <style>
-    /* Import Computer Modern font if available, otherwise use LaTeX-like serif fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&display=swap');
+    /* Import classic newspaper fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Crimson+Pro:wght@400;600;700&family=Old+Standard+TT:wght@400;700&display=swap');
     
     .journal-container {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
         background-color: #fefefe;
-        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        box-shadow: 0 0 30px rgba(0,0,0,0.15);
         padding: 40px;
-        font-family: 'Computer Modern', 'Crimson Pro', 'Latin Modern Roman', 'Times New Roman', serif;
+        font-family: 'Crimson Pro', 'Times New Roman', serif;
+        position: relative;
+        min-height: 400px;
+        opacity: 0;
+    }
+    
+    /* Measurement containers - invisible */
+    .measurement-container {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+        width: 1400px;
+        padding: 40px;
+        visibility: hidden;
+    }
+    
+    /* Final optimized layout classes */
+    .layout-tall-articles .newspaper-layout {
+        grid-template-columns: 1.2fr 1.6fr 1.2fr !important;
+    }
+    
+    .layout-short-articles .newspaper-layout {
+        grid-template-columns: 0.8fr 2.4fr 0.8fr !important;
+    }
+    
+    .layout-large-image .main-image {
+        max-width: 600px !important;
+    }
+    
+    .layout-small-image .main-image {
+        max-width: 400px !important;
+    }
+    
+    .layout-compact .secondary-content {
+        margin-top: 10px !important;
+        gap: 15px !important;
+    }
+    
+    .layout-expanded .secondary-content {
+        margin-top: 25px !important;
+        gap: 30px !important;
+    }
+    
+    /* Smooth reveal */
+    .content-ready {
+        opacity: 1 !important;
+        transition: opacity 0.4s ease-in-out;
+    }
+    
+    /* Classic newspaper masthead */
+    .journal-masthead {
+        text-align: center;
+        border-bottom: 4px double #000;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
     }
     
     .journal-title {
-        font-family: 'Computer Modern', 'Crimson Pro', 'Latin Modern Roman', 'Times New Roman', serif;
-        font-weight: 700;
-        font-size: 3.5rem;
-        text-align: center;
-        margin-bottom: 10px;
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: 4.5rem;
         color: #1a1a1a;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        margin: 0;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .journal-subtitle {
+        font-family: 'Old Standard TT', serif;
+        font-size: 1.2rem;
+        color: #666;
+        font-style: italic;
+        margin: 10px 0;
         letter-spacing: 2px;
     }
     
-    .title-separator {
-        width: 100%;
-        height: 4px;
-        background-color: #000;
-        margin: 20px 0 30px 0;
-    }
-    
-    /* Main grid layout */
-    .main-layout {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-        grid-template-rows: auto 1fr;
-        gap: 20px;
-        align-items: start;
-        /* Set a min-height to ensure rectangular shape */
-        min-height: 800px;
-    }
-    
-    /* Image spans columns 2-3, row 1 */
-    .image-container {
-        grid-column: 2 / 4;
-        grid-row: 1;
-    }
-    
-    .image-placeholder {
-        width: 100%;
-        height: 450px;
-        background-color: #2c2c2c;
-        border: 1px solid #000;
+    .publication-info {
+        font-family: 'Old Standard TT', serif;
+        font-size: 0.9rem;
+        color: #888;
+        margin-top: 15px;
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-style: italic;
-        font-size: 14px;
-    }
-    
-    /* Column containers with overflow handling */
-    .column {
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-    
-    .column-1 {
-        grid-column: 1;
-        grid-row: 1 / -1;
-    }
-    
-    .column-2 {
-        grid-column: 2;
-        grid-row: 2;
-    }
-    
-    .column-3 {
-        grid-column: 3;
-        grid-row: 2;
-    }
-    
-    .column-4 {
-        grid-column: 4;
-        grid-row: 1 / -1;
-    }
-    
-    /* Articles with consistent styling */
-    .article-item {
-        font-family: 'Computer Modern', 'Crimson Pro', 'Latin Modern Roman', 'Times New Roman', serif;
-        font-size: 16px;
-        line-height: 1.6;
-        text-align: justify;
-        margin-bottom: 20px;
-        break-inside: avoid;
-    }
-    
-    .article-header {
-        font-weight: bold;
-        color: #2c2c2c;
-        margin-bottom: 8px;
-        font-size: 15px;
-        letter-spacing: 0.5px;
-    }
-    
-    .article-content {
-        color: #333;
-        /* Add text overflow handling */
-        overflow-wrap: break-word;
-        hyphens: auto;
-    }
-    
-    /* Hide overflow content to maintain rectangle */
-    .articles-wrapper {
-        max-height: 100%;
-        overflow: hidden;
-    }
-    
-    .turn-info {
-        text-align: center;
-        font-family: 'Computer Modern', 'Crimson Pro', 'Latin Modern Roman', 'Times New Roman', serif;
-        font-size: 1.8rem;
-        margin-bottom: 30px;
-        color: #666;
     }
     
     /* Year navigation styling */
@@ -135,51 +105,244 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 40px;
+        margin-bottom: 30px;
+        padding: 0 20px;
     }
     
     .nav-button {
         background-color: #1a1a1a;
         color: white;
         border: none;
-        padding: 15px 25px;
-        font-size: 2rem;
+        padding: 12px 20px;
+        font-size: 1.5rem;
         cursor: pointer;
-        border-radius: 5px;
+        border-radius: 3px;
         transition: background-color 0.3s;
+        font-family: 'Old Standard TT', serif;
     }
     
     .nav-button:hover {
         background-color: #333;
     }
     
-    @media (max-width: 1024px) {
-        .main-layout {
+    .turn-info {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #444;
+    }
+    
+    /* Dynamic layout - content-aware sizing */
+    .newspaper-layout {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 20px;
+        margin-bottom: 20px;
+        align-items: start;
+    }
+    
+    /* Article styling - natural flow */
+    .article-item {
+        font-family: 'Crimson Pro', serif;
+        font-size: 15px;
+        line-height: 1.6;
+        text-align: justify;
+        padding: 15px;
+        border: 1px solid #ddd;
+        background-color: #fafafa;
+        break-inside: avoid;
+        height: auto;
+        min-height: auto;
+    }
+    
+    .article-header {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 16px;
+        color: #1a1a1a;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #000;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .article-content {
+        color: #2c2c2c;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        text-indent: 1.5em;
+    }
+    
+    /* Layout containers */
+    .left-article {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    .main-image-container {
+        grid-column: 2;
+        grid-row: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .right-article {
+        grid-column: 3;
+        grid-row: 1;
+    }
+    
+    .secondary-content {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-top: 15px;
+        align-items: start;
+    }
+    
+    /* Images - natural sizing with constraints */
+    .main-image {
+        width: 100%;
+        max-width: 500px;
+        height: auto;
+        border: 3px solid #000;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        display: block;
+    }
+    
+    .image-caption {
+        font-family: 'Old Standard TT', serif;
+        font-size: 13px;
+        font-style: italic;
+        color: #555;
+        padding: 0 20px;
+        line-height: 1.4;
+        text-align: center;
+        max-width: 500px;
+    }
+    
+    .bottom-article {
+        padding: 20px;
+        border: 2px solid #000;
+        background-color: #f9f9f9;
+    }
+    
+    .secondary-image-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .secondary-image {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        border: 2px solid #666;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        display: block;
+    }
+    
+    .secondary-caption {
+        font-family: 'Old Standard TT', serif;
+        font-size: 12px;
+        font-style: italic;
+        color: #555;
+        line-height: 1.3;
+        text-align: center;
+        max-width: 300px;
+    }
+    
+    /* Dynamic layout classes - applied by JavaScript */
+    .layout-optimized .newspaper-layout {
+        transition: all 0.3s ease;
+    }
+    
+    .layout-tall-articles .newspaper-layout {
+        grid-template-columns: 1.2fr 1.6fr 1.2fr;
+    }
+    
+    .layout-short-articles .newspaper-layout {
+        grid-template-columns: 0.8fr 2.4fr 0.8fr;
+    }
+    
+    .layout-large-image .main-image {
+        max-width: 600px;
+    }
+    
+    .layout-small-image .main-image {
+        max-width: 400px;
+    }
+    
+    .layout-compact .secondary-content {
+        margin-top: 10px;
+        gap: 15px;
+    }
+    
+    .layout-expanded .secondary-content {
+        margin-top: 25px;
+        gap: 30px;
+    }
+    
+    /* Decorative elements */
+    .decorative-border {
+        border-top: 3px double #000;
+        border-bottom: 1px solid #666;
+        height: 1px;
+        margin: 25px 0;
+    }
+    
+    /* Print-style column rules */
+    .column-rule {
+        border-right: 1px solid #ccc;
+        padding-right: 20px;
+        margin-right: 20px;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 1200px) {
+        .newspaper-layout {
             grid-template-columns: 1fr;
             grid-template-rows: auto;
-            min-height: auto;
         }
         
-        .column-1,
-        .image-container,
-        .column-2,
-        .column-3,
-        .column-4 {
+        .left-article,
+        .main-image-container,
+        .right-article {
             grid-column: 1;
             grid-row: auto;
         }
         
-        .image-placeholder {
-            max-width: 600px;
-            margin: 0 auto;
+        .secondary-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .journal-title {
+            font-size: 3.5rem;
         }
         
         .journal-container {
             padding: 20px;
         }
-        
+    }
+    
+    @media (max-width: 768px) {
         .journal-title {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
+        }
+        
+        .publication-info {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .year-navigation {
+            padding: 0 10px;
         }
     }
 </style>
@@ -191,98 +354,101 @@
 <div class="journal-container">
     <!-- Year Navigation -->
     <div class="year-navigation">
-        <button class="nav-button" id="previousYear" type="button">‹</button>
-        <div class="turn-info" id="turn">Tour</div>
-        <button class="nav-button" id="nextYear" type="button">›</button>
+        <button class="nav-button" id="previousYear" type="button">‹ Précédent</button>
+        <div class="turn-info" id="turn">Tour {{ annee }}</div>
+        <button class="nav-button" id="nextYear" type="button">Suivant ›</button>
     </div>
     
-    <!-- Journal Title -->
-    <h1 class="journal-title">LE JOURNAL ÉNERGÉTIQUE</h1>
+    <!-- Newspaper Masthead -->
+    <div class="journal-masthead">
+        <h1 class="journal-title">La Gazette du Climat</h1>
+        <div class="journal-subtitle">Quotidien Toulousain de la transition énergétique</div>
+        <div class="publication-info">
+            <span>Édition Nationale</span>
+            <span>Tour {{ annee }}</span>
+            <span>Prix: 2,50€</span>
+        </div>
+    </div>
     
-    <!-- Title Separator -->
-    <div class="title-separator"></div>
-    
-    <!-- Main Content with 4-column layout -->
-    <div class="main-layout">
-        <!-- Column 1 (left-most, full height) -->
-        <div class="column column-1">
-            <div class="articles-wrapper">
-                {% for article in articles %}
-                    {% if loop.index0 % 4 == 0 %}
-                    <div class="article-item" id="article-{{ loop.index }}">
-                        <div class="article-header">
-                            {{ names[loop.index0] }}, {{ roles[loop.index0] }}
-                        </div>
-                        <div class="article-content">
-                            {{ article }}
-                        </div>
-                    </div>
-                    {% endif %}
-                {% endfor %}
+    <!-- Main Newspaper Layout -->
+    <div class="newspaper-layout">
+        <!-- Left Sidebar Article -->
+        <div class="left-article">
+            {% if articles and articles|length > 0 %}
+            <div class="article-item">
+                <div class="article-header">
+                    {{ names[0] }}, {{ roles[0] }}
+                </div>
+                <div class="article-content">
+                    {{ articles[0] }}
+                </div>
             </div>
+            {% endif %}
         </div>
         
-        <!-- Image Container (columns 2-3, row 1) -->
-        <div class="image-container">
-            <div class="image-placeholder">
-                [Image à venir]
+        <!-- Main Feature Image -->
+        <div class="main-image-container">
+            {% if infra_img %}
+            <img src="{{ infra_img }}" alt="Image principale" class="main-image">
+            <div class="image-caption">
+                {% if infra_txt %}
+                    <div id="main-caption">Caption de l'image principale</div>
+                {% endif %}
             </div>
+            {% else %}
+            <div class="main-image" style="background-color: #e0e0e0; display: flex; align-items: center; justify-content: center; height: 300px; color: #666;">
+                Image principale à venir
+            </div>
+            {% endif %}
         </div>
         
-        <!-- Column 2 (under left side of image) -->
-        <div class="column column-2">
-            <div class="articles-wrapper">
-                {% for article in articles %}
-                    {% if loop.index0 % 4 == 1 %}
-                    <div class="article-item" id="article-{{ loop.index }}">
-                        <div class="article-header">
-                            {{ names[loop.index0] }}, {{ roles[loop.index0] }}
-                        </div>
-                        <div class="article-content">
-                            {{ article }}
-                        </div>
-                    </div>
-                    {% endif %}
-                {% endfor %}
+        <!-- Right Sidebar Article -->
+        <div class="right-article">
+            {% if articles and articles|length > 1 %}
+            <div class="article-item">
+                <div class="article-header">
+                    {{ names[1] }}, {{ roles[1] }}
+                </div>
+                <div class="article-content">
+                    {{ articles[1] }}
+                </div>
             </div>
+            {% endif %}
         </div>
         
-        <!-- Column 3 (under right side of image) -->
-        <div class="column column-3">
-            <div class="articles-wrapper">
-                {% for article in articles %}
-                    {% if loop.index0 % 4 == 2 %}
-                    <div class="article-item" id="article-{{ loop.index }}">
-                        <div class="article-header">
-                            {{ names[loop.index0] }}, {{ roles[loop.index0] }}
-                        </div>
-                        <div class="article-content">
-                            {{ article }}
-                        </div>
-                    </div>
-                    {% endif %}
-                {% endfor %}
+        <!-- Secondary Content Area -->
+        <div class="secondary-content">
+            <!-- Bottom Main Article -->
+            <div class="bottom-article">
+                {% if articles and articles|length > 2 %}
+                <div class="article-header">
+                    {{ names[2] }}, {{ roles[2] }}
+                </div>
+                <div class="article-content">
+                    {{ articles[2] }}
+                </div>
+                {% endif %}
             </div>
-        </div>
-        
-        <!-- Column 4 (right-most, full height) -->
-        <div class="column column-4">
-            <div class="articles-wrapper">
-                {% for article in articles %}
-                    {% if loop.index0 % 4 == 3 %}
-                    <div class="article-item" id="article-{{ loop.index }}">
-                        <div class="article-header">
-                            {{ names[loop.index0] }}, {{ roles[loop.index0] }}
-                        </div>
-                        <div class="article-content">
-                            {{ article }}
-                        </div>
-                    </div>
+            
+            <!-- Secondary Image -->
+            <div class="secondary-image-container">
+                {% if greenwashing_img %}
+                <img src="{{ greenwashing_img }}" alt="Image secondaire" class="secondary-image">
+                <div class="secondary-caption">
+                    {% if greenwashing_txt %}
+                        <div id="secondary-caption">Caption de l'image secondaire</div>
                     {% endif %}
-                {% endfor %}
+                </div>
+                {% else %}
+                <div class="secondary-image" style="background-color: #e0e0e0; display: flex; align-items: center; justify-content: center; height: 200px; color: #666; font-size: 12px;">
+                    Image secondaire
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
+    
+    <div class="decorative-border"></div>
 </div>
 
 {% endblock %}
@@ -292,42 +458,228 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script type="text/javascript">
-Array.prototype.reduce=function(fun){var len=this.length>>>0;if(typeof fun!="function")throw
-new TypeError;if(len==0&&arguments.length==1)throw new TypeError;var i=0;if(arguments.length>=2)var
-rv=arguments[1];else{do{if(i in this){var rv=this[i++];break}if(++i>=len)throw new
-TypeError;}while(true)}for(;i<len;i++)if(i in this)rv=fun.call(undefined,rv,this[i],i,this);return
-rv};
+Array.prototype.reduce=function(fun){var len=this.length>>>0;if(typeof fun!="function")throw new TypeError;if(len==0&&arguments.length==1)throw new TypeError;var i=0;if(arguments.length>=2)var rv=arguments[1];else{do{if(i in this){var rv=this[i++];break}if(++i>=len)throw new TypeError;}while(true)}for(;i<len;i++)if(i in this)rv=fun.call(undefined,rv,this[i],i,this);return rv};
 
-// Year navigation functionality
 $(function () {
-    // Function to balance column heights
-    function balanceColumns() {
-        const columns = document.querySelectorAll('.column');
-        let maxHeight = 0;
+    // Pre-computation approach: measure first, then render
+    function precomputeOptimalLayout() {
+        console.log('Starting layout pre-computation...');
         
-        // Find the maximum natural height
-        columns.forEach(col => {
-            col.style.height = 'auto';
-            const height = col.offsetHeight;
-            if (height > maxHeight) maxHeight = height;
-        });
+        // Create invisible measurement container
+        const measurementContainer = $(`
+            <div class="measurement-container">
+                <div class="newspaper-layout" style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 20px;">
+                    <div class="left-article">
+                        <div class="article-item" style="padding: 15px; font-family: 'Crimson Pro', serif; font-size: 15px; line-height: 1.6;">
+                            <div class="article-header" style="margin-bottom: 12px;">Header</div>
+                            <div class="article-content" style="text-indent: 1.5em;"></div>
+                        </div>
+                    </div>
+                    <div class="main-image-container">
+                        <img class="main-image" style="width: 100%; max-width: 500px; display: block;" />
+                        <div class="image-caption" style="font-size: 13px; line-height: 1.4;"></div>
+                    </div>
+                    <div class="right-article">
+                        <div class="article-item" style="padding: 15px; font-family: 'Crimson Pro', serif; font-size: 15px; line-height: 1.6;">
+                            <div class="article-header" style="margin-bottom: 12px;">Header</div>
+                            <div class="article-content" style="text-indent: 1.5em;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="secondary-content" style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 15px;">
+                    <div class="bottom-article">
+                        <div class="article-item" style="padding: 20px;">
+                            <div class="article-header">Header</div>
+                            <div class="article-content" style="text-indent: 1.5em;"></div>
+                        </div>
+                    </div>
+                    <div class="secondary-image-container">
+                        <img class="secondary-image" style="width: 100%; max-width: 300px; display: block;" />
+                        <div class="secondary-caption" style="font-size: 12px; line-height: 1.3;"></div>
+                    </div>
+                </div>
+            </div>
+        `);
         
-        // Set all columns to the same height
-        columns.forEach(col => {
-            col.style.height = maxHeight + 'px';
-        });
+        $('body').append(measurementContainer);
+        
+        // Load content into measurement container
+        const leftContent = $('.journal-container .left-article .article-content').html() || '';
+        const rightContent = $('.journal-container .right-article .article-content').html() || '';
+        const bottomContent = $('.journal-container .bottom-article .article-content').html() || '';
+        
+        measurementContainer.find('.left-article .article-content').html(leftContent);
+        measurementContainer.find('.right-article .article-content').html(rightContent);
+        measurementContainer.find('.bottom-article .article-content').html(bottomContent);
+        
+        // Load images for measurement
+        const mainImgSrc = $('.journal-container .main-image').attr('src');
+        const secondaryImgSrc = $('.journal-container .secondary-image').attr('src');
+        
+        if (mainImgSrc) {
+            measurementContainer.find('.main-image').attr('src', mainImgSrc);
+        }
+        if (secondaryImgSrc) {
+            measurementContainer.find('.secondary-image').attr('src', secondaryImgSrc);
+        }
+        
+        // Wait for measurement images to load, then calculate
+        let imagesLoaded = 0;
+        const totalImages = measurementContainer.find('img').length;
+        
+        function onMeasurementImageLoad() {
+            imagesLoaded++;
+            if (imagesLoaded >= totalImages || totalImages === 0) {
+                performMeasurementsAndOptimize(measurementContainer);
+            }
+        }
+        
+        if (totalImages === 0) {
+            performMeasurementsAndOptimize(measurementContainer);
+        } else {
+            measurementContainer.find('img').each(function() {
+                if (this.complete) {
+                    onMeasurementImageLoad();
+                } else {
+                    $(this).on('load', onMeasurementImageLoad);
+                    $(this).on('error', onMeasurementImageLoad); // Handle broken images
+                }
+            });
+        }
     }
     
-    // Balance on load and resize
-    $(window).on('load resize', balanceColumns);
+    function performMeasurementsAndOptimize(measurementContainer) {
+        console.log('Performing measurements...');
+        
+        // Measure content in invisible container
+        const leftHeight = measurementContainer.find('.left-article .article-content')[0]?.scrollHeight || 0;
+        const rightHeight = measurementContainer.find('.right-article .article-content')[0]?.scrollHeight || 0;
+        const bottomHeight = measurementContainer.find('.bottom-article .article-content')[0]?.scrollHeight || 0;
+        const avgSidebarHeight = (leftHeight + rightHeight) / 2;
+        
+        // Measure images
+        const mainImg = measurementContainer.find('.main-image')[0];
+        const secondaryImg = measurementContainer.find('.secondary-image')[0];
+        
+        let mainImageAspect = 1;
+        let secondaryImageAspect = 1;
+        
+        if (mainImg && mainImg.naturalWidth && mainImg.naturalHeight) {
+            mainImageAspect = mainImg.naturalWidth / mainImg.naturalHeight;
+        }
+        if (secondaryImg && secondaryImg.naturalWidth && secondaryImg.naturalHeight) {
+            secondaryImageAspect = secondaryImg.naturalWidth / secondaryImg.naturalHeight;
+        }
+        
+        console.log('Measurements:', { leftHeight, rightHeight, avgSidebarHeight, mainImageAspect });
+        
+        // Calculate optimal layout
+        let layoutClasses = [];
+        
+        if (avgSidebarHeight > 300) {
+            layoutClasses.push('layout-tall-articles');
+        } else if (avgSidebarHeight < 150) {
+            layoutClasses.push('layout-short-articles');
+        }
+        
+        if (mainImageAspect > 1.5 || avgSidebarHeight > 400) {
+            layoutClasses.push('layout-large-image');
+        } else if (mainImageAspect < 0.8 || avgSidebarHeight < 120) {
+            layoutClasses.push('layout-small-image');
+        }
+        
+        const totalContentHeight = leftHeight + rightHeight + bottomHeight;
+        if (totalContentHeight < 500) {
+            layoutClasses.push('layout-compact');
+        } else if (totalContentHeight > 800) {
+            layoutClasses.push('layout-expanded');
+        }
+        
+        // Apply optimal layout to real container BEFORE showing content
+        const realContainer = $('.journal-container');
+        realContainer.addClass(layoutClasses.join(' '));
+        
+        // Apply column formatting to bottom article if needed
+        if (bottomHeight > 200) {
+            realContainer.find('.bottom-article .article-content').css({
+                'column-count': 'auto',
+                'column-width': '300px',
+                'column-gap': '25px',
+                'column-rule': '1px solid #ddd'
+            });
+        }
+        
+        console.log('Applied layout classes:', layoutClasses);
+        
+        // Clean up measurement container
+        measurementContainer.remove();
+        
+        // Now reveal the content with optimal layout already applied
+        setTimeout(() => {
+            realContainer.addClass('content-ready');
+            console.log('Content revealed with optimal layout');
+        }, 50);
+    }
     
+    // Caption loading function
+    function loadCaptions() {
+        let captionsLoaded = 0;
+        const totalCaptions = $('[id$="-caption"]').length;
+        
+        function onCaptionLoaded() {
+            captionsLoaded++;
+            if (captionsLoaded >= totalCaptions) {
+                precomputeOptimalLayout();
+            }
+        }
+        
+        {% if infra_txt %}
+        fetch('{{ infra_txt }}')
+            .then(response => response.ok ? response.text() : Promise.reject())
+            .then(text => {
+                document.getElementById('main-caption').textContent = text.trim();
+                onCaptionLoaded();
+            })
+            .catch(() => {
+                document.getElementById('main-caption').textContent = 'Légende non disponible';
+                onCaptionLoaded();
+            });
+        {% endif %}
+        
+        {% if greenwashing_txt %}
+        fetch('{{ greenwashing_txt }}')
+            .then(response => response.ok ? response.text() : Promise.reject())
+            .then(text => {
+                document.getElementById('secondary-caption').textContent = text.trim();
+                onCaptionLoaded();
+            })
+            .catch(() => {
+                document.getElementById('secondary-caption').textContent = 'Légende non disponible';
+                onCaptionLoaded();
+            });
+        {% endif %}
+        
+        if (totalCaptions === 0) {
+            precomputeOptimalLayout();
+        }
+    }
+    
+    // Start the process
+    loadCaptions();
+    
+    // Fallback
+    setTimeout(() => {
+        if (!$('.journal-container').hasClass('content-ready')) {
+            console.log('Fallback: showing content');
+            $('.journal-container').addClass('content-ready');
+        }
+    }, 5000);
+
     $('#previousYear').click(() => {
-        // Add your previous year logic here
         console.log('Previous year clicked');
     });
 
     $('#nextYear').click(() => {
-        // Add your next year logic here  
         console.log('Next year clicked');
     });
 });
