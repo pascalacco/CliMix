@@ -354,7 +354,7 @@ def generate_article(character, data, dictionnaire_regions, year):
     else:
         texte = "Rôle non reconnu. Veuillez vérifier le personnage."
 
-    return texte
+    return texte, infrastructure
 
 def make_text(data,nom,pronom,role):
     if role == "agriculteur":
@@ -373,8 +373,8 @@ def make_text(data,nom,pronom,role):
         personnage = Personnage(nom,pronom,"première ministre","La République En Marche")
     
     from flaskapp.journal.france import dictionnaire_regions as regions
-    article = generate_article(personnage, data, regions, 2040)
-    return article
+    article, infrastructure = generate_article(personnage, data, regions, 2040)
+    return article, infrastructure
 
     
 
