@@ -414,8 +414,15 @@ personnage_par_defaut={"activiste": "José Bové",
     "greenpeace" : "Greta Thunberg",
     "prem. ministre": "Maria Carey"}
 
-def creer_journal_params(dm, annee):
-    roles_dict = dm.get_roles()
+def creer_journal_params(dm, annee): 
+    try :
+        roles_dict = dm.get_roles()
+    except :
+        roles_dict={
+            "names":["","","","","",""],
+            "pronouns" : ["","","","","",""],
+            "roles" : [ "agriculteurice","PDG solaire","PDG éolien","activiste","élu(e)","greenpeace"]
+        }
     names = roles_dict["names"]
     pronouns = roles_dict["pronouns"]
     roles = roles_dict["roles"]
