@@ -15,6 +15,7 @@ import flaskapp.journal.journal as jr
 
 import random
 
+import os
 
 def init_couleur_et_noms():
     init_cols = ['demande', 'electrolyse',
@@ -330,6 +331,9 @@ class vJournal2(Visualiseur):
 
         num_written = 0 #on va faire des articles en fonction des rôles des joueurs et des actions du tour
         articles = []
+        names_final = []
+        roles_final = []
+        picked_infra = []
         while num_written < 3:
             player = random.randint(0,len(roles)-1)
             role = roles[player]
@@ -337,39 +341,153 @@ class vJournal2(Visualiseur):
             pronoun = pronouns[player]
             if role == "PDG solaire":
                 if "pv" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    picked_infra.append("pv")
+                    article, _ = jr.make_text(datas,name,pronoun,role)
+                    articles.append(article)
                     num_written += 1
+                    roles_final.append(role)
+                    names_final.append(name)
                     roles.pop(player)
+                    names.pop(player)
+                    pronouns.pop(player)
             elif role == "PDG éolien":
                 if "off" or "on" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    article, infra = jr.make_text(datas,name,pronoun,role)
+                    if infra == "éolien onshore":
+                        picked_infra.append("on")
+                    else:
+                        picked_infra.append("off")
+                    articles.append(article)
                     num_written += 1
+                    roles_final.append(role)
+                    names_final.append(name)
                     roles.pop(player)
+                    names.pop(player)
+                    pronouns.pop(player)
             elif role == "agriculteur":
                 if "pv" or "on" or "meth" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    article, infra = jr.make_text(datas,name,pronoun,role)
+                    if infra == "photovoltaïque":
+                        picked_infra.append("pv")
+                    elif infra == "éolien onshore":
+                        picked_infra.append("on")
+                    else:
+                        picked_infra.append("meth")
+                    articles.append(article)
                     num_written += 1
+                    roles_final.append(role)
+                    names_final.append(name)
                     roles.pop(player)
+                    names.pop(player)
+                    pronouns.pop(player)
             elif role == "activiste":
                 if "pv" or "off" or "on" or "meth" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    article, infra = jr.make_text(datas,name,pronoun,role)
+                    if infra == "photovoltaïque":
+                        picked_infra.append("pv")
+                    elif infra == "éolien onshore":
+                        picked_infra.append("on")
+                    elif infra == "éolien offshore":
+                        picked_infra.append("off")
+                    else:
+                        picked_infra.append("meth")
+                    articles.append(article)
                     num_written += 1
+                    roles_final.append(role)
+                    names_final.append(name)
                     roles.pop(player)
+                    names.pop(player)
+                    pronouns.pop(player)
             elif role == "greenpeace":
                 if "nuc" or "nuc suppr" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    article, infra = jr.make_text(datas,name,pronoun,role)
+                    if infra == "maintenue":
+                        picked_infra.append("nuc")
+                    else:
+                        picked_infra.append("nuc suppr")
+                    articles.append(article)
                     num_written += 1
+                    roles_final.append(role)
+                    names_final.append(name)
                     roles.pop(player)
+                    names.pop(player)
+                    pronouns.pop(player)
             elif role == "élue":
                 if "sous prod" or "nuc suppr" in infras_tour:
-                    articles.append(jr.make_text(datas,name,pronoun,role))
+                    article, infra = jr.make_text(datas,name,pronoun,role)
+                    if infra == "sous-production":
+                        picked_infra.append("sous prod")
+                    else:
+                        picked_infra.append("nuc suppr")
+                    articles.append(article)
                     num_written += 1
+                    roles_final.append(role)
+                    names_final.append(name)
                     roles.pop(player)
+                    names.pop(player)
+                    pronouns.pop(player)
             elif role == "première ministre":
                 articles.append(jr.make_text(datas,name,pronoun,role))
                 num_written += 1
+                roles_final.append(role)
+                names_final.append(name)
                 roles.pop(player)
-        self.jinja_params.update({"articles": articles,"names":names,"roles":roles})
+                names.pop(player)
+                pronouns.pop(player)
+        #get image infra 
+        base_path = "/Users/julesripoll/Developer/CliMix/flaskapp/static/images_une"
+        infra = random.choice(picked_infra)
+        if infra == "pv":
+            list_imgs = [f for f in os.listdir(f"{base_path}/pv") if 'jpg' in f]
+            infra_img = random.choice(list_imgs)
+            infra_txt = infra_img.replace(".jpg",".txt")
+            infra_img = f"/static/images_une/pv/{infra_img}"
+            infra_txt = f"/static/images_une/pv/{infra_txt}"
+        elif infra == "off":
+            list_imgs = [f for f in os.listdir(f"{base_path}/offshore") if 'jpg' in f]
+            infra_img = random.choice(list_imgs)
+            infra_txt = infra_img.replace(".jpg",".txt")
+            infra_img = f"/static/images_une/offshore/{infra_img}"
+            infra_txt = f"/static/images_une/offshore/{infra_txt}"
+        elif infra == "on":
+            list_imgs = [f for f in os.listdir(f"{base_path}/onshore") if 'jpg' in f]
+            infra_img = random.choice(list_imgs)
+            infra_txt = infra_img.replace(".jpg",".txt")
+            infra_img = f"/static/images_une/onshore/{infra_img}"
+            infra_txt = f"/static/images_une/onshore/{infra_txt}"
+        elif infra == "meth":
+            list_imgs = [f for f in os.listdir(f"{base_path}/methaniseur") if 'jpg' in f]
+            infra_img = random.choice(list_imgs)
+            infra_txt = infra_img.replace(".jpg",".txt")
+            infra_img = f"/static/images_une/methaniseur/{infra_img}"
+            infra_txt = f"/static/images_une/methaniseur/{infra_txt}"
+        elif infra == "nuc suppr":
+            list_imgs = [f for f in os.listdir(f"{base_path}/demantelement") if 'jpg' in f]
+            infra_img = random.choice(list_imgs)
+            infra_txt = infra_img.replace(".jpg",".txt")
+            infra_img = f"/static/images_une/demantelement/{infra_img}"
+            infra_txt = f"/static/images_une/demantelement/{infra_txt}"
+        elif infra == "nuc":
+            list_imgs = [f for f in os.listdir(f"{base_path}/nucleaire") if 'jpg' in f]
+            infra_img = random.choice(list_imgs)
+            infra_txt = infra_img.replace(".jpg",".txt")
+            infra_img = f"/static/images_une/nucleaire/{infra_img}"
+            infra_txt = f"/static/images_une/nucleaire/{infra_txt}"
+        elif infra == "sous prod":
+            list_imgs = [f for f in os.listdir(f"{base_path}/sousproduction") if 'jpg' in f]
+            infra_img = random.choice(list_imgs)
+            infra_txt = infra_img.replace(".jpg",".txt")
+            infra_img = f"/static/images_une/sousproduction/{infra_img}"
+            infra_txt = f"/static/images_une/sousproduction/{infra_txt}"
+        
+        #get image greenwashing
+        list_imgs = [f for f in os.listdir(f"{base_path}/greenwashing") if 'jpg' in f]
+        greenwashing_img = random.choice(list_imgs)
+        greenwashing_txt = greenwashing_img.replace(".jpg",".txt")
+        greenwashing_img = f"/static/images_une/greenwashing/{greenwashing_img}"
+        greenwashing_txt = f"/static/images_une/greenwashing/{greenwashing_txt}"
+
+        self.jinja_params.update({"articles": articles,"names":names_final,"roles":roles_final,"infra_img":infra_img,"infra_txt":infra_txt,"greenwashing_img":greenwashing_img,"greenwashing_txt":greenwashing_txt})
 
 class vResults(Visualiseur):
     def genere_jinja_parameters(self):
