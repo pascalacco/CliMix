@@ -368,9 +368,12 @@ class DataManager:
         shutil.make_archive(self.chemin + '../' + fichier, 'zip', self.chemin)
         return fichier + '.zip'
 
+    def get_roles(self):
+        return self.get_fichier(fichier='roles')
+
         ###____________________________________________________________________________________
         ### Pas à jour
-
+    """
     def get_mdp(self):
         ## Aller chercher dans le bon fichier self.chemin/infos.json le mot de passe
         ## et return None si pas de fichier ou autre
@@ -486,7 +489,7 @@ class DataManager:
         with open(self.scores_path, "r") as f:
             scores = json.load(f)
         return scores[role][theme][1]
-
+    """
 
 """
 Code extérieur à l'archiveur
@@ -494,7 +497,7 @@ Code extérieur à l'archiveur
 
 json_opts = {"indent": 4, "sort_keys": True}
 
-
+"""
 def creer_dossier(chemin_dossier):
     if not os.path.exists(chemin_dossier):
         os.makedirs(chemin_dossier)
@@ -504,7 +507,7 @@ def get_rol(equipe, partie):
     data_role = DataManager(equipe=equipe, partie=partie).get_roles()
     return data_role
 
-
+"""
 if __name__ == "__main__":
     partie = Parties()
     # print(partie.get_group_list())

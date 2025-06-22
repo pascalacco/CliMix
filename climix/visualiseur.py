@@ -290,6 +290,7 @@ class vProduction(VisualiseurBokeh):
 
 class vJournal(Visualiseur):
     def genere_jinja_parameters(self):
+        """
         with open(f"{self.dm.chemin}/roles.json","r") as f:
             roles_dict = json.load(f)
         names = roles_dict["names"]
@@ -473,8 +474,10 @@ class vJournal(Visualiseur):
         greenwashing_txt = greenwashing_img.replace(".jpg",".txt")
         greenwashing_img = f"/static/images_une/greenwashing/{greenwashing_img}"
         greenwashing_txt = f"/static/images_une/greenwashing/{greenwashing_txt}"
-
-        self.jinja_params.update({"articles": articles,"names":names_final,"roles":roles_final,"infra_img":infra_img,"infra_txt":infra_txt,"greenwashing_img":greenwashing_img,"greenwashing_txt":greenwashing_txt})
+        """
+        jinja_params= jr.creer_journal_params(self.dm, self.annee)
+        self.jinja_params.update(**jinja_params)
+        #{"articles": articles,"names":names_final,"roles":roles_final,"infra_img":infra_img,"infra_txt":infra_txt,"greenwashing_img":greenwashing_img,"greenwashing_txt":greenwashing_txt})
 
 class vResults(Visualiseur):
     def genere_jinja_parameters(self):

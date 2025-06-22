@@ -76,7 +76,7 @@
         document.getElementById("btn-save").removeAttribute("disabled");
     }
 
-    function saveNames() {
+    async function saveAndContinue() {
         // Collect all the form data
         const formData = {
             equipe: "{{ equipe }}",
@@ -99,20 +99,16 @@
             type: "POST",
             data: JSON.stringify(formData),
             contentType: "application/json; charset=utf-8",
-            dataType: "json"
-        });
-    }
-
-    function saveAndContinue() {
-        saveNames()
-            .then(function (response) {
+            dataType: "json",
+            success: function (response) {
                 console.log("Names saved successfully!");
                 continueToSaisie();
-            })
-            .catch(function (error) {
+            },
+            error: function (error) {
                 console.error("Error saving names:", error);
                 alert("Error saving names. Please try again." + error);
-            });
+            }
+        });
     }
 
     function continueToSaisie() {

@@ -52,6 +52,12 @@ def set_group():
             resp = make_response(jsonify(["log_in_error pour " + equipe + "/" + partie]))
     return resp
 
+
+
+@app.route('/enregistrer_noms/<equipe>/<partie>/')
+def enregistrer_noms(equipe, partie):
+    return make_response(render_template("enregistrer_noms.html", equipe=equipe, partie=partie, annee="2030"))
+
 @app.route('/save_names', methods=["POST"])
 @cross_origin(support_credentials=True)
 def save_names():
@@ -66,7 +72,8 @@ def save_names():
         "pronouns":pronouns,
         "roles":roles
     }
-    dm = DataManager(equipe=equipe, partie=partie)
+    dm, msg = parties.get_data_manager(equipe=equipe, partie=partie)
+
     with open(f"{dm.chemin}/roles.json","w") as f:
         json.dump(roles_dict,f,ensure_ascii=False,**DataManager.json_opts)
     return jsonify({"status": "success"})
@@ -78,10 +85,6 @@ def saisie(equipe, partie):
     mix, annee_active = maitre_de_jeu.recup_mix(dm, "2030")
     resp = saisie_html(equipe=equipe, partie=partie, annee=annee_active)
     return resp
-
-@app.route('/enregistrer_noms/<equipe>/<partie>/')
-def enregistrer_noms(equipe, partie):
-    return render_template("enregistrer_noms.html", equipe=equipe, partie=partie)
 
 
 @app.route('/saisie/<equipe>/<partie>/<annee>')
