@@ -12,7 +12,6 @@ from bokeh.resources import INLINE
 from flask import json
 
 import flaskapp.journal.journal as jr
-
 import random
 
 import os
@@ -288,22 +287,8 @@ class vProduction(VisualiseurBokeh):
         self.set_fig(self.fig_prod(), "Pilotage de la production")
 
 
+
 class vJournal(Visualiseur):
-    def genere_jinja_parameters(self):
-
-        datas = jr.calculer_data(self.dm, self.annee)
-
-        #self.jinja_params.update({"article": jr.exemple(datas) })
-        with open(f"{self.dm.chemin}/roles.json","r") as f:
-            roles_dict = json.load(f)
-        names = roles_dict["names"]
-        pronouns = roles_dict["pronouns"]
-        roles = roles_dict["roles"]
-        articles = [jr.make_text(datas,name,pronoun,role) for (name,pronoun,role) in zip(names,pronouns,roles)]
-        #articles = [jr.exemple(datas) for _ in range(6)]
-        self.jinja_params.update({"articles": articles})
-
-class vJournal2(Visualiseur):
     def genere_jinja_parameters(self):
         with open(f"{self.dm.chemin}/roles.json","r") as f:
             roles_dict = json.load(f)
@@ -435,7 +420,9 @@ class vJournal2(Visualiseur):
                 names.pop(player)
                 pronouns.pop(player)
         #get image infra 
-        base_path = "/Users/julesripoll/Developer/CliMix/flaskapp/static/images_une"
+        import os
+
+        base_path = os.path.dirname(os.path.realpath(__file__)) + "/../flaskapp/static/images_une"
         infra = random.choice(picked_infra)
         if infra == "pv":
             list_imgs = [f for f in os.listdir(f"{base_path}/pv") if 'jpg' in f]
@@ -500,7 +487,6 @@ class vResults(Visualiseur):
 
 vuesClasses = {"resultats": vResults,
                "journal": vJournal,
-               "journal_2": vJournal2,
                "scenario": vScenario,
                "production": vProduction
                }
