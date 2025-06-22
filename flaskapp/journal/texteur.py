@@ -1,7 +1,7 @@
 import random
 
 
-def arguments_agriculteur(personnage, infrastructure):
+def arguments_agriculteurice(personnage, infrastructure):
     arguments_eoliennes = [
         "les éoliennes provoquent une perturbation du paysage et altèrent la beauté naturelle des champs",
         "les éoliennes génèrent des nuisances sonores qui affectent la tranquillité des zones rurales",
@@ -35,7 +35,7 @@ def arguments_agriculteur(personnage, infrastructure):
         "l'installation d'un méthaniseur représente une menace pour la santé du bétail en cas de mauvaise gestion des déchets"
     ]
 
-    if personnage.role == "agriculteur":
+    if personnage.role == "agriculteurice":
         if infrastructure == "éolien onshore":
             return random.sample(arguments_eoliennes, 2)
         elif infrastructure == "photovoltaïque":
@@ -44,12 +44,12 @@ def arguments_agriculteur(personnage, infrastructure):
             return random.sample(arguments_methaniseur, 2)
     return []
 
-def texte_agriculteur(personnage, region, infrastructure):
+def texte_agriculteurice(personnage, region, infrastructure):
     # Sélectionner une foire agricole aléatoire dans la région
     foire = random.choice(region.foires_agricoles)
     
     # Générer deux arguments contre l'infrastructure
-    arguments = arguments_agriculteur(personnage, infrastructure)
+    arguments = arguments_agriculteurice(personnage, infrastructure)
     
     # Si la liste d'arguments est vide ou ne contient pas assez d'éléments
     if len(arguments) < 2:

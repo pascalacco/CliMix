@@ -24,13 +24,13 @@ class Personnage:
 
 def generer_listes_personnages(personnages):
     # Dictionnaire pour identifier les personnages selon leur fonction
-    premier_ministre = next(p for p in personnages if p.role == "première ministre")
+    premier_ministre = next(p for p in personnages if p.role == "prem. ministre")
     pdg_photovoltaique = next(p for p in personnages if p.role == "PDG solaire")
     pdg_eolienne = next(p for p in personnages if p.role == "PDG éolien")
     leader_greenpeace = next(p for p in personnages if p.role == "greenpeace")
     syndicaliste_agricole = next(p for p in personnages if p.role == "texte_resultat")
     activiste = next(p for p in personnages if p.role == "activiste")  # Modifié ici
-    elu = next(p for p in personnages if p.role == "élue")
+    elu = next(p for p in personnages if p.role == "élu(e)")
 
     # Choix aléatoire pour la première apparition du PDG de l'entreprise éolienne
     premier_pdg = random.choice([pdg_photovoltaique, pdg_eolienne])
@@ -249,7 +249,7 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
 
         return infrastructure, region
 
-    elif personnage.role == 'agriculteur':
+    elif personnage.role == 'agriculteurice':
         # Choisir une infrastructure parmi celles avec des régions non vides
         infrastructures_non_vides = []
         if data.regions_photovoltaiques:
@@ -315,7 +315,7 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
 
         return infrastructure, region
 
-    elif personnage.role == 'élue':
+    elif personnage.role == 'élu(e)':
         # Logique pour le rôle Élu
         if data.regions_suppression_nucleaire:  # Vérifie si des centrales ont été supprimées
             region = random.choice(data.regions_suppression_nucleaire)
@@ -325,7 +325,7 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
                 region = random.choice(data.regions_sous_production)
                 infrastructure = 'sous-production'
             else:
-                return "Aucune région disponible pour l'Élue."
+                return "Aucune région disponible pour l'élu(e)."
 
         return infrastructure, region
 
@@ -334,31 +334,32 @@ def choisir_infrastructure_et_region(personnage, data, seuil_puissance=1000):
 
 def generate_article(character, data, dictionnaire_regions, year):
 
-    if character.role != 'première ministre':
+    if character.role != 'prem. ministre':
         infrastructure, region_choisie = choisir_infrastructure_et_region(character, data)
 
     if character.role == 'greenpeace':
         texte = texte_greenpeace(character, dictionnaire_regions.get(region_choisie), infrastructure)
-    elif character.role == 'agriculteur':
-        texte = texte_agriculteur(character, dictionnaire_regions.get(region_choisie), infrastructure)
+    elif character.role == 'agriculteurice':
+        texte = texte_agriculteurice(character, dictionnaire_regions.get(region_choisie), infrastructure)
     elif character.role == 'PDG solaire':
         texte = texte_pdg_solaire(character, dictionnaire_regions.get(region_choisie))
     elif character.role == 'PDG éolien':
         texte = texte_pdg_eolien(character, dictionnaire_regions.get(region_choisie))
     elif character.role == 'activiste':
         texte = texte_activiste(character, dictionnaire_regions.get(region_choisie), infrastructure)
-    elif character.role == 'élue':
+    elif character.role == 'élu(e)':
         texte = texte_elue(character, dictionnaire_regions.get(region_choisie), infrastructure)
-    elif character.role == 'première ministre':
+    elif character.role == 'prem. ministre':
         texte = texte_premiere_ministre(character, data, year)
+        infrastructure=None
     else:
         texte = "Rôle non reconnu. Veuillez vérifier le personnage."
 
     return texte, infrastructure
 
 def make_text(data,nom,pronom,role):
-    if role == "agriculteur":
-        personnage = Personnage(nom,pronom,"agriculteur","Paysans en colère")
+    if role == "agriculteurice":
+        personnage = Personnage(nom,pronom,"agriculteurice","Paysans en colère")
     elif role == "activiste":
         personnage = Personnage(nom,pronom,"activiste","La nature avant les profits")
     elif role == "PDG solaire":
@@ -366,11 +367,11 @@ def make_text(data,nom,pronom,role):
     elif role == "PDG éolien":
         personnage = Personnage(nom,pronom,"PDG éolien","Wind Power")
     elif role == "élu(e)":
-        personnage = Personnage(nom,pronom,"élue","Parti Socialiste")
+        personnage = Personnage(nom,pronom,"élu(e)","Parti Socialiste")
     elif role == "greenpeace":
         personnage = Personnage(nom,pronom,"greenpeace","greenpeace")
-    elif role == "prem ministre":
-        personnage = Personnage(nom,pronom,"première ministre","La République En Marche")
+    elif role == "prem. ministre":
+        personnage = Personnage(nom,pronom,"prem. ministre","La République En Marche")
     
     from flaskapp.journal.france import dictionnaire_regions as regions
     article, infrastructure = generate_article(personnage, data, regions, 2040)
@@ -388,12 +389,12 @@ def exemple(datas):
 
     personnages.append(Personnage("Lachaize", "Sébastien", "PDG éolien", "Wind Power"))
 
-    personnages.append(Personnage("Delga", "Carole", "élue", "Parti Socialiste"))
+    personnages.append(Personnage("Delga", "Carole", "élu(e)", "Parti Socialiste"))
 
     personnages.append(Personnage("Acco", "Pascal", "greenpeace", "greenpeace"))
 
     personnages.append(
-        Personnage(nom='Swift', prenom='Taylor', role='première ministre', affiliation='La République En Marche'))
+        Personnage(nom='Swift', prenom='Taylor', role='prem. ministre', affiliation='La République En Marche'))
 
     listes_personnages = generer_listes_personnages(personnages)
 
@@ -404,6 +405,14 @@ def exemple(datas):
     article = generate_article(character[0], datas, regions, 2040)
     return article
 """
+personnage_par_defaut={"activiste": "José Bové",
+    "agriculteurice": "Léonce Rudelle",
+    "PDG solaire": "Sébastien Lachaize",
+    "PDG éolien": "Louis Armstrong",
+    "activiste": "Big Flot",
+    "élu(e)": "Taylor swift",
+    "greenpeace" : "Greta Thunberg",
+    "prem. ministre": "Maria Carey"}
 
 def creer_journal_params(dm, annee):
     roles_dict = dm.get_roles()
@@ -411,8 +420,12 @@ def creer_journal_params(dm, annee):
     pronouns = roles_dict["pronouns"]
     roles = roles_dict["roles"]
 
+    for num in range(len(roles)):
+        if names[num]=="":
+            names[num]=personnage_par_defaut[roles[num]]
+        if pronouns[num]=="":
+            pronouns[num]="iel"
 
-    
     datas = calculer_data(dm, annee)
 
     infras_tour = [] #recup les infras sur lesquelles on a agi ce tour ci
@@ -432,10 +445,10 @@ def creer_journal_params(dm, annee):
         infras_tour.append("sous prod")
 
     sont_concernes_par = {
-        "pv" : ["activiste", "agriculteur", "PDG solaire"],
+        "pv" : ["activiste", "agriculteurice", "PDG solaire"],
         "off" : ["PDG éolien",  "activiste"],
-        "on" : ["PDG éolien", "activiste", "agriculteur"],
-        "meth" : [ "activiste", "agriculteur"],
+        "on" : ["PDG éolien", "activiste", "agriculteurice"],
+        "meth" : [ "activiste", "agriculteurice"],
         "nuc suppr" : [ "élu(e)", "greenpeace"],
         "nuc" : ["greenpeace", ],
         "sous prod" : ["élu(e)"],
@@ -484,7 +497,7 @@ def creer_journal_params(dm, annee):
                 roles.pop(player)
                 names.pop(player)
                 pronouns.pop(player)
-        elif role == "agriculteur":
+        elif role == "agriculteurice":
             if "pv" in infras_tour or "on" in infras_tour or "meth" in infras_tour:
                 article, infra = make_text(datas,name,pronoun,role)
                 if infra == "photovoltaïque":
@@ -546,8 +559,9 @@ def creer_journal_params(dm, annee):
                 roles.pop(player)
                 names.pop(player)
                 pronouns.pop(player)
-        elif role == "première ministre":
-            articles.append(make_text(datas,name,pronoun,role))
+        elif role == "prem. ministre":
+            article,_ = make_text(datas,name,pronoun,role)
+            articles.append(article)
             num_written += 1
             roles_final.append(role)
             names_final.append(name)
@@ -661,11 +675,11 @@ if __name__ == "__main__":
     data.afficher_infos()
     # Génération du texte
     perso1 = personnages[0]
-    print(texte_agriculteur(perso1, dictionnaire_regions.get("Normandie"), "photovoltaïque"))
+    print(texte_agriculteurice(perso1, dictionnaire_regions.get("Normandie"), "photovoltaïque"))
     print()
-    print(texte_agriculteur(perso1, dictionnaire_regions["Bretagne"], "méthaniseur"))
+    print(texte_agriculteurice(perso1, dictionnaire_regions["Bretagne"], "méthaniseur"))
     print()
-    print(texte_agriculteur(perso1, dictionnaire_regions["Bretagne"], "éolien onshore"))
+    print(texte_agriculteurice(perso1, dictionnaire_regions["Bretagne"], "éolien onshore"))
 
     # %% [markdown]
     # # Génération texte activiste.
