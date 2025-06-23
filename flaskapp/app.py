@@ -74,8 +74,10 @@ def save_names():
     }
     dm, msg = parties.get_data_manager(equipe=equipe, partie=partie)
 
-    with open(f"{dm.chemin}/roles.json","w") as f:
-        json.dump(roles_dict,f,ensure_ascii=False,**DataManager.json_opts)
+    with open(f"{dm.chemin}/roles.json", "w", encoding="utf-8") as f:
+
+        json.dump(roles_dict, f, ensure_ascii=False, **DataManager.json_opts)
+    
     return jsonify({"status": "success"})
 
 @app.route('/saisie/<equipe>/<partie>/')
