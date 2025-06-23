@@ -27,15 +27,17 @@
             <a class="nav-link {% if vue == 'scenario' %} active {% endif %}" aria-current="page"
                 onclick="spin('scenario')" id="scenario">Scenario</a>
         </li>
-        <li class="nav-item">
+        <!--li class="nav-item"
             <a class="nav-link {% if vue == 'journal' %} active {% endif %}" aria-current="page"
                 onclick="spin('journal')" id="journal">Journal</a>
-        </li>
+        </li-->
 
         <div class="text-center mt-3 mb-5">
+            {% if vue != 'journal' %}
             <button class="btn btn-success" onclick="window.location.href = '/saisie/{{equipe}}/{{partie}}/{{annee}}';"
                 type="button">
                 < Retourner au mix pour le modifier</button>
+            {% endif %}
                     {% set annee_int = annee | int%}
                     {% set next_annee = (annee_int +5) | safe%}
 
@@ -45,10 +47,16 @@
                         Terminer le jeu >
                     </button>
                     {% else %}
-                    <button class="btn btn-success"
+                    {% if vue == 'journal' %}
+                    <button class="btn btn-success" id="btn-valider"
                         onclick="window.location.href = '/commit/{{equipe}}/{{partie}}/{{annee}}';"
-                        type="button">Valider ce mix et passer au tour suivant >
+                        type="button">Passer au tour suivant >
+                    {% else %}
+                    <button class="btn btn-success" id="btn-valider"
+                        onclick="window.location.href = '/vues/'+equipe+'/'+partie+'/'+annee+'/journal';"
+                        type="button">Lire le journal et passer au tour suivant >
                     </button>
+                    {% endif %}
                     {% endif %}
 
         </div>
