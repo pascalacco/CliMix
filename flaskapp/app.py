@@ -74,9 +74,7 @@ def save_names():
     }
     dm, msg = parties.get_data_manager(equipe=equipe, partie=partie)
 
-    with open(f"{dm.chemin}/roles.json", "w", encoding="utf-8") as f:
-
-        json.dump(roles_dict, f, ensure_ascii=False, **DataManager.json_opts)
+    dm.set_roles(roles_dict)
     
     return jsonify({"status": "success"})
 

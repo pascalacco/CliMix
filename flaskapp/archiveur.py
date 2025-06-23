@@ -178,7 +178,7 @@ class Parties:
         return compilation, annees
 
     def log(self, trace):
-        with open(self.chemin_game_data + 'logs.txt', 'a') as logs:
+        with open(self.chemin_game_data + 'logs.txt', 'a', encoding="utf-8") as logs:
             logs.write("[{}] {} \n".format(datetime.datetime.now(), trace))
 
 
@@ -232,7 +232,7 @@ class DataManager:
     def init_fichier(self, fich, format=".json"):
         dico = self.pays.get_init_fichier(fich)
 
-        with open(self.chemin + fich + format, "w") as dst:
+        with open(self.chemin + fich + format, "w", encoding="utf-8") as dst:
             json.dump(dico, dst, **DataManager.json_opts)
 
     def init_partie(self):
@@ -256,7 +256,7 @@ class DataManager:
     def verif_fichier(self, fich, format=".json"):
         ok = True
         try:
-            src = open(self.chemin + fich + format, "r")
+            src = open(self.chemin + fich + format, "r", encoding="utf-8")
             dic = json.load(src)
         except:
             ok = False
@@ -276,18 +276,18 @@ class DataManager:
         return annee
 
     def get_fichier(self, fichier, ext=".json"):
-        with open(self.chemin + fichier + ext, "r") as f:
+        with open(self.chemin + fichier + ext, "r", encoding="utf-8") as f:
             obj = json.load(f)
             return obj
 
     def set_fichier(self, fichier, dico, ext=".json"):
-        with open(self.chemin + fichier + ext, "w") as f:
+        with open(self.chemin + fichier + ext, "w", encoding="utf-8") as f:
             json.dump(dico, f, **DataManager.json_opts)
 
     def cp_fichier(self, src, dst, ext=".json"):
-        with open(self.chemin + src + ext, "r") as src:
+        with open(self.chemin + src + ext, "r", encoding="utf-8") as src:
             dico = json.load(src)
-            with open(self.chemin + dst + ext, "w") as dst:
+            with open(self.chemin + dst + ext, "w", encoding="utf-8") as dst:
                 json.dump(dico, dst, **DataManager.json_opts)
         return dico
 
@@ -371,125 +371,11 @@ class DataManager:
     def get_roles(self):
         return self.get_fichier(fichier='roles')
 
-        ###____________________________________________________________________________________
-        ### Pas à jour
-    """
-    def get_mdp(self):
-        ## Aller chercher dans le bon fichier self.chemin/infos.json le mot de passe
-        ## et return None si pas de fichier ou autre
-        return None
+    def set_roles(self, dict_roles) :
+        self.set_fichier(fichier='roles', dico=dict_roles)
 
-    def get_info(self):
-        with open(self.infos_path, 'r') as json_file:
-            infos = json.load(json_file)
-        return infos
+    
 
-    def set_round(self):
-        current_round = -1
-        with open(self.round_path, 'wb') as file:
-            pickle.dump(current_round, file)
-
-    def get_round(self):
-        with open(self.round_path, 'rb') as file:
-            current_round = pickle.load(file)
-        return current_round
-
-    def update_round(self):
-        with open(self.round_path, 'rb') as file:
-            current_round = pickle.load(file)
-        current_round += 1
-        with open(self.round_path, 'wb') as file:
-            pickle.dump(current_round, file)
-
-    def get_year(self):
-        with open(self.results_path, 'r') as json_file:
-            results = json.load(json_file)
-        years = list(results.keys())
-        round = self.get_round()
-        return years[round]
-
-    def set_roles(self, names):
-        create_roles(names=names, path=self.roles_path)
-
-    def get_roles(self):
-        with open(self.roles_path, 'r') as json_file:
-            roles = json.load(json_file)
-        round = self.get_round()
-        roles = {key: values[round] for key, values in roles.items()}
-        return roles
-
-    def set_mix_aggregated(self):
-        with open(self.initial_mix_path, 'r') as json_file:
-            mix = json.load(json_file)
-        mix["annee"] = 2025
-        mix = {"2025": mix}
-        with open(self.aggregated_mix_path, 'w') as file:
-            json.dump(mix, file)
-
-    def set_scores(self):
-        set_scores_dict(self.scores_path)
-
-    def update_scores(self):
-        current_round = self.get_round()
-        update_scores_fn(self.scores_path, self.results_path, self.aggregated_mix_path, current_round)
-
-    def set_occasions(self):
-        set_occasions_dict(self.occasions_path)
-
-    def update_title(self):
-        years = ["2030", "2035", "2040", "2045", "2050"]
-        current_round = self.get_round()
-        output = "Année " + years[current_round]
-        with open(self.title_path, 'w') as file:
-            file.write(output)
-
-    def set_title(self):
-        output = "Année 2030"
-        with open(self.title_path, 'w') as file:
-            file.write(output)
-
-    def get_title(self):
-        with open(self.title_path, 'r') as file:
-            title = file.read()
-        return title
-
-    def get_mix_aggregated(self):
-        with open(self.aggregated_mix_path, 'rb') as file:
-            mix_dict = json.load(file)
-        return mix_dict
-
-    def update_mix(self, data):
-        with open(self.mix_path, "w") as dst:  #
-            json.dump(data, dst)
-
-    def update_mix_aggregated(self, data):
-        year = self.get_year()
-        mix_dict = self.get_mix_aggregated()
-        mix_dict[year] = data
-        with open(self.aggregated_mix_path, "w") as dst:
-            json.dump(mix_dict, dst)
-
-    def get_occasions(self):
-        with open(self.occasions_path, "r") as f:
-            occasions = json.load(f)
-        return occasions
-
-    def get_scores(self):
-        with open(self.scores_path, "r") as f:
-            scores = json.load(f)
-        return scores
-
-    def update_gpt_text(self, character_number, text):
-        file_path = self.chemin_game_data + "game_data/{}/{}/perso{}.txt".format(self.equipe, self.partie,
-                                                                                 character_number)
-        with open(file_path, 'w') as file:
-            file.write(text)
-
-    def get_data_for_themes(self, role, theme):
-        with open(self.scores_path, "r") as f:
-            scores = json.load(f)
-        return scores[role][theme][1]
-    """
 
 """
 Code extérieur à l'archiveur
